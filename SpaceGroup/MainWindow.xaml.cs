@@ -1,4 +1,4 @@
-﻿using SpaceGroupProject;
+﻿using SpaceGroup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +23,6 @@ namespace SpaceGroup
     public partial class MainWindow : Window
     {
         CrystalCell atomCell;
-        private Trackball _trackball;
 
         public MainWindow()
         {
@@ -65,7 +64,7 @@ namespace SpaceGroup
             DefineLights();
 
             // Create the model.
-            DefineModel(MainModel3Dgroup);
+            //DefineModel(MainModel3Dgroup);
 
             // Add the group of models to a ModelVisual3D.
             ModelVisual3D model_visual = new ModelVisual3D();
@@ -160,6 +159,7 @@ namespace SpaceGroup
             Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text);
             atomCell.atomCollection.Add(atom);
             DataGridAtoms.Items.Refresh();
+            visualizeAtom(MainModel3Dgroup, atom);
         }
 
         private void deleteButtonClick(object sender, RoutedEventArgs e)
@@ -167,6 +167,17 @@ namespace SpaceGroup
             atomCell.atomCollection.Remove(DataGridAtoms.SelectedItem as Atom);
             //MessageBox.Show((DataGridAtoms.SelectedItem as Atom).Element);
             DataGridAtoms.Items.Refresh();
+        }
+
+        private void visualizeAtom(Model3DGroup model_group, Atom atom)
+        {
+            MeshGeometry3D mesh1 = new MeshGeometry3D();
+            AddSphere(mesh1, new Point3D(atomCell.YAxisL * atom.X, atomCell.ZAxisL * atom.Z, atomCell.XAxisL * atom.X), 0.25, 20, 30);
+            //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
+            SolidColorBrush brush1 = Brushes.Red;
+            DiffuseMaterial material1 = new DiffuseMaterial(brush1);
+            GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
+            model_group.Children.Add(model1);
         }
 
         private void AddSphere(MeshGeometry3D mesh, Point3D center,
@@ -291,15 +302,55 @@ namespace SpaceGroup
 
                 CameraTheta += mouseDeltaX * 0.01;
 
-                PositionCamera();
+                TheCamera.LookDirection = new Vector3D(TheCamera.LookDirection.X + mouseDeltaX * 0.01, TheCamera.LookDirection.Y + mouseDeltaY * 0.01, 0);
+
+                //PositionCamera();
             }
             else
             {
                 mouseDragged = false;
             }
+
+            if(e.MiddleButton == MouseButtonState.Pressed)
+            {
+                MouseOldX = mouseX;
+                MouseOldY = mouseY;
+                Point position = e.GetPosition(this);
+                mouseX = position.X;
+                mouseY = position.Y;
+                mouseDeltaX = (mouseX - MouseOldX);
+                mouseDeltaY = (mouseY - MouseOldY);
+
+                MoveRight(mouseDeltaX);
+                MoveForward(mouseDeltaY);
+
+            }
         }
 
+        public void MoveRight(double d)
+        {
+            double u = 0.05;
+            PerspectiveCamera camera = (PerspectiveCamera)MainViewport.Camera;
+            Vector3D lookDirection = camera.LookDirection;
+            Point3D position = camera.Position;
+            lookDirection.Normalize();
+            position = position + u * lookDirection * d;
 
+            camera.Position = position;
+        }
+
+        public void MoveForward(double d)
+        {
+            double u = 0.05;
+            PerspectiveCamera camera = (PerspectiveCamera)MainViewport.Camera;
+            Vector3D lookDirection = camera.LookDirection;
+            Point3D position = camera.Position;
+
+            lookDirection.Normalize();
+            position = position + u * lookDirection * d;
+
+            camera.Position = position;
+        }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -332,6 +383,12 @@ namespace SpaceGroup
 
             // Update the camera's position.
             PositionCamera();
+        }
+
+        private void newGroup_Click(object sender, RoutedEventArgs e)
+        {
+            SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings();
+            spaceGroupSettings.Show();
         }
     }
 }
