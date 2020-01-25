@@ -297,12 +297,23 @@ namespace SpaceGroup
                 mouseDeltaX = (mouseX - MouseOldX);
                 mouseDeltaY = (mouseY - MouseOldY);
 
-                CameraPhi += mouseDeltaY * 0.01;
-                if (CameraPhi > Math.PI / 2.0) CameraPhi = Math.PI / 2.0;
+                double angleX = mouseDeltaX * 0.2;
+                double angleY = mouseDeltaY * 0.2;
 
-                CameraTheta += mouseDeltaX * 0.01;
+                Rotate(Math3D.UnitY, 2 * angleX);
+                Rotate(RightDirection, 2 * angleY);
 
-                TheCamera.LookDirection = new Vector3D(TheCamera.LookDirection.X + mouseDeltaX * 0.01, TheCamera.LookDirection.Y + mouseDeltaY * 0.01, 0);
+
+                //changeHeading(angleX);
+                //ChangePitch(angleY);
+
+                //CameraPhi += mouseDeltaY * 0.01;
+                //if (CameraPhi > Math.PI / 2.0) CameraPhi = Math.PI / 2.0;
+
+                //CameraTheta += mouseDeltaX * 0.01;
+
+                //TheCamera.LookDirection = new Vector3D(TheCamera.LookDirection.X + mouseDeltaX * 0.01, TheCamera.LookDirection.Y + mouseDeltaY * 0.01, 0);
+
 
                 //PositionCamera();
             }
@@ -337,6 +348,14 @@ namespace SpaceGroup
             position = position + u * lookDirection * d;
 
             camera.Position = position;
+        }
+
+        public void Rotate(Vector3D axis, double angle)
+        {
+            Quaternion q = Math3D.Rotation(axis, angle);
+            TheCamera.Position = q.Transform(TheCamera.Position);
+            TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
+            TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
         }
 
         public void MoveForward(double d)
@@ -389,6 +408,37 @@ namespace SpaceGroup
         {
             SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings();
             spaceGroupSettings.Show();
+        }
+
+
+        //CAMERA STUFF
+        public Vector3D LeftDirection
+        {
+            get { return TheCamera.UpDirection.Cross(TheCamera.LookDirection); }
+        }
+
+        public Vector3D RightDirection
+        {
+            get { return TheCamera.LookDirection.Cross(TheCamera.UpDirection); }
+        }
+
+        public void ChangeRoll(double angle)
+        {
+            TheCamera.UpDirection = TheCamera.UpDirection.Rotate(TheCamera.LookDirection, angle);
+        }
+
+        public void ChangePitch(double angle)
+        {
+            Quaternion q = Math3D.Rotation(LeftDirection, angle);
+            TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
+            TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
+        }
+
+        public void changeHeading(double angle)
+        {
+            Quaternion q = Math3D.RotationZ(angle);
+            TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
+            TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
         }
     }
 }
