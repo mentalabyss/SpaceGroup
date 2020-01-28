@@ -138,14 +138,14 @@ namespace SpaceGroup
         private void PositionCamera()
         {
             // Calculate the camera's position in Cartesian coordinates.
-            double y = CameraR * Math.Sin(CameraPhi);
-            double hyp = CameraR * Math.Cos(CameraPhi);
-            double x = hyp * Math.Cos(CameraTheta);
-            double z = hyp * Math.Sin(CameraTheta);
-            TheCamera.Position = new Point3D(x, y, z);
+            //double y = CameraR * Math.Sin(CameraPhi);
+            //double hyp = CameraR * Math.Cos(CameraPhi);
+            //double x = hyp * Math.Cos(CameraTheta);
+            //double z = hyp * Math.Sin(CameraTheta);
+            TheCamera.Position = new Point3D(0, 0, -10);
 
             // Look toward the origin.
-            TheCamera.LookDirection = new Vector3D(-x, -y, -z);
+            TheCamera.LookDirection = new Vector3D(0, 0, 1);
 
             // Set the Up direction.
             TheCamera.UpDirection = new Vector3D(0, 1, 0);
@@ -268,13 +268,6 @@ namespace SpaceGroup
             }
         }
 
-
-        public void OnViewportMouseUp(object sender, MouseButtonEventArgs args)
-        {
-
-        }
-
-
         double mouseX;
         double mouseY;
         double MouseOldX;
@@ -297,11 +290,14 @@ namespace SpaceGroup
                 mouseDeltaX = (mouseX - MouseOldX);
                 mouseDeltaY = (mouseY - MouseOldY);
 
-                double angleX = mouseDeltaX * 0.2;
-                double angleY = mouseDeltaY * 0.2;
+                double angleX = mouseDeltaX * 0.1;
+                double angleY = mouseDeltaY * 0.1;
 
-                Rotate(Math3D.UnitY, 2 * angleX);
-                Rotate(RightDirection, 2 * angleY);
+                changeHeading(angleX);
+                ChangePitch(-angleY);
+
+                //Rotate(Math3D.UnitY, 2 * angleX);
+                //Rotate(RightDirection, 2 * angleY);
 
 
                 //changeHeading(angleX);
@@ -332,9 +328,21 @@ namespace SpaceGroup
                 mouseDeltaX = (mouseX - MouseOldX);
                 mouseDeltaY = (mouseY - MouseOldY);
 
-                MoveRight(mouseDeltaX);
-                MoveForward(mouseDeltaY);
+                MoveRight(- mouseDeltaX * 0.5);
+                MoveUp(mouseDeltaY * 0.5);
+            }
 
+            if(e.RightButton == MouseButtonState.Pressed)
+            {
+                MouseOldX = mouseX;
+                MouseOldY = mouseY;
+                Point position = e.GetPosition(this);
+                mouseX = position.X;
+                mouseY = position.Y;
+                mouseDeltaX = (mouseX - MouseOldX);
+                mouseDeltaY = (mouseY - MouseOldY);
+
+                MoveForward(mouseDeltaY * 0.5);
             }
         }
 
@@ -345,7 +353,7 @@ namespace SpaceGroup
             Vector3D lookDirection = camera.LookDirection;
             Point3D position = camera.Position;
             lookDirection.Normalize();
-            position = position + u * lookDirection * d;
+            position = position + u * RightDirection * d;
 
             camera.Position = position;
         }
@@ -367,6 +375,19 @@ namespace SpaceGroup
 
             lookDirection.Normalize();
             position = position + u * lookDirection * d;
+
+            camera.Position = position;
+        }
+
+        public void MoveUp(double d)
+        {
+            double u = 0.05;
+            PerspectiveCamera camera = (PerspectiveCamera)MainViewport.Camera;
+            Vector3D upDirection = camera.UpDirection;
+            Point3D position = camera.Position;
+
+            upDirection.Normalize();
+            position = position + u * upDirection * d;
 
             camera.Position = position;
         }
@@ -436,7 +457,7 @@ namespace SpaceGroup
 
         public void changeHeading(double angle)
         {
-            Quaternion q = Math3D.RotationZ(angle);
+            Quaternion q = Math3D.RotationY(angle);
             TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
             TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
         }
