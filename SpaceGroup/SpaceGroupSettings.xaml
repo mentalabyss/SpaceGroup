@@ -15,8 +15,8 @@
 		</Grid.RowDefinitions>
 
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto"/>
-			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
 
 		<Label Grid.Row="0" Content="Название" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,10"/>
@@ -32,8 +32,9 @@
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 			</DataGrid.Columns>
-			
+
 		</DataGrid>
 		<Button Content="Добавить группу" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Margin="10,10,10,10" Click="addGroupButtonClicked"/>
+		<ComboBox Name="combobox" HorizontalAlignment="Left" Margin="198,15,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
 	</Grid>
 </Window>
