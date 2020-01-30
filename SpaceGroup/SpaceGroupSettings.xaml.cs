@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,19 @@ namespace SpaceGroup
     {
         public int a;
 
-        public List<SpaceGroupCl> spaceGroupGroup;
+        private List<SpaceGroupCl> spaceGroupGroup;
+        public List<SpaceGroupCl> SpaceGroupGroup
+        {
+            get
+            {
+                return spaceGroupGroup;
+            }
+
+            set
+            {
+                spaceGroupGroup = value;
+            }
+        }
 
         public ObservableCollection<Expr> Expressions
         {
@@ -55,6 +68,7 @@ namespace SpaceGroup
             }
 
             combobox.ItemsSource = spaceGroupGroup;
+            spaceGroupGroup.RemoveAll(item => item.dummy);
             spaceGroupGroup.Add(new SpaceGroupCl { Name = "Добавить группу...", dummy = true });
         }
 
@@ -81,6 +95,9 @@ namespace SpaceGroup
 
             spaceGroupGroup.Add(spaceGroupCl);
             SerializeSpaceGroupList();
+            readdDummy();
+            combobox.ItemsSource = null;
+            combobox.ItemsSource = spaceGroupGroup;
         }
 
         private void SerializeSpaceGroupList()
@@ -103,19 +120,33 @@ namespace SpaceGroup
         {
             var comboBox = (ComboBox)sender;
             var selectedItem = comboBox.SelectedItem as SpaceGroupCl;
+
             if (selectedItem != null && selectedItem.dummy)
             {
                 //Creating the new item
-
+                addButton.Content = "Добавить новую группу";
                 //Adding to the datasource
 
                 //Removing and adding the dummy item from the collection, thus it is always the last on the 'list'
                 spaceGroupGroup.Remove(selectedItem);
                 spaceGroupGroup.Add(selectedItem);
-
+                comboBox.ItemsSource = spaceGroupGroup;
                 //Select the new item
-                
             }
+            else
+            {
+                addButton.Content = "Применить";
+                sgName.Text = combobox.SelectedItem.ToString();
+                //expressionsGrid.ItemsSource = (SpaceGroupCl)combobox.SelectedItem
+                readdDummy();
+            }
+        }
+
+        private void readdDummy()
+        {
+            spaceGroupGroup.RemoveAll(item => item.dummy);
+            //spaceGroupGroup.Add()
+            spaceGroupGroup.Add(new SpaceGroupCl { Name = "Добавить новую группу...", dummy = true });
         }
     }
 }
