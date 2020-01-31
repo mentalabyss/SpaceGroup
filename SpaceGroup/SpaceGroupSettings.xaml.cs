@@ -72,11 +72,6 @@ namespace SpaceGroup
             spaceGroupGroup.Add(new SpaceGroupCl { Name = "Добавить группу...", dummy = true });
         }
 
-        public class Expr
-        {
-            public string Text { get; set; }
-        }
-
         private void deleteButtonClick(object sender, RoutedEventArgs e)
         {
             var expr = expressionsGrid.SelectedItem as Expr;
@@ -85,14 +80,8 @@ namespace SpaceGroup
 
         private void addGroupButtonClicked(object sender, RoutedEventArgs e)
         {
-            string[] stringExpressions = new string[Expressions.Count];
-            for(int i = 0; i < Expressions.Count; i++)
-            {
-                stringExpressions[i] = Expressions[i].Text;
-            }
-
-            SpaceGroupCl spaceGroupCl = new SpaceGroupCl(sgName.Text, stringExpressions);
-
+            SpaceGroupCl spaceGroupCl = new SpaceGroupCl(sgName.Text, Expressions);
+            spaceGroupGroup.RemoveAll(x => x.Name == sgName.Text);
             spaceGroupGroup.Add(spaceGroupCl);
             SerializeSpaceGroupList();
             readdDummy();
@@ -123,6 +112,16 @@ namespace SpaceGroup
 
             if (selectedItem != null && selectedItem.dummy)
             {
+                sgName.Text = String.Empty;
+                Console.WriteLine("BEFORE: ", Expressions.Count);
+
+                for (int i = 0; i < Expressions.Count; i++)
+                {
+                    Expressions.Remove(Expressions[i]);
+                }
+
+                Console.WriteLine("AFTER", Expressions.Count);
+                expressionsGrid.ItemsSource = Expressions;
                 //Creating the new item
                 addButton.Content = "Добавить новую группу";
                 //Adding to the datasource
@@ -136,8 +135,26 @@ namespace SpaceGroup
             else
             {
                 addButton.Content = "Применить";
-                sgName.Text = combobox.SelectedItem.ToString();
-                //expressionsGrid.ItemsSource = (SpaceGroupCl)combobox.SelectedItem
+                try
+                {
+                    sgName.Text = combobox.SelectedItem.ToString();
+                    var selectedGroup = (SpaceGroupCl)combobox.SelectedItem;
+                    Expressions = new ObservableCollection<Expr>();
+                    Expressions = selectedGroup.exprs;
+                    expressionsGrid.ItemsSource = null;
+                    expressionsGrid.ItemsSource = Expressions;
+                }
+                catch(NullReferenceException nullref)
+                {
+                    Console.WriteLine(nullref.Message);
+                }
+                
+                //foreach(string s in selectedGroup.Expressions)
+                //{
+                //    Expr expr = new Expr { Text = s };
+                //    Expressions.Add(expr);
+                //}
+                
                 readdDummy();
             }
         }

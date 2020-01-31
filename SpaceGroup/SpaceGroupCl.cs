@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ namespace SpaceGroup
         string[] expressions;
         public bool dummy = false;
 
+        public ObservableCollection<Expr> exprs;
+
         public SpaceGroupCl()
         {
 
@@ -21,16 +24,21 @@ namespace SpaceGroup
         public string Name { get => name; set => name = value; }
         public string[] Expressions { get => expressions; set => expressions = value; }
 
-        public SpaceGroupCl(string name, string[] expressions)
+        public SpaceGroupCl(string name, ObservableCollection<Expr> obsColExpr)
         {
             this.name = name;
-            foreach(string expression in expressions)
+            exprs = obsColExpr;
+            expressions = new string[obsColExpr.Count];
+            for (int i = 0; i < obsColExpr.Count; i++)
+            {
+                expressions[i] = obsColExpr[i].Text;
+            }
+
+            foreach (string expression in expressions)
             {
                 string[] split = expression.Split(',');
                 expressions = new List<string>().Concat(expressions).Concat(split).ToArray();
             }
-
-
         }
 
         public static double Evaluate(string expression, double x, double y, double z)
