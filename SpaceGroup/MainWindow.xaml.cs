@@ -23,7 +23,7 @@ namespace SpaceGroup
     public partial class MainWindow : Window
     {
         CrystalCell atomCell;
-
+        SpaceGroupCl selectedSpaceGroup;
         public MainWindow()
         {
             InitializeComponent();
@@ -48,9 +48,16 @@ namespace SpaceGroup
         // The change in CameraR when you press + or -.
         private const double CameraDR = 0.1;
 
+        public void selectGroup(SpaceGroupCl spaceGroup)
+        {
+            selectedSpaceGroup = spaceGroup;
+            MessageBox.Show(spaceGroup.Expressions[0]);
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             atomCell = new CrystalCell();
+            selectedSpaceGroup = new SpaceGroupCl();
             atomCell.setCellParams(20.06999, 19.92, 13.42, 90, 90, 90); //hard code - заменить
             DataGridAtoms.ItemsSource = atomCell.atomCollection;
 
@@ -171,13 +178,30 @@ namespace SpaceGroup
 
         private void visualizeAtom(Model3DGroup model_group, Atom atom)
         {
-            MeshGeometry3D mesh1 = new MeshGeometry3D();
-            AddSphere(mesh1, new Point3D(atomCell.YAxisL * atom.X, atomCell.ZAxisL * atom.Z, atomCell.XAxisL * atom.X), 0.25, 20, 30);
-            //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-            SolidColorBrush brush1 = Brushes.Red;
-            DiffuseMaterial material1 = new DiffuseMaterial(brush1);
-            GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
-            model_group.Children.Add(model1);
+            for(int i = 0; i < selectedSpaceGroup.Expressions.Length; i++)
+            {
+                MeshGeometry3D mesh1 = new MeshGeometry3D();
+                AddSphere(mesh1, new Point3D
+                    (
+                    atomCell.YAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], 0, atom.Y, 0),
+                    atomCell.ZAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], 0, 0, atom.Z),
+                    atomCell.XAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0)
+                    ),
+                    0.25, 20, 30);
+                //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
+                SolidColorBrush brush1 = Brushes.Red;
+                DiffuseMaterial material1 = new DiffuseMaterial(brush1);
+                GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
+                model_group.Children.Add(model1);
+            }
+            //MeshGeometry3D mesh1 = new MeshGeometry3D();
+            //AddSphere(mesh1, new Point3D(atomCell.YAxisL * atom.X, atomCell.ZAxisL * atom.Z, atomCell.XAxisL * atom.X), 0.25, 20, 30);
+            ////AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
+            //SolidColorBrush brush1 = Brushes.Red;
+            //DiffuseMaterial material1 = new DiffuseMaterial(brush1);
+            //GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
+            //model_group.Children.Add(model1);
+
         }
 
         private void AddSphere(MeshGeometry3D mesh, Point3D center,
@@ -428,6 +452,7 @@ namespace SpaceGroup
         private void newGroup_Click(object sender, RoutedEventArgs e)
         {
             SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings();
+            spaceGroupSettings.Owner = this;
             spaceGroupSettings.Show();
         }
 

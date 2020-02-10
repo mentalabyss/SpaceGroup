@@ -28,15 +28,15 @@ namespace SpaceGroup
         {
             this.name = name;
             exprs = obsColExpr;
-            expressions = new string[obsColExpr.Count];
-            for (int i = 0; i < obsColExpr.Count; i++)
-            {
-                expressions[i] = obsColExpr[i].Text;
-            }
+            expressions = new string[0];
+            //for (int i = 0; i < obsColExpr.Count; i++)
+            //{
+            //    expressions[i] = obsColExpr[i].Text;
+            //}
 
-            foreach (string expression in expressions)
+            foreach (Expr expr in obsColExpr)
             {
-                string[] split = expression.Split(',');
+                string[] split = expr.Text.Split(',');
                 expressions = new List<string>().Concat(expressions).Concat(split).ToArray();
             }
         }

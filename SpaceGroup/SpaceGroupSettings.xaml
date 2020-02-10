@@ -36,5 +36,6 @@
 		</DataGrid>
 		<Button x:Name="addButton" Content="Добавить группу" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Margin="10,10,10,10" Click="addGroupButtonClicked"/>
 		<ComboBox Name="combobox" HorizontalAlignment="Left" Margin="198,15,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
+		<Button x:Name="selectButton" Content="Выбрать группу" HorizontalAlignment="Left" Margin="295,10,0,0" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Click="selectButton_click"/>
 	</Grid>
 </Window>

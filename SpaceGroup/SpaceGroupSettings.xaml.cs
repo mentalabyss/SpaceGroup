@@ -165,5 +165,11 @@ namespace SpaceGroup
             //spaceGroupGroup.Add()
             spaceGroupGroup.Add(new SpaceGroupCl { Name = "Добавить новую группу...", dummy = true });
         }
+
+        private void selectButton_click(object sender, RoutedEventArgs e)
+        {
+            var selectedGroup = (SpaceGroupCl)combobox.SelectedItem;
+            ((MainWindow)this.Owner).selectGroup(selectedGroup);
+        }
     }
 }
