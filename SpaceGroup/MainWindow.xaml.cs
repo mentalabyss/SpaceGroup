@@ -30,7 +30,7 @@ namespace SpaceGroup
         }
         // The main object model group.
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
-
+        private GeometryModel3D AxesModel;
         // The camera.
         private PerspectiveCamera TheCamera;
 
@@ -70,15 +70,88 @@ namespace SpaceGroup
             // Define lights.
             DefineLights();
 
+            buildAxes(out AxesModel);
             // Create the model.
             //DefineModel(MainModel3Dgroup);
 
             // Add the group of models to a ModelVisual3D.
             ModelVisual3D model_visual = new ModelVisual3D();
             model_visual.Content = MainModel3Dgroup;
-
+            MainModel3Dgroup.Children.Add(AxesModel);
             // Display the main visual to the viewport.
             MainViewport.Children.Add(model_visual);
+        }
+
+        private void buildAxes(out GeometryModel3D axes_model)
+        {
+            // Make the axes model.
+            MeshGeometry3D axes_mesh = new MeshGeometry3D();
+            Point3D origin = new Point3D(0, 0, 0);
+            Point3D xmax = new Point3D(0.75, 0, 0);
+            Point3D ymax = new Point3D(0, 0.75, 0);
+            Point3D zmax = new Point3D(0, 0, 0.75);
+            AddSegment(axes_mesh, origin, xmax, new Vector3D(0, 1, 0));
+            AddSegment(axes_mesh, origin, zmax, new Vector3D(0, 1, 0));
+            AddSegment(axes_mesh, origin, ymax, new Vector3D(1, 0, 0));
+
+            SolidColorBrush axes_brush = Brushes.Red;
+            DiffuseMaterial axes_material = new DiffuseMaterial(axes_brush);
+            axes_model = new GeometryModel3D(axes_mesh, axes_material);
+        }
+
+        private void AddSegment(MeshGeometry3D mesh, Point3D point1, Point3D point2, Vector3D up)
+        {
+            const double thickness = 0.01;
+
+            // Get the segment's vector.
+            Vector3D v = point2 - point1;
+
+            // Get the scaled up vector.
+            Vector3D n1 = ScaleVector(up, thickness / 2.0);
+
+            // Get another scaled perpendicular vector.
+            Vector3D n2 = Vector3D.CrossProduct(v, n1);
+            n2 = ScaleVector(n2, thickness / 2.0);
+
+            // Make a skinny box.
+            // p1pm means point1 PLUS n1 MINUS n2.
+            Point3D p1pp = point1 + n1 + n2;
+            Point3D p1mp = point1 - n1 + n2;
+            Point3D p1pm = point1 + n1 - n2;
+            Point3D p1mm = point1 - n1 - n2;
+            Point3D p2pp = point2 + n1 + n2;
+            Point3D p2mp = point2 - n1 + n2;
+            Point3D p2pm = point2 + n1 - n2;
+            Point3D p2mm = point2 - n1 - n2;
+
+            // Sides.
+            AddTriangle(mesh, p1pp, p1mp, p2mp);
+            AddTriangle(mesh, p1pp, p2mp, p2pp);
+
+            AddTriangle(mesh, p1pp, p2pp, p2pm);
+            AddTriangle(mesh, p1pp, p2pm, p1pm);
+
+            AddTriangle(mesh, p1pm, p2pm, p2mm);
+            AddTriangle(mesh, p1pm, p2mm, p1mm);
+
+            AddTriangle(mesh, p1mm, p2mm, p2mp);
+            AddTriangle(mesh, p1mm, p2mp, p1mp);
+
+            // Ends.
+            AddTriangle(mesh, p1pp, p1pm, p1mm);
+            AddTriangle(mesh, p1pp, p1mm, p1mp);
+
+            AddTriangle(mesh, p2pp, p2mp, p2mm);
+            AddTriangle(mesh, p2pp, p2mm, p2pm);
+        }
+
+        private Vector3D ScaleVector(Vector3D vector, double length)
+        {
+            double scale = length / vector.Length;
+            return new Vector3D(
+                vector.X * scale,
+                vector.Y * scale,
+                vector.Z * scale);
         }
 
         private void DefineModel(Model3DGroup model_group)
@@ -187,7 +260,7 @@ namespace SpaceGroup
                     atomCell.ZAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], 0, 0, atom.Z),
                     atomCell.XAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0)
                     ),
-                    0.25, 20, 30);
+                    0.5, 20, 30);
                 //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
                 SolidColorBrush brush1 = Brushes.Red;
                 DiffuseMaterial material1 = new DiffuseMaterial(brush1);

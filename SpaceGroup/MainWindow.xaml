@@ -39,8 +39,7 @@
 				Grid.Row ="1"
                 Background="Transparent" 
                 MouseDown="OnViewportMouseDown"  
-                MouseMove="OnViewportMouseMove" Margin="0,0,0,0">
-		</Canvas>
+                MouseMove="OnViewportMouseMove" Margin="0,0,0,0"/>
 
 		<Grid Grid.Column ="0" Grid.Row ="1">
 			<Grid.ColumnDefinitions>
