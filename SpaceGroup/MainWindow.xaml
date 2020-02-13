@@ -59,7 +59,7 @@
 					<Label Height="24" Name="label1" Width="57">Атом</Label>
 					<TextBox Height="22" Name="atomName" Width="91" Canvas.Left="66" Canvas.Top="0" />
 
-					<Button Canvas.Left="0" Canvas.Top="121" Height="29" Name="addButton" Width="157" Click="addAtomButton_Click" RenderTransformOrigin="0.497,0.483">Добавить</Button>
+					<Button Canvas.Left="0" Canvas.Top="131" Height="29" Name="addButton" Width="157" Click="addAtomButton_Click" RenderTransformOrigin="0.497,0.483">Добавить</Button>
 					<Label Content="x" Canvas.Top="24" Width="57"/>
 					<TextBox Height="23" Name="xCoord" Canvas.Left="66" Canvas.Top="27" Width="91"/>
 					<TextBox Height="23" Name="yCoord" Canvas.Left="66" Canvas.Top="55" Width="91"/>
