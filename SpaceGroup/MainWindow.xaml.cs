@@ -31,11 +31,9 @@ namespace SpaceGroup
         }
         // The main object model group.
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
-        private Model3DGroup AxesModel3DGroup = new Model3DGroup();
         private GeometryModel3D AxesModel;
         // The camera.
         private PerspectiveCamera TheCamera;
-        private PerspectiveCamera AxesPortCamera;
 
         // The camera's current location.
         private double CameraPhi = Math.PI / 6.0;       // 30 degrees
@@ -54,7 +52,6 @@ namespace SpaceGroup
         public void selectGroup(SpaceGroupCl spaceGroup)
         {
             selectedSpaceGroup = spaceGroup;
-            MessageBox.Show(spaceGroup.Expressions[0]);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -70,11 +67,6 @@ namespace SpaceGroup
             MainViewport.Camera = TheCamera;
             PositionCamera();
 
-            AxesPortCamera = new PerspectiveCamera();
-            AxesPortCamera.FieldOfView = 60;
-            AxesViewPort.Camera = AxesPortCamera;
-
-
             // Define lights.
             DefineLights();
 
@@ -86,13 +78,10 @@ namespace SpaceGroup
             ModelVisual3D model_visual = new ModelVisual3D();
             model_visual.Content = MainModel3Dgroup;
             MainModel3Dgroup.Children.Add(AxesModel);
-            axesTranslate = new TranslateTransform3D(TheCamera.Position.X -0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
-            AxesModel.Transform = axesTranslate;
+            //axesTranslate = new TranslateTransform3D(TheCamera.Position.X -0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
+            //AxesModel.Transform = axesTranslate;
             // Display the main visual to the viewport.
             MainViewport.Children.Add(model_visual);
-
-            ModelVisual3D axesModel_visual = new ModelVisual3D();
-
         }
 
         private void buildAxes(out GeometryModel3D axes_model)
@@ -250,11 +239,18 @@ namespace SpaceGroup
 
         private void addAtomButton_Click(object sender, RoutedEventArgs e)
         {
-            string s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(atomName.Text.ToLower());
-            Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text);
-            atomCell.atomCollection.Add(atom);
-            DataGridAtoms.Items.Refresh();
-            visualizeAtom(MainModel3Dgroup, atom);
+            try
+            {
+                string s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(atomName.Text.ToLower());
+                Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text);
+                visualizeAtom(MainModel3Dgroup, atom);
+                atomCell.atomCollection.Add(atom);
+                DataGridAtoms.Items.Refresh();
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("Не выбрана группа!");
+            }
         }
 
         private void deleteButtonClick(object sender, RoutedEventArgs e)
@@ -266,22 +262,25 @@ namespace SpaceGroup
 
         private void visualizeAtom(Model3DGroup model_group, Atom atom)
         {
-            for(int i = 0; i < selectedSpaceGroup.Expressions.Length; i++)
+            for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
+                Console.WriteLine(i);
                 MeshGeometry3D mesh1 = new MeshGeometry3D();
                 AddSphere(mesh1, new Point3D
-                    (
-                    atomCell.YAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], 0, atom.Y, 0),
-                    atomCell.ZAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], 0, 0, atom.Z),
-                    atomCell.XAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0)
-                    ),
-                    0.5, 20, 30);
-                //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-                SolidColorBrush brush1 = Brushes.Red;
-                DiffuseMaterial material1 = new DiffuseMaterial(brush1);
-                GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
-                model_group.Children.Add(model1);
+                   (
+                     atomCell.YAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0),
+                     atomCell.ZAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z),
+                     atomCell.XAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0)
+                     
+                   ),
+                     3, 20, 30);
+                    //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
+                 SolidColorBrush brush1 = Brushes.Red;
+                 DiffuseMaterial material1 = new DiffuseMaterial(brush1);
+                 GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
+                 model_group.Children.Add(model1);
             }
+
             //MeshGeometry3D mesh1 = new MeshGeometry3D();
             //AddSphere(mesh1, new Point3D(atomCell.YAxisL * atom.X, atomCell.ZAxisL * atom.Z, atomCell.XAxisL * atom.X), 0.25, 20, 30);
             ////AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
@@ -369,7 +368,6 @@ namespace SpaceGroup
 
         public void OnViewportMouseDown(object sender, MouseEventArgs e)
         {
-            Console.WriteLine("Mouse Down");
             Point position = e.GetPosition(this);
             mouseX = position.X;
             mouseY = position.Y;
@@ -391,8 +389,6 @@ namespace SpaceGroup
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                Console.WriteLine("Mouse Dragged");
-
                 mouseDragged = true;
                 MouseOldX = mouseX;
                 MouseOldY = mouseY;
@@ -456,6 +452,7 @@ namespace SpaceGroup
 
                 MoveForward(mouseDeltaY * 0.5);
             }
+
             moveAxesWithCamera();
         }
 
@@ -505,38 +502,38 @@ namespace SpaceGroup
             camera.Position = position;
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Up:
-                    CameraPhi += CameraDPhi;
-                    if (CameraPhi > Math.PI / 2.0) CameraPhi = Math.PI / 2.0;
-                    break;
-                case Key.Down:
-                    CameraPhi -= CameraDPhi;
-                    if (CameraPhi < -Math.PI / 2.0) CameraPhi = -Math.PI / 2.0;
-                    break;
-                case Key.Left:
-                    CameraTheta += CameraDTheta;
-                    break;
-                case Key.Right:
-                    CameraTheta -= CameraDTheta;
-                    break;
-                case Key.Add:
-                case Key.OemPlus:
-                    CameraR -= CameraDR;
-                    if (CameraR < CameraDR) CameraR = CameraDR;
-                    break;
-                case Key.Subtract:
-                case Key.OemMinus:
-                    CameraR += CameraDR;
-                    break;
-            }
+        //private void Window_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    switch (e.Key)
+        //    {
+        //        case Key.Up:
+        //            CameraPhi += CameraDPhi;
+        //            if (CameraPhi > Math.PI / 2.0) CameraPhi = Math.PI / 2.0;
+        //            break;
+        //        case Key.Down:
+        //            CameraPhi -= CameraDPhi;
+        //            if (CameraPhi < -Math.PI / 2.0) CameraPhi = -Math.PI / 2.0;
+        //            break;
+        //        case Key.Left:
+        //            CameraTheta += CameraDTheta;
+        //            break;
+        //        case Key.Right:
+        //            CameraTheta -= CameraDTheta;
+        //            break;
+        //        case Key.Add:
+        //        case Key.OemPlus:
+        //            CameraR -= CameraDR;
+        //            if (CameraR < CameraDR) CameraR = CameraDR;
+        //            break;
+        //        case Key.Subtract:
+        //        case Key.OemMinus:
+        //            CameraR += CameraDR;
+        //            break;
+        //    }
 
-            // Update the camera's position.
-            PositionCamera();
-        }
+        //    // Update the camera's position.
+        //    PositionCamera();
+        //}
 
         private void newGroup_Click(object sender, RoutedEventArgs e)
         {
@@ -580,6 +577,9 @@ namespace SpaceGroup
         {
             axesTranslate = new TranslateTransform3D(TheCamera.Position.X - 0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
             AxesModel.Transform = axesTranslate;
+            //TranslateTransform3D axesTranslate2 = new TranslateTransform3D(TheCamera.LookDirection.X, TheCamera.LookDirection.Y, TheCamera.LookDirection.Z);
+            //AxesModel.Transform = axesTranslate2;
         }
+        //private void 
     }
 }

@@ -27,12 +27,11 @@
 				<DataGridTemplateColumn Width="*" Header="Действие">
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<Button Content="Delete" Click="deleteButtonClick"/>
+							<Button Content="Удалить" Click="deleteButtonClick" Width="Auto"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 			</DataGrid.Columns>
-
 		</DataGrid>
 		<Button x:Name="addButton" Content="Добавить группу" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Margin="10,10,10,10" Click="addGroupButtonClicked"/>
 		<ComboBox Name="combobox" HorizontalAlignment="Left" Margin="198,15,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
