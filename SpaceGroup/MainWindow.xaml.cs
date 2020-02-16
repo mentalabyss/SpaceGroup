@@ -24,15 +24,18 @@ namespace SpaceGroup
     {
         CrystalCell atomCell;
         SpaceGroupCl selectedSpaceGroup;
+        TranslateTransform3D axesTranslate;
         public MainWindow()
         {
             InitializeComponent();
         }
         // The main object model group.
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
+        private Model3DGroup AxesModel3DGroup = new Model3DGroup();
         private GeometryModel3D AxesModel;
         // The camera.
         private PerspectiveCamera TheCamera;
+        private PerspectiveCamera AxesPortCamera;
 
         // The camera's current location.
         private double CameraPhi = Math.PI / 6.0;       // 30 degrees
@@ -67,6 +70,11 @@ namespace SpaceGroup
             MainViewport.Camera = TheCamera;
             PositionCamera();
 
+            AxesPortCamera = new PerspectiveCamera();
+            AxesPortCamera.FieldOfView = 60;
+            AxesViewPort.Camera = AxesPortCamera;
+
+
             // Define lights.
             DefineLights();
 
@@ -78,8 +86,13 @@ namespace SpaceGroup
             ModelVisual3D model_visual = new ModelVisual3D();
             model_visual.Content = MainModel3Dgroup;
             MainModel3Dgroup.Children.Add(AxesModel);
+            axesTranslate = new TranslateTransform3D(TheCamera.Position.X -0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
+            AxesModel.Transform = axesTranslate;
             // Display the main visual to the viewport.
             MainViewport.Children.Add(model_visual);
+
+            ModelVisual3D axesModel_visual = new ModelVisual3D();
+
         }
 
         private void buildAxes(out GeometryModel3D axes_model)
@@ -87,9 +100,9 @@ namespace SpaceGroup
             // Make the axes model.
             MeshGeometry3D axes_mesh = new MeshGeometry3D();
             Point3D origin = new Point3D(0, 0, 0);
-            Point3D xmax = new Point3D(0.75, 0, 0);
-            Point3D ymax = new Point3D(0, 0.75, 0);
-            Point3D zmax = new Point3D(0, 0, 0.75);
+            Point3D xmax = new Point3D(0.1, 0, 0);
+            Point3D ymax = new Point3D(0, 0.1, 0);
+            Point3D zmax = new Point3D(0, 0, 0.1);
             AddSegment(axes_mesh, origin, xmax, new Vector3D(0, 1, 0));
             AddSegment(axes_mesh, origin, zmax, new Vector3D(0, 1, 0));
             AddSegment(axes_mesh, origin, ymax, new Vector3D(1, 0, 0));
@@ -98,6 +111,8 @@ namespace SpaceGroup
             DiffuseMaterial axes_material = new DiffuseMaterial(axes_brush);
             axes_model = new GeometryModel3D(axes_mesh, axes_material);
         }
+
+ 
 
         private void AddSegment(MeshGeometry3D mesh, Point3D point1, Point3D point2, Vector3D up)
         {
@@ -222,10 +237,10 @@ namespace SpaceGroup
             //double hyp = CameraR * Math.Cos(CameraPhi);
             //double x = hyp * Math.Cos(CameraTheta);
             //double z = hyp * Math.Sin(CameraTheta);
-            TheCamera.Position = new Point3D(0, 0, -10);
+            TheCamera.Position = new Point3D(0, 0, +10);
 
             // Look toward the origin.
-            TheCamera.LookDirection = new Vector3D(0, 0, 1);
+            TheCamera.LookDirection = new Vector3D(0, 0, -1);
 
             // Set the Up direction.
             TheCamera.UpDirection = new Vector3D(0, 1, 0);
@@ -441,6 +456,7 @@ namespace SpaceGroup
 
                 MoveForward(mouseDeltaY * 0.5);
             }
+            moveAxesWithCamera();
         }
 
         public void MoveRight(double d)
@@ -558,6 +574,12 @@ namespace SpaceGroup
             Quaternion q = Math3D.RotationY(angle);
             TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
             TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
+        }
+
+        private void moveAxesWithCamera()
+        {
+            axesTranslate = new TranslateTransform3D(TheCamera.Position.X - 0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
+            AxesModel.Transform = axesTranslate;
         }
     }
 }

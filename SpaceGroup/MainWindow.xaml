@@ -34,7 +34,7 @@
 
 		<Viewport3D Grid.Column ="1" Grid.Row ="1"  Name ="MainViewport"/>
 
-		<Canvas x:Name="canvasOn3D"
+        <Canvas x:Name="canvasOn3D"
                 Grid.Column="1"
 				Grid.Row ="1"
                 Background="Transparent" 
@@ -90,5 +90,8 @@
 
 			</GroupBox>
 		</Grid>
-	</Grid>
+        <Canvas Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="5,301,0,0" Grid.Row="1" VerticalAlignment="Top" Width="100">
+            <Viewport3D Name="AxesViewPort" Height="100" Width="100"/>
+        </Canvas>
+    </Grid>
 </Window>
