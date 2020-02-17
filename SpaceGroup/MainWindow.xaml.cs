@@ -32,6 +32,9 @@ namespace SpaceGroup
         // The main object model group.
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
         private GeometryModel3D AxesModel;
+        private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
+
+        private SolidColorBrush atomColor;
         // The camera.
         private PerspectiveCamera TheCamera;
 
@@ -245,6 +248,7 @@ namespace SpaceGroup
                 Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text);
                 visualizeAtom(MainModel3Dgroup, atom);
                 atomCell.atomCollection.Add(atom);
+
                 DataGridAtoms.Items.Refresh();
             }
             catch (NullReferenceException)
@@ -255,13 +259,18 @@ namespace SpaceGroup
 
         private void deleteButtonClick(object sender, RoutedEventArgs e)
         {
+            int index = DataGridAtoms.SelectedIndex;
+            Model3DGroup groupToRemove = atomReproductions[index];
+            MainModel3Dgroup.Children.Remove(groupToRemove);
             atomCell.atomCollection.Remove(DataGridAtoms.SelectedItem as Atom);
             //MessageBox.Show((DataGridAtoms.SelectedItem as Atom).Element);
             DataGridAtoms.Items.Refresh();
+            
         }
 
         private void visualizeAtom(Model3DGroup model_group, Atom atom)
         {
+            Model3DGroup atomRepro = new Model3DGroup();
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
                 Console.WriteLine(i);
@@ -270,16 +279,18 @@ namespace SpaceGroup
                    (
                      atomCell.YAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0),
                      atomCell.ZAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z),
-                     atomCell.XAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0)
-                     
+                     atomCell.XAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0) 
                    ),
                      3, 20, 30);
-                    //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-                 SolidColorBrush brush1 = Brushes.Red;
+                //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
+                SolidColorBrush brush1 = atomColor;
                  DiffuseMaterial material1 = new DiffuseMaterial(brush1);
                  GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
-                 model_group.Children.Add(model1);
+                atomRepro.Children.Add(model1);
             }
+            atomReproductions.Add(atomRepro);
+            model_group.Children.Add(atomRepro);
+            //model_group.Children.Add();
 
             //MeshGeometry3D mesh1 = new MeshGeometry3D();
             //AddSphere(mesh1, new Point3D(atomCell.YAxisL * atom.X, atomCell.ZAxisL * atom.Z, atomCell.XAxisL * atom.X), 0.25, 20, 30);
@@ -579,6 +590,15 @@ namespace SpaceGroup
             AxesModel.Transform = axesTranslate;
             //TranslateTransform3D axesTranslate2 = new TranslateTransform3D(TheCamera.LookDirection.X, TheCamera.LookDirection.Y, TheCamera.LookDirection.Z);
             //AxesModel.Transform = axesTranslate2;
+        }
+
+        private void pickColor(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.ColorDialog colorDialog = new System.Windows.Forms.ColorDialog();
+            if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                atomColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
+            }
         }
         //private void 
     }
