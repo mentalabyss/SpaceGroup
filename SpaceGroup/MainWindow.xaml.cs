@@ -74,7 +74,8 @@ namespace SpaceGroup
             // Define lights.
             DefineLights();
 
-            buildAxes(out AxesModel);
+            //buildAxes(out AxesModel);
+            buildStaticAxes(out AxesModel);
             buildCellBorders(out BordersModel);
             // Create the model.
             //DefineModel(MainModel3Dgroup);
@@ -125,11 +126,32 @@ namespace SpaceGroup
             axes_model = new GeometryModel3D(axes_mesh, axes_material);
         }
 
- 
+        private void buildStaticAxes(out GeometryModel3D static_axes_model)
+        {
+            MeshGeometry3D axes_mesh = new MeshGeometry3D();
+            Point3D origin = new Point3D(0, 0, 0);
+            Point3D xmax = new Point3D(30, 0, 0);
+            Point3D ymax = new Point3D(0, 30, 0);
+            Point3D zmax = new Point3D(0, 0, 30);
+            AddSegment(axes_mesh, origin, xmax, new Vector3D(0, 1, 0));
+            AddSegment(axes_mesh, origin, zmax, new Vector3D(0, 1, 0));
+            AddSegment(axes_mesh, origin, ymax, new Vector3D(1, 0, 0));
+            Vector3D vX = xmax - origin;
+            vX.Normalize();
+            Vector3D perpX = Vector3D.CrossProduct(vX, new Vector3D(0, 1, 0));
+            perpX.Normalize();
+            Vector3D v1X = ScaleVector(-vX + perpX, 5);
+            Vector3D v2X = ScaleVector(-vX - perpX, 5);
+            AddSegment(axes_mesh, xmax, xmax + v1X, new Vector3D(0, 1, 0));
+            AddSegment(axes_mesh, xmax, xmax + v2X, new Vector3D(0, 1, 0));
+            SolidColorBrush axes_brush = Brushes.Blue;
+            DiffuseMaterial axes_material = new DiffuseMaterial(axes_brush);
+            static_axes_model = new GeometryModel3D(axes_mesh, axes_material);
+        }
 
         private void AddSegment(MeshGeometry3D mesh, Point3D point1, Point3D point2, Vector3D up)
         {
-            const double thickness = 0.01;
+            const double thickness = 0.5;
 
             // Get the segment's vector.
             Vector3D v = point2 - point1;
@@ -433,7 +455,7 @@ namespace SpaceGroup
                 MoveForward(mouseDeltaY * 0.5);
             }
 
-            moveAxesWithCamera();
+            //moveAxesWithCamera();
         }
 
         public void MoveRight(double d)
