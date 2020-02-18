@@ -33,6 +33,7 @@ namespace SpaceGroup
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
         private GeometryModel3D AxesModel;
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
+        private GeometryModel3D BordersModel;
 
         private SolidColorBrush atomColor;
         // The camera.
@@ -74,6 +75,7 @@ namespace SpaceGroup
             DefineLights();
 
             buildAxes(out AxesModel);
+            buildCellBorders(out BordersModel);
             // Create the model.
             //DefineModel(MainModel3Dgroup);
 
@@ -81,10 +83,29 @@ namespace SpaceGroup
             ModelVisual3D model_visual = new ModelVisual3D();
             model_visual.Content = MainModel3Dgroup;
             MainModel3Dgroup.Children.Add(AxesModel);
+            MainModel3Dgroup.Children.Add(BordersModel);
             //axesTranslate = new TranslateTransform3D(TheCamera.Position.X -0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
             //AxesModel.Transform = axesTranslate;
             // Display the main visual to the viewport.
             MainViewport.Children.Add(model_visual);
+        }
+
+
+        private void buildCellBorders(out GeometryModel3D borders_model)
+        {
+            MeshGeometry3D borders_mesh = new MeshGeometry3D();
+            Point3D origin = new Point3D(0, 0, 0);
+            Point3D xLine = new Point3D(atomCell.YAxisL, 0, 0);
+            Point3D yLine = new Point3D(0, atomCell.ZAxisL, 0);
+            Point3D zLine = new Point3D(0, 0, atomCell.XAxisL);
+
+            AddSegment(borders_mesh, origin, xLine, new Vector3D(0, 1, 0));
+            AddSegment(borders_mesh, origin, yLine, new Vector3D(1, 0, 0));
+            AddSegment(borders_mesh, origin, zLine, new Vector3D(0, 1, 0));
+
+            SolidColorBrush borders_brush = Brushes.Black;
+            DiffuseMaterial borders_material = new DiffuseMaterial(borders_brush);
+            borders_model = new GeometryModel3D(borders_mesh, borders_material);
         }
 
         private void buildAxes(out GeometryModel3D axes_model)
@@ -161,58 +182,6 @@ namespace SpaceGroup
                 vector.Z * scale);
         }
 
-        private void DefineModel(Model3DGroup model_group)
-        {
-#if ONE_BIG_SPHERE
-            MeshGeometry3D mesh1 = new MeshGeometry3D();
-            AddSphere(mesh1, new Point3D(0, 0, 0), 1, 5, 10);
-            SolidColorBrush brush1 = Brushes.Red;
-            DiffuseMaterial material1 = new DiffuseMaterial(brush1);
-            GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
-            model_group.Children.Add(model1);
-#else
-            // Make spheres centered at (+/-1, 0, 0).
-            MeshGeometry3D mesh1 = new MeshGeometry3D();
-            AddSphere(mesh1, new Point3D(1, 0, 0), 0.25, 5, 10);
-            AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-            SolidColorBrush brush1 = Brushes.Red;
-            DiffuseMaterial material1 = new DiffuseMaterial(brush1);
-            GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
-            model_group.Children.Add(model1);
-
-            // Make spheres centered at (0, +/-1, 0).
-            MeshGeometry3D mesh2 = new MeshGeometry3D();
-            AddSphere(mesh2, new Point3D(0, 1, 0), 0.25, 5, 10);
-            AddSphere(mesh2, new Point3D(0, -1, 0), 0.25, 5, 10);
-            SolidColorBrush brush2 = Brushes.Green;
-            DiffuseMaterial material2 = new DiffuseMaterial(brush2);
-            GeometryModel3D model2 = new GeometryModel3D(mesh2, material2);
-            model_group.Children.Add(model2);
-
-            // Make spheres centered at (0, 0, +/-1).
-            MeshGeometry3D mesh3 = new MeshGeometry3D();
-            AddSphere(mesh3, new Point3D(0, 0, 1), 0.25, 5, 10);
-            AddSphere(mesh3, new Point3D(0, 0, -1), 0.25, 5, 10);
-            SolidColorBrush brush3 = Brushes.Blue;
-            DiffuseMaterial material3 = new DiffuseMaterial(brush3);
-            GeometryModel3D model3 = new GeometryModel3D(mesh3, material3);
-            model_group.Children.Add(model3);
-
-#endif
-
-            Console.WriteLine(
-                mesh1.Positions.Count +
-                mesh2.Positions.Count +
-                mesh3.Positions.Count +
-                " points");
-            Console.WriteLine(
-                (mesh1.TriangleIndices.Count +
-                 mesh2.TriangleIndices.Count +
-                 mesh3.TriangleIndices.Count +
-                 " triangles"));
-            Console.WriteLine();
-        }
-
         private void DefineLights()
         {
             AmbientLight ambient_light = new AmbientLight(Colors.Gray);
@@ -281,7 +250,7 @@ namespace SpaceGroup
                      atomCell.ZAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z),
                      atomCell.XAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0) 
                    ),
-                     3, 20, 30);
+                     1.5, 20, 30);
                 //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
                 SolidColorBrush brush1 = atomColor;
                  DiffuseMaterial material1 = new DiffuseMaterial(brush1);
@@ -599,6 +568,16 @@ namespace SpaceGroup
             {
                 atomColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
             }
+        }
+
+        private void ScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            //MessageBox.Show(atomResizer.);
+            //foreach(Model3DGroup atomGroup in atomReproductions)
+            //{
+            //    atomGroup.Transform = new ScaleTransform3D(atomResizer.Value * 0.1, atomResizer.Value * 0.1, atomResizer.Value * 0.1);
+            //    new ScaleTransform3D()
+            //}
         }
         //private void 
     }
