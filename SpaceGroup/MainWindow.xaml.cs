@@ -130,9 +130,9 @@ namespace SpaceGroup
         {
             MeshGeometry3D axes_mesh = new MeshGeometry3D();
             Point3D origin = new Point3D(0, 0, 0);
-            Point3D xmax = new Point3D(30, 0, 0);
-            Point3D ymax = new Point3D(0, 30, 0);
-            Point3D zmax = new Point3D(0, 0, 30);
+            Point3D xmax = new Point3D(25, 0, 0);
+            Point3D ymax = new Point3D(0, 25, 0);
+            Point3D zmax = new Point3D(0, 0, 25);
             AddSegment(axes_mesh, origin, xmax, new Vector3D(0, 1, 0));
             AddSegment(axes_mesh, origin, zmax, new Vector3D(0, 1, 0));
             AddSegment(axes_mesh, origin, ymax, new Vector3D(1, 0, 0));
@@ -140,8 +140,8 @@ namespace SpaceGroup
             vX.Normalize();
             Vector3D perpX = Vector3D.CrossProduct(vX, new Vector3D(0, 1, 0));
             perpX.Normalize();
-            Vector3D v1X = ScaleVector(-vX + perpX, 5);
-            Vector3D v2X = ScaleVector(-vX - perpX, 5);
+            Vector3D v1X = ScaleVector(-vX + perpX, 1);
+            Vector3D v2X = ScaleVector(-vX - perpX, 1);
             AddSegment(axes_mesh, xmax, xmax + v1X, new Vector3D(0, 1, 0));
             AddSegment(axes_mesh, xmax, xmax + v2X, new Vector3D(0, 1, 0));
             SolidColorBrush axes_brush = Brushes.Blue;
@@ -151,7 +151,7 @@ namespace SpaceGroup
 
         private void AddSegment(MeshGeometry3D mesh, Point3D point1, Point3D point2, Vector3D up)
         {
-            const double thickness = 0.5;
+            const double thickness = 0.05;
 
             // Get the segment's vector.
             Vector3D v = point2 - point1;
@@ -268,13 +268,15 @@ namespace SpaceGroup
                 MeshGeometry3D mesh1 = new MeshGeometry3D();
                 AddSphere(mesh1, new Point3D
                    (
-                     atomCell.YAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0),
-                     atomCell.ZAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z),
-                     atomCell.XAxisL * SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0) 
+                     SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0) * atomCell.YAxisL,
+                     SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z) * atomCell.ZAxisL,
+                     SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0) * atomCell.XAxisL
                    ),
-                     1.5, 20, 30);
-                //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-                SolidColorBrush brush1 = atomColor;
+                     0.7, 20, 30);
+
+                Console.WriteLine(SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0) / atomCell.YAxisL);
+            //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
+            SolidColorBrush brush1 = atomColor;
                  DiffuseMaterial material1 = new DiffuseMaterial(brush1);
                  GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
                 atomRepro.Children.Add(model1);
