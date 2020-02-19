@@ -15,7 +15,7 @@ namespace SpaceGroup
 
         public double XAxisL { get => xAxisL; set => xAxisL = value; }
         public double YAxisL { get => yAxisL; set => yAxisL = value; }
-        public double ZAxisL { get => xAxisL; set => xAxisL = value; }
+        public double ZAxisL { get => zAxisL; set => zAxisL = value; }
         public double Alpha { get => xAxisL; set => xAxisL = value; }
         public double Beta { get => xAxisL; set => xAxisL = value; }
         public double Gamma { get => xAxisL; set => xAxisL = value; }

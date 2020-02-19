@@ -28,14 +28,14 @@ namespace SpaceGroup
             double.TryParse(y, out this.y);
             double.TryParse(z, out this.z);
 
-            if (this.x < 0)
-                this.x += 1;
+            //if (this.x < 0)
+            //    this.x += 1;
 
-            if (this.y < 0)
-                this.y += 1;
+            //if (this.y < 0)
+            //    this.y += 1;
 
-            if (this.z < 0)
-                this.z += 1;
+            //if (this.z < 0)
+            //    this.z += 1;
         }
     }
 }
