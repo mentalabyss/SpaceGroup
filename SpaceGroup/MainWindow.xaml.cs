@@ -282,13 +282,18 @@ namespace SpaceGroup
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
                 MeshGeometry3D mesh1 = new MeshGeometry3D();
-                AddSphere(mesh1, new Point3D
-                   (
-                     SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0) * atomCell.YAxisL,
-                     SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z) * atomCell.ZAxisL,
-                     SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0) * atomCell.XAxisL
-                   ),
-                     0.7, 20, 30);
+                double x = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0) * atomCell.YAxisL; //Y
+                double y = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z) * atomCell.ZAxisL; //Z
+                double z = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0) * atomCell.XAxisL; //X
+
+                if (x < 0)
+                    x += atomCell.YAxisL;
+                if (y < 0)
+                    y += atomCell.ZAxisL;
+                if (z < 0)
+                    z += atomCell.XAxisL;
+
+                AddSphere(mesh1, new Point3D(x, y, z), 0.7, 20, 30);
             //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
             SolidColorBrush brush1 = atomColor;
                  DiffuseMaterial material1 = new DiffuseMaterial(brush1);
