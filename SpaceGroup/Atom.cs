@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+
 
 namespace SpaceGroup
 {
@@ -23,10 +25,17 @@ namespace SpaceGroup
 
         public Atom(string element, string x, string y, string z)
         {
-            this.element = element;
-            this.x = Convert.ToDouble(x);
-            this.y = Convert.ToDouble(y);
-            this.z = Convert.ToDouble(z);
+            try
+            {
+                this.element = element;
+                this.x = Convert.ToDouble(x);
+                this.y = Convert.ToDouble(y);
+                this.z = Convert.ToDouble(z);
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
     }
 }
