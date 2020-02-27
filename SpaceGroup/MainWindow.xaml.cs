@@ -37,7 +37,7 @@ namespace SpaceGroup
 
         private SolidColorBrush atomColor;
         // The camera.
-        private PerspectiveCamera TheCamera;
+        private OrthographicCamera TheCamera;
 
         // The camera's current location.
         private double CameraPhi = Math.PI / 6.0;       // 30 degrees
@@ -66,8 +66,10 @@ namespace SpaceGroup
             DataGridAtoms.ItemsSource = atomCell.atomCollection;
 
             // Give the camera its initial position.
-            TheCamera = new PerspectiveCamera();
-            TheCamera.FieldOfView = 60;
+            TheCamera = new OrthographicCamera();
+            //TheCamera = new PerspectiveCamera();
+            TheCamera.Width = 60;
+            //TheCamera.FieldOfView = 60;
             MainViewport.Camera = TheCamera;
             PositionCamera();
 
@@ -168,7 +170,7 @@ namespace SpaceGroup
 
         private void AddSegment(MeshGeometry3D mesh, Point3D point1, Point3D point2, Vector3D up)
         {
-            const double thickness = 0.05;
+            const double thickness = 0.01;
 
             // Get the segment's vector.
             Vector3D v = point2 - point1;
@@ -237,7 +239,7 @@ namespace SpaceGroup
             //double hyp = CameraR * Math.Cos(CameraPhi);
             //double x = hyp * Math.Cos(CameraTheta);
             //double z = hyp * Math.Sin(CameraTheta);
-            TheCamera.Position = new Point3D(0, 0, +10);
+            TheCamera.Position = new Point3D(0, 0, +40);
 
             // Look toward the origin.
             TheCamera.LookDirection = new Vector3D(0, 0, -1);
@@ -502,7 +504,7 @@ namespace SpaceGroup
         public void MoveForward(double d)
         {
             double u = 0.05;
-            PerspectiveCamera camera = (PerspectiveCamera)MainViewport.Camera;
+            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
             Vector3D lookDirection = camera.LookDirection;
             Point3D position = camera.Position;
 
@@ -515,7 +517,7 @@ namespace SpaceGroup
         public void MoveUp(double d)
         {
             double u = 0.05;
-            PerspectiveCamera camera = (PerspectiveCamera)MainViewport.Camera;
+            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
             Vector3D upDirection = camera.UpDirection;
             Point3D position = camera.Position;
 
@@ -525,38 +527,38 @@ namespace SpaceGroup
             camera.Position = position;
         }
 
-        //private void Window_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    switch (e.Key)
-        //    {
-        //        case Key.Up:
-        //            CameraPhi += CameraDPhi;
-        //            if (CameraPhi > Math.PI / 2.0) CameraPhi = Math.PI / 2.0;
-        //            break;
-        //        case Key.Down:
-        //            CameraPhi -= CameraDPhi;
-        //            if (CameraPhi < -Math.PI / 2.0) CameraPhi = -Math.PI / 2.0;
-        //            break;
-        //        case Key.Left:
-        //            CameraTheta += CameraDTheta;
-        //            break;
-        //        case Key.Right:
-        //            CameraTheta -= CameraDTheta;
-        //            break;
-        //        case Key.Add:
-        //        case Key.OemPlus:
-        //            CameraR -= CameraDR;
-        //            if (CameraR < CameraDR) CameraR = CameraDR;
-        //            break;
-        //        case Key.Subtract:
-        //        case Key.OemMinus:
-        //            CameraR += CameraDR;
-        //            break;
-        //    }
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                    CameraPhi += CameraDPhi;
+                    if (CameraPhi > Math.PI / 2.0) CameraPhi = Math.PI / 2.0;
+                    break;
+                case Key.Down:
+                    CameraPhi -= CameraDPhi;
+                    if (CameraPhi < -Math.PI / 2.0) CameraPhi = -Math.PI / 2.0;
+                    break;
+                case Key.Left:
+                    CameraTheta += CameraDTheta;
+                    break;
+                case Key.Right:
+                    CameraTheta -= CameraDTheta;
+                    break;
+                case Key.Add:
+                case Key.OemPlus:
+                    CameraR -= CameraDR;
+                    if (CameraR < CameraDR) CameraR = CameraDR;
+                    break;
+                case Key.Subtract:
+                case Key.OemMinus:
+                    CameraR += CameraDR;
+                    break;
+            }
 
-        //    // Update the camera's position.
-        //    PositionCamera();
-        //}
+            // Update the camera's position.
+            PositionCamera();
+        }
 
         private void newGroup_Click(object sender, RoutedEventArgs e)
         {
@@ -623,5 +625,10 @@ namespace SpaceGroup
             //}
         }
         //private void 
+
+        private void RotateCamera()
+        {
+
+        }
     }
 }
