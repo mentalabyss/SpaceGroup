@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:SpaceGroup"
         mc:Ignorable="d"
         Title="MainWindow"
-		Loaded="Window_Loaded">
+		Loaded="Window_Loaded"
+		>
 
 	<Grid>
 		<Grid.ColumnDefinitions>
@@ -85,7 +86,9 @@
 							<Button Content="Цвет" Canvas.Left="81" Canvas.Top="111" Width="75" Click="pickColor"/>
 						</Canvas>
 					</GroupBox>
-					<TextBlock Grid.Row="2" Text="Масштаб: "/>
+					<TextBlock Grid.Row="2"><Run Text="Масштаб: "/><InlineUIContainer>
+						</InlineUIContainer></TextBlock>
+					<Button Grid.Row="3" Content="Button" Width="75" Click="Button_Click"/>
 					<ScrollBar Name= "atomResizer" Grid.Row="2" ValueChanged="ScrollBar_ValueChanged"/>
 				</Grid>
 			</ScrollViewer>

@@ -22,6 +22,7 @@ namespace SpaceGroup
     /// </summary>
     public partial class MainWindow : Window
     {
+        List<Atom> multipliedAtoms;
         CrystalCell atomCell;
         SpaceGroupCl selectedSpaceGroup;
         TranslateTransform3D axesTranslate;
@@ -34,24 +35,11 @@ namespace SpaceGroup
         private GeometryModel3D AxesModel;
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
         private GeometryModel3D BordersModel;
+        private GeometryModel3D polyhedra_model;
 
         private SolidColorBrush atomColor;
         // The camera.
         private OrthographicCamera TheCamera;
-
-        // The camera's current location.
-        private double CameraPhi = Math.PI / 6.0;       // 30 degrees
-        private double CameraTheta = Math.PI / 6.0;     // 30 degrees
-        private double CameraR = 3.0;
-
-        // The change in CameraPhi when you press the up and down arrows.
-        private const double CameraDPhi = 0.1;
-
-        // The change in CameraTheta when you press the left and right arrows.
-        private const double CameraDTheta = 0.1;
-
-        // The change in CameraR when you press + or -.
-        private const double CameraDR = 0.1;
 
         public void selectGroup(SpaceGroupCl spaceGroup)
         {
@@ -60,6 +48,7 @@ namespace SpaceGroup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            multipliedAtoms = new List<Atom>();
             atomCell = new CrystalCell();
             selectedSpaceGroup = new SpaceGroupCl();
             atomCell.setCellParams(20.06999, 19.92, 13.42, 90, 90, 90); //hard code - заменить
@@ -91,8 +80,14 @@ namespace SpaceGroup
             //AxesModel.Transform = axesTranslate;
             // Display the main visual to the viewport.
             MainViewport.Children.Add(model_visual);
+            moveFromCenter();
         }
 
+        private void moveFromCenter()
+        {
+            var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2);
+            MainModel3Dgroup.Transform = transform;
+        }
 
         private void buildCellBorders(out GeometryModel3D borders_model)
         {
@@ -170,7 +165,7 @@ namespace SpaceGroup
 
         private void AddSegment(MeshGeometry3D mesh, Point3D point1, Point3D point2, Vector3D up)
         {
-            const double thickness = 0.01;
+            const double thickness = 0.04;
 
             // Get the segment's vector.
             Vector3D v = point2 - point1;
@@ -234,12 +229,7 @@ namespace SpaceGroup
 
         private void PositionCamera()
         {
-            // Calculate the camera's position in Cartesian coordinates.
-            //double y = CameraR * Math.Sin(CameraPhi);
-            //double hyp = CameraR * Math.Cos(CameraPhi);
-            //double x = hyp * Math.Cos(CameraTheta);
-            //double z = hyp * Math.Sin(CameraTheta);
-            TheCamera.Position = new Point3D(0, 0, +40);
+            TheCamera.Position = new Point3D(0, atomCell.ZAxisL / 2, +40);
 
             // Look toward the origin.
             TheCamera.LookDirection = new Vector3D(0, 0, -1);
@@ -280,6 +270,13 @@ namespace SpaceGroup
 
         private void visualizeAtom(Model3DGroup model_group, Atom atom)
         {
+            double atomSize = 0.7;
+            if (atom.Element[0] == 'O' && (atom.Element[1] != 's'))
+            {
+                atomSize = 0.3;
+            }
+ 
+
             Model3DGroup atomRepro = new Model3DGroup();
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
@@ -295,12 +292,14 @@ namespace SpaceGroup
                 if (z < 0)
                     z += atomCell.XAxisL;
 
-                AddSphere(mesh1, new Point3D(x, y, z), 0.7, 20, 30);
+                AddSphere(mesh1, new Point3D(x, y, z), atomSize, 20, 30);
             //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-            SolidColorBrush brush1 = atomColor;
-                 DiffuseMaterial material1 = new DiffuseMaterial(brush1);
-                 GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
+                SolidColorBrush brush1 = atomColor;
+                DiffuseMaterial material1 = new DiffuseMaterial(brush1);
+                GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
                 atomRepro.Children.Add(model1);
+
+                multipliedAtoms.Add(new Atom(atom.Element, z.ToString(), x.ToString(), y.ToString()));
             }
             atomReproductions.Add(atomRepro);
             model_group.Children.Add(atomRepro);
@@ -314,6 +313,31 @@ namespace SpaceGroup
             //GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
             //model_group.Children.Add(model1);
 
+        }
+
+        private void DrawPolyhedra()
+        {
+            List<Atom> oxygens = Polyhedra.CalculatePolyhedra(multipliedAtoms);
+            MeshGeometry3D polyhedra_mesh = new MeshGeometry3D();
+            for (int i = 0; i < oxygens.Count; i += 4)
+            {
+                Point3D point0 = new Point3D(oxygens[i].Y, oxygens[i].Z, oxygens[i].X);
+                Point3D point1 = new Point3D(oxygens[i+1].Y, oxygens[i+1].Z, oxygens[i+1].X);
+                Point3D point2 = new Point3D(oxygens[i+2].Y, oxygens[i+2].Z, oxygens[i+2].X);
+                Point3D point3 = new Point3D(oxygens[i+3].Y, oxygens[i+3].Z, oxygens[i+3].X);
+
+                AddSegment(polyhedra_mesh, point0, point1, new Vector3D(0, 1, 0));
+                AddSegment(polyhedra_mesh, point0, point2, new Vector3D(0, 1, 0));
+                AddSegment(polyhedra_mesh, point0, point3, new Vector3D(0, 1, 0));
+                AddSegment(polyhedra_mesh, point1, point3, new Vector3D(0, 1, 0));
+                AddSegment(polyhedra_mesh, point1, point2, new Vector3D(0, 1, 0));
+                AddSegment(polyhedra_mesh, point2, point3, new Vector3D(0, 1, 0));
+
+                SolidColorBrush borders_brush = Brushes.Black;
+                DiffuseMaterial borders_material = new DiffuseMaterial(borders_brush);
+                polyhedra_model = new GeometryModel3D(polyhedra_mesh, borders_material);
+                MainModel3Dgroup.Children.Add(polyhedra_model);
+            }
         }
 
         private void AddSphere(MeshGeometry3D mesh, Point3D center,
@@ -426,25 +450,7 @@ namespace SpaceGroup
                 double angleX = mouseDeltaX * 0.1;
                 double angleY = mouseDeltaY * 0.1;
 
-                changeHeading(angleX);
-                ChangePitch(-angleY);
-
-                //Rotate(Math3D.UnitY, 2 * angleX);
-                //Rotate(RightDirection, 2 * angleY);
-
-
-                //changeHeading(angleX);
-                //ChangePitch(angleY);
-
-                //CameraPhi += mouseDeltaY * 0.01;
-                //if (CameraPhi > Math.PI / 2.0) CameraPhi = Math.PI / 2.0;
-
-                //CameraTheta += mouseDeltaX * 0.01;
-
-                //TheCamera.LookDirection = new Vector3D(TheCamera.LookDirection.X + mouseDeltaX * 0.01, TheCamera.LookDirection.Y + mouseDeltaY * 0.01, 0);
-
-
-                //PositionCamera();
+                RotateCamera(angleX, angleY);  
             }
             else
             {
@@ -493,13 +499,7 @@ namespace SpaceGroup
             camera.Position = position;
         }
 
-        public void Rotate(Vector3D axis, double angle)
-        {
-            Quaternion q = Math3D.Rotation(axis, angle);
-            TheCamera.Position = q.Transform(TheCamera.Position);
-            TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
-            TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
-        }
+
 
         public void MoveForward(double d)
         {
@@ -527,39 +527,6 @@ namespace SpaceGroup
             camera.Position = position;
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Up:
-                    CameraPhi += CameraDPhi;
-                    if (CameraPhi > Math.PI / 2.0) CameraPhi = Math.PI / 2.0;
-                    break;
-                case Key.Down:
-                    CameraPhi -= CameraDPhi;
-                    if (CameraPhi < -Math.PI / 2.0) CameraPhi = -Math.PI / 2.0;
-                    break;
-                case Key.Left:
-                    CameraTheta += CameraDTheta;
-                    break;
-                case Key.Right:
-                    CameraTheta -= CameraDTheta;
-                    break;
-                case Key.Add:
-                case Key.OemPlus:
-                    CameraR -= CameraDR;
-                    if (CameraR < CameraDR) CameraR = CameraDR;
-                    break;
-                case Key.Subtract:
-                case Key.OemMinus:
-                    CameraR += CameraDR;
-                    break;
-            }
-
-            // Update the camera's position.
-            PositionCamera();
-        }
-
         private void newGroup_Click(object sender, RoutedEventArgs e)
         {
             SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings();
@@ -577,33 +544,6 @@ namespace SpaceGroup
         public Vector3D RightDirection
         {
             get { return TheCamera.LookDirection.Cross(TheCamera.UpDirection); }
-        }
-
-        public void ChangeRoll(double angle)
-        {
-            TheCamera.UpDirection = TheCamera.UpDirection.Rotate(TheCamera.LookDirection, angle);
-        }
-
-        public void ChangePitch(double angle)
-        {
-            Quaternion q = Math3D.Rotation(LeftDirection, angle);
-            TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
-            TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
-        }
-
-        public void changeHeading(double angle)
-        {
-            Quaternion q = Math3D.RotationY(angle);
-            TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
-            TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
-        }
-
-        private void moveAxesWithCamera()
-        {
-            axesTranslate = new TranslateTransform3D(TheCamera.Position.X - 0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
-            AxesModel.Transform = axesTranslate;
-            //TranslateTransform3D axesTranslate2 = new TranslateTransform3D(TheCamera.LookDirection.X, TheCamera.LookDirection.Y, TheCamera.LookDirection.Z);
-            //AxesModel.Transform = axesTranslate2;
         }
 
         private void pickColor(object sender, RoutedEventArgs e)
@@ -626,9 +566,24 @@ namespace SpaceGroup
         }
         //private void 
 
-        private void RotateCamera()
+        private void RotateCamera(double angleX, double angleY)
         {
+            Rotate(new Vector3D(0, 1, 0), angleX * 2);
+            Rotate(RightDirection, 2 * angleY);
+        }
 
+
+        public void Rotate(Vector3D axis, double angle)
+        {
+            Quaternion q = Math3D.Rotation(axis, angle);
+            TheCamera.Position = q.Transform(TheCamera.Position);
+            TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
+            TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            DrawPolyhedra();
         }
     }
 }
