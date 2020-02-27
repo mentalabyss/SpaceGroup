@@ -10,6 +10,7 @@ namespace SpaceGroup
 {
     public class Atom
     {
+        public Atom() { }
         string element;
         double x, y, z;
 

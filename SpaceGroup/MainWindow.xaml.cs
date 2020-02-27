@@ -1,6 +1,7 @@
 ﻿using SpaceGroup;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 
 namespace SpaceGroup
 {
@@ -568,7 +570,7 @@ namespace SpaceGroup
 
         private void RotateCamera(double angleX, double angleY)
         {
-            Rotate(new Vector3D(0, 1, 0), angleX * 2);
+            Rotate(new Vector3D(0, 1, 0), - angleX * 2);
             Rotate(RightDirection, 2 * angleY);
         }
 
@@ -584,6 +586,45 @@ namespace SpaceGroup
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             DrawPolyhedra();
+        }
+
+        private void saveTableButton_Click(object sender, RoutedEventArgs e)
+        {
+            SerializeTableList();
+        }
+
+        private void SerializeTableList()
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(System.Collections.ObjectModel.ObservableCollection<Atom>));
+            TextWriter writer = new StreamWriter("table.xml");
+            xmlSerializer.Serialize(writer, atomCell.atomCollection);
+            writer.Close();
+        }
+
+        private System.Collections.ObjectModel.ObservableCollection<Atom> DeserializeTableList(string filename)
+        {
+            var mySerializer = new XmlSerializer(typeof(System.Collections.ObjectModel.ObservableCollection<Atom>));
+            var myFileStream = new FileStream(filename, FileMode.Open);
+            var myObject = (System.Collections.ObjectModel.ObservableCollection<Atom>)mySerializer.Deserialize(myFileStream);
+            return myObject;
+        }
+
+        private void openBtnClick(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            openFileDialog.DefaultExt = ".xml";
+            //openFileDialog.Filter = "XML files(*.xml)";
+
+            if(openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string filename = openFileDialog.FileName;
+
+                atomCell.atomCollection = DeserializeTableList(filename);
+                MessageBox.Show("loaded");
+                //visualizeAtom(MainModel3Dgroup, atom);
+                //atomCell.atomCollection.Add(atom);
+                DataGridAtoms.ItemsSource = atomCell.atomCollection;
+            }
         }
     }
 }
