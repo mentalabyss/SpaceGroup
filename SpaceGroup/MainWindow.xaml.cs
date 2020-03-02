@@ -278,7 +278,7 @@ namespace SpaceGroup
             if (atom.Element[0] == 'O' && (atom.Element[1] != 's'))
             {
                 atomSize = 0.3;
-                brush1.Color = Color.FromRgb(255, 0, 0);
+                brush1.Color = Color.FromRgb(255, 0, 0); //oxygen to red
             }
  
 
