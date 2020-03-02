@@ -35,7 +35,5 @@ namespace SpaceGroup
             beta = b;
             gamma = g;
         }
-
-
     }
 }

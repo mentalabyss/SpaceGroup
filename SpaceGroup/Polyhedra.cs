@@ -14,6 +14,7 @@ namespace SpaceGroup
             foreach(Atom atom in atoms.Where(a => a.Element[0] != 'O'))
             {
                 var result = atoms.Where(a => a.Element[0] == 'O').OrderBy(a => Distance(atom, a)).Take(4);
+                Console.WriteLine(result.ToString());
                 allOxygens = allOxygens.Concat(result.ToList()).ToList();
             }
 

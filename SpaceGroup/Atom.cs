@@ -13,15 +13,17 @@ namespace SpaceGroup
         public Atom() { }
         string element;
         double x, y, z;
+        //SolidColorBrush 
 
         public string Element
         {
             get { return element; }
+            set { element = value; }
         }
 
-        public double X { get { return x; } }
-        public double Y { get { return y; } }
-        public double Z { get { return z; } }
+        public double X { get { return x; } set { x = value; } }
+        public double Y { get { return y; } set { y = value; } }
+        public double Z { get { return z; } set { z = value; } }
 
 
         public Atom(string element, string x, string y, string z)

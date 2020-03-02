@@ -16,6 +16,8 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Serialization;
+using System.Runtime.Serialization;
+using System.Collections.ObjectModel;
 
 namespace SpaceGroup
 {
@@ -272,13 +274,17 @@ namespace SpaceGroup
 
         private void visualizeAtom(Model3DGroup model_group, Atom atom)
         {
-            SolidColorBrush brush1 = atomColor;
+            SolidColorBrush brush1 = new SolidColorBrush();
 
             double atomSize = 0.7;
             if (atom.Element[0] == 'O' && (atom.Element[1] != 's'))
             {
                 atomSize = 0.3;
                 brush1.Color = Color.FromRgb(255, 0, 0); //oxygen to red
+            }
+            else
+            {
+                brush1 = atomColor;
             }
  
 
@@ -597,18 +603,37 @@ namespace SpaceGroup
 
         private void SerializeTableList()
         {
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(System.Collections.ObjectModel.ObservableCollection<Atom>));
+            List<Atom> atoms = new List<Atom>();
+            foreach(Atom a in atomCell.atomCollection)
+            {
+                atoms.Add(a);
+            }
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Atom>));
             TextWriter writer = new StreamWriter("table.xml");
-            xmlSerializer.Serialize(writer, atomCell.atomCollection);
+
+            Console.WriteLine("B");
+            foreach(Atom a in atoms)
+            {
+                Console.WriteLine(a.X);
+            }
+            Console.WriteLine("E");
+
+            xmlSerializer.Serialize(writer, atoms);
             writer.Close();
         }
 
-        private System.Collections.ObjectModel.ObservableCollection<Atom> DeserializeTableList(string filename)
+        private ObservableCollection<Atom> DeserializeTableList(string filename)
         {
-            var mySerializer = new XmlSerializer(typeof(System.Collections.ObjectModel.ObservableCollection<Atom>));
+
+            var mySerializer = new XmlSerializer(typeof(List<Atom>));
             var myFileStream = new FileStream(filename, FileMode.Open);
-            var myObject = (System.Collections.ObjectModel.ObservableCollection<Atom>)mySerializer.Deserialize(myFileStream);
-            return myObject;
+            List<Atom> myObject = (List<Atom>)mySerializer.Deserialize(myFileStream);
+            ObservableCollection<Atom> ret = new ObservableCollection<Atom>();
+            foreach(Atom a in myObject)
+            {
+                ret.Add(a);
+            }
+            return ret;
         }
 
         private void openBtnClick(object sender, RoutedEventArgs e)
@@ -622,10 +647,16 @@ namespace SpaceGroup
                 string filename = openFileDialog.FileName;
 
                 atomCell.atomCollection = DeserializeTableList(filename);
+                foreach(Atom a in atomCell.atomCollection)
+                {
+                    visualizeAtom(MainModel3Dgroup, a);
+                }
                 MessageBox.Show("loaded");
                 //visualizeAtom(MainModel3Dgroup, atom);
                 //atomCell.atomCollection.Add(atom);
                 DataGridAtoms.ItemsSource = atomCell.atomCollection;
+
+
             }
         }
     }
