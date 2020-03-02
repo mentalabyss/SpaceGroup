@@ -272,10 +272,13 @@ namespace SpaceGroup
 
         private void visualizeAtom(Model3DGroup model_group, Atom atom)
         {
+            SolidColorBrush brush1 = atomColor;
+
             double atomSize = 0.7;
             if (atom.Element[0] == 'O' && (atom.Element[1] != 's'))
             {
                 atomSize = 0.3;
+                brush1.Color = Color.FromRgb(255, 0, 0);
             }
  
 
@@ -296,7 +299,6 @@ namespace SpaceGroup
 
                 AddSphere(mesh1, new Point3D(x, y, z), atomSize, 20, 30);
             //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-                SolidColorBrush brush1 = atomColor;
                 DiffuseMaterial material1 = new DiffuseMaterial(brush1);
                 GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
                 atomRepro.Children.Add(model1);
