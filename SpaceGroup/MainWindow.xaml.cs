@@ -249,7 +249,7 @@ namespace SpaceGroup
             try
             {
                 string s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(atomName.Text.ToLower());
-                Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text);
+                Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text, atomColor);
                 visualizeAtom(MainModel3Dgroup, atom);
                 atomCell.atomCollection.Add(atom);
 
@@ -274,6 +274,7 @@ namespace SpaceGroup
 
         private void visualizeAtom(Model3DGroup model_group, Atom atom)
         {
+
             SolidColorBrush brush1 = new SolidColorBrush();
 
             double atomSize = 0.7;
@@ -284,9 +285,9 @@ namespace SpaceGroup
             }
             else
             {
-                brush1 = atomColor;
+                brush1 = atom.Brush;
             }
- 
+
 
             Model3DGroup atomRepro = new Model3DGroup();
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
@@ -309,7 +310,7 @@ namespace SpaceGroup
                 GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
                 atomRepro.Children.Add(model1);
 
-                multipliedAtoms.Add(new Atom(atom.Element, z.ToString(), x.ToString(), y.ToString()));
+                multipliedAtoms.Add(new Atom(atom.Element, z.ToString(), x.ToString(), y.ToString(), atomColor));
             }
             atomReproductions.Add(atomRepro);
             model_group.Children.Add(atomRepro);
@@ -631,6 +632,7 @@ namespace SpaceGroup
             ObservableCollection<Atom> ret = new ObservableCollection<Atom>();
             foreach(Atom a in myObject)
             {
+                a.StringToColor();
                 ret.Add(a);
             }
             return ret;
