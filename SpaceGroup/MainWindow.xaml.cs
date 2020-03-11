@@ -35,11 +35,16 @@ namespace SpaceGroup
             InitializeComponent();
         }
         // The main object model group.
+        private Model3DGroup cells_and_atoms;
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
         private GeometryModel3D AxesModel;
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
         private GeometryModel3D BordersModel;
         private GeometryModel3D polyhedra_model;
+        private GeometryModel3D x_Axis;
+        private GeometryModel3D y_Axis;
+        private GeometryModel3D z_Axis;
+
 
         private SolidColorBrush atomColor;
         // The camera.
@@ -70,7 +75,7 @@ namespace SpaceGroup
             DefineLights();
 
             //buildAxes(out AxesModel);
-            buildStaticAxes(out AxesModel);
+            buildStaticAxes(out x_Axis, out y_Axis, out z_Axis);
             buildCellBorders(out BordersModel);
             // Create the model.
             //DefineModel(MainModel3Dgroup);
@@ -78,13 +83,20 @@ namespace SpaceGroup
             // Add the group of models to a ModelVisual3D.
             ModelVisual3D model_visual = new ModelVisual3D();
             model_visual.Content = MainModel3Dgroup;
-            MainModel3Dgroup.Children.Add(AxesModel);
+            MainModel3Dgroup.Children.Add(x_Axis);
+            MainModel3Dgroup.Children.Add(y_Axis);
+            MainModel3Dgroup.Children.Add(z_Axis);
             MainModel3Dgroup.Children.Add(BordersModel);
             //axesTranslate = new TranslateTransform3D(TheCamera.Position.X -0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
             //AxesModel.Transform = axesTranslate;
             // Display the main visual to the viewport.
             MainViewport.Children.Add(model_visual);
             moveFromCenter();
+        }
+
+        private void Translate_Cell()
+        {
+
         }
 
         private void moveFromCenter()
@@ -144,27 +156,91 @@ namespace SpaceGroup
             axes_model = new GeometryModel3D(axes_mesh, axes_material);
         }
 
-        private void buildStaticAxes(out GeometryModel3D static_axes_model)
+        private void buildStaticAxes(out GeometryModel3D static_Y_axis_model, out GeometryModel3D static_X_axis_model, out GeometryModel3D static_Z_axis_model)
         {
-            MeshGeometry3D axes_mesh = new MeshGeometry3D();
+            MeshGeometry3D x_mesh = new MeshGeometry3D();
+            MeshGeometry3D y_mesh = new MeshGeometry3D();
+            MeshGeometry3D z_mesh = new MeshGeometry3D();
             Point3D origin = new Point3D(0, 0, 0);
+
+
+            //Y (normal: X):
             Point3D xmax = new Point3D(25, 0, 0);
-            Point3D ymax = new Point3D(0, 25, 0);
-            Point3D zmax = new Point3D(0, 0, 25);
-            AddSegment(axes_mesh, origin, xmax, new Vector3D(0, 1, 0));
-            AddSegment(axes_mesh, origin, zmax, new Vector3D(0, 1, 0));
-            AddSegment(axes_mesh, origin, ymax, new Vector3D(1, 0, 0));
+            AddSegment(y_mesh, origin, xmax, new Vector3D(0, 1, 0));
+
             Vector3D vX = xmax - origin;
             vX.Normalize();
             Vector3D perpX = Vector3D.CrossProduct(vX, new Vector3D(0, 1, 0));
             perpX.Normalize();
             Vector3D v1X = ScaleVector(-vX + perpX, 1);
             Vector3D v2X = ScaleVector(-vX - perpX, 1);
-            AddSegment(axes_mesh, xmax, xmax + v1X, new Vector3D(0, 1, 0));
-            AddSegment(axes_mesh, xmax, xmax + v2X, new Vector3D(0, 1, 0));
+            AddSegment(y_mesh, xmax, xmax + v1X, new Vector3D(0, 1, 0));
+            AddSegment(y_mesh, xmax, xmax + v2X, new Vector3D(0, 1, 0));
+
+            Vector3D perpX1 = Vector3D.CrossProduct(vX, new Vector3D(0, 0, 1));
+            perpX1.Normalize();
+            Vector3D v1X1 = ScaleVector(-vX + perpX1, 1);
+            Vector3D v2X1 = ScaleVector(-vX - perpX1, 1);
+            AddSegment(y_mesh, xmax, xmax + v1X1, new Vector3D(0, 0, 1));
+            AddSegment(y_mesh, xmax, xmax + v2X1, new Vector3D(0, 0, 1));
+
             SolidColorBrush axes_brush = Brushes.Blue;
-            DiffuseMaterial axes_material = new DiffuseMaterial(axes_brush);
-            static_axes_model = new GeometryModel3D(axes_mesh, axes_material);
+            DiffuseMaterial y_axis_material = new DiffuseMaterial(axes_brush);
+
+            static_Y_axis_model = new GeometryModel3D(y_mesh, y_axis_material);
+
+            //Z (normal: Y):
+            Point3D ymax = new Point3D(0, 25, 0);
+            AddSegment(z_mesh, origin, ymax, new Vector3D(1, 0, 0));
+
+            Vector3D vY = ymax - origin;
+            vY.Normalize();
+            Vector3D perpY = Vector3D.CrossProduct(vY, new Vector3D(1, 0, 0));
+            perpX.Normalize();
+            Vector3D v1Y = ScaleVector(-vY + perpY, 1);
+            Vector3D v2Y = ScaleVector(-vY - perpY, 1);
+            AddSegment(z_mesh, ymax, ymax + v1Y, new Vector3D(0, 1, 0));
+            AddSegment(z_mesh, ymax, ymax + v2Y, new Vector3D(0, 1, 0));
+
+            Vector3D perpY1 = Vector3D.CrossProduct(vY, new Vector3D(0, 0, 1));
+            perpX1.Normalize();
+            Vector3D v1Y1 = ScaleVector(-vY + perpY1, 1);
+            Vector3D v2Y1 = ScaleVector(-vY - perpY1, 1);
+            AddSegment(z_mesh, ymax, ymax + v1Y1, new Vector3D(0, 0, 1));
+            AddSegment(z_mesh, ymax, ymax + v2Y1, new Vector3D(0, 0, 1));
+
+            axes_brush = Brushes.Green;
+            DiffuseMaterial z_axis_material = new DiffuseMaterial(axes_brush);
+
+            static_Z_axis_model = new GeometryModel3D(z_mesh, z_axis_material);
+
+
+            //X (normal: Z):
+            Point3D zmax = new Point3D(0, 0, 25);
+            AddSegment(x_mesh, origin, zmax, new Vector3D(0, 1, 0));
+
+            Vector3D vZ = zmax - origin;
+            vZ.Normalize();
+            Vector3D perpZ = Vector3D.CrossProduct(vZ, new Vector3D(0, 1, 0));
+            perpX.Normalize();
+            Vector3D v1Z = ScaleVector(-vZ + perpZ, 1);
+            Vector3D v2Z = ScaleVector(-vZ - perpZ, 1);
+            AddSegment(x_mesh, zmax, zmax + v1Z, new Vector3D(0, 1, 0));
+            AddSegment(x_mesh, zmax, zmax + v2Z, new Vector3D(0, 1, 0));
+
+            Vector3D perpZ1 = Vector3D.CrossProduct(vZ, new Vector3D(1, 0, 0));
+            perpX1.Normalize();
+            Vector3D v1Z1 = ScaleVector(-vZ + perpZ1, 1);
+            Vector3D v2Z1 = ScaleVector(-vZ - perpZ1, 1);
+            AddSegment(x_mesh, zmax, zmax + v1Z1, new Vector3D(1, 0, 0));
+            AddSegment(x_mesh, zmax, zmax + v2Z1, new Vector3D(1, 0, 0));
+
+            axes_brush = Brushes.Red;
+            DiffuseMaterial x_axis_material = new DiffuseMaterial(axes_brush);
+
+            static_X_axis_model = new GeometryModel3D(x_mesh, x_axis_material);
+
+            //static_axes_model = new GeometryModel3D(axes_mesh, axes_material);
         }
 
         private void AddSegment(MeshGeometry3D mesh, Point3D point1, Point3D point2, Vector3D up)
