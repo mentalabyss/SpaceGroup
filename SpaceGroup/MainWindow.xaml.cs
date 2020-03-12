@@ -35,7 +35,7 @@ namespace SpaceGroup
             InitializeComponent();
         }
         // The main object model group.
-        private Model3DGroup cells_and_atoms;
+        private Model3DGroup cells_and_atoms = new Model3DGroup();
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
         private GeometryModel3D AxesModel;
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
@@ -87,6 +87,7 @@ namespace SpaceGroup
             MainModel3Dgroup.Children.Add(y_Axis);
             MainModel3Dgroup.Children.Add(z_Axis);
             MainModel3Dgroup.Children.Add(BordersModel);
+            MainModel3Dgroup.Children.Add(cells_and_atoms);
             //axesTranslate = new TranslateTransform3D(TheCamera.Position.X -0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
             //AxesModel.Transform = axesTranslate;
             // Display the main visual to the viewport.
@@ -96,7 +97,9 @@ namespace SpaceGroup
 
         private void Translate_Cell()
         {
-
+            Model3DGroup Upper_Cell_Model = cells_and_atoms;
+            var transform = new TranslateTransform3D(0, -atomCell.ZAxisL, 0);
+            Upper_Cell_Model.Transform = transform;
         }
 
         private void moveFromCenter()
@@ -326,7 +329,7 @@ namespace SpaceGroup
             {
                 string s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(atomName.Text.ToLower());
                 Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text, atomColor);
-                visualizeAtom(MainModel3Dgroup, atom);
+                visualizeAtom(cells_and_atoms, atom);
                 atomCell.atomCollection.Add(atom);
 
                 DataGridAtoms.Items.Refresh();
@@ -385,21 +388,10 @@ namespace SpaceGroup
                 DiffuseMaterial material1 = new DiffuseMaterial(brush1);
                 GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
                 atomRepro.Children.Add(model1);
-
-                multipliedAtoms.Add(new Atom(atom.Element, z.ToString(), x.ToString(), y.ToString(), atomColor));
+                multipliedAtoms.Add(new Atom(atom.Element, z.ToString(), x.ToString(), y.ToString(), atomColor)); //NULLPTREXCEPTION
             }
             atomReproductions.Add(atomRepro);
             model_group.Children.Add(atomRepro);
-            //model_group.Children.Add();
-
-            //MeshGeometry3D mesh1 = new MeshGeometry3D();
-            //AddSphere(mesh1, new Point3D(atomCell.YAxisL * atom.X, atomCell.ZAxisL * atom.Z, atomCell.XAxisL * atom.X), 0.25, 20, 30);
-            ////AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-            //SolidColorBrush brush1 = Brushes.Red;
-            //DiffuseMaterial material1 = new DiffuseMaterial(brush1);
-            //GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
-            //model_group.Children.Add(model1);
-
         }
 
         private void DrawPolyhedra()
@@ -670,7 +662,8 @@ namespace SpaceGroup
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            DrawPolyhedra();
+            Translate_Cell();
+            //DrawPolyhedra();
         }
 
         private void saveTableButton_Click(object sender, RoutedEventArgs e)
@@ -727,7 +720,7 @@ namespace SpaceGroup
                 atomCell.atomCollection = DeserializeTableList(filename);
                 foreach(Atom a in atomCell.atomCollection)
                 {
-                    visualizeAtom(MainModel3Dgroup, a);
+                    visualizeAtom(cells_and_atoms, a);
                 }
                 MessageBox.Show("loaded");
                 //visualizeAtom(MainModel3Dgroup, atom);
