@@ -89,7 +89,8 @@
 					</GroupBox>
 					<TextBlock Grid.Row="2"><Run Text="Масштаб: "/><InlineUIContainer>
 						</InlineUIContainer></TextBlock>
-					<Button Grid.Row="3" Content="Button" Width="75" Click="Button_Click"/>
+					<Button Grid.Row="2" Content="Трансляция" Width="75" Click="draw_translations" Margin="10,43,174,-43"/>
+					<Button Grid.Row="2" Content="Полиэдры" Margin="90,43,80,-43" Click="draw_polyhydras"/>
 					<ScrollBar Name= "atomResizer" Grid.Row="2" ValueChanged="ScrollBar_ValueChanged"/>
 				</Grid>
 			</ScrollViewer>

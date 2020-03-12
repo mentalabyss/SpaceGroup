@@ -86,8 +86,9 @@ namespace SpaceGroup
             MainModel3Dgroup.Children.Add(x_Axis);
             MainModel3Dgroup.Children.Add(y_Axis);
             MainModel3Dgroup.Children.Add(z_Axis);
-            MainModel3Dgroup.Children.Add(BordersModel);
+            //MainModel3Dgroup.Children.Add(BordersModel);
             MainModel3Dgroup.Children.Add(cells_and_atoms);
+            cells_and_atoms.Children.Add(BordersModel);
             //axesTranslate = new TranslateTransform3D(TheCamera.Position.X -0.2, TheCamera.Position.Y - 0.1, TheCamera.Position.Z - 0.5);
             //AxesModel.Transform = axesTranslate;
             // Display the main visual to the viewport.
@@ -95,11 +96,37 @@ namespace SpaceGroup
             moveFromCenter();
         }
 
-        private void Translate_Cell()
+        private void Translate_Cell(string direction)
         {
-            Model3DGroup Upper_Cell_Model = cells_and_atoms;
-            var transform = new TranslateTransform3D(0, -atomCell.ZAxisL, 0);
+            Model3DGroup Upper_Cell_Model = cells_and_atoms.Clone();
+            var transform = new TranslateTransform3D();
+
+            switch (direction)
+            {
+                case "up":
+                    transform = new TranslateTransform3D(0, atomCell.ZAxisL, 0);
+                    break;
+                case "down":
+                    transform = new TranslateTransform3D(0, -atomCell.ZAxisL, 0);
+                    break;
+                case "right":
+                    transform = new TranslateTransform3D(atomCell.YAxisL, 0, 0);
+                    break;
+                case "left":
+                    transform = new TranslateTransform3D(-atomCell.YAxisL, 0, 0);
+                    break;
+                case "front":
+                    transform = new TranslateTransform3D(0, 0, -atomCell.XAxisL);
+                    break;
+                case "back":
+                    transform = new TranslateTransform3D(0, 0, atomCell.XAxisL);
+                    break;
+                default:
+                    break;
+            }
+
             Upper_Cell_Model.Transform = transform;
+            MainModel3Dgroup.Children.Add(Upper_Cell_Model);
         }
 
         private void moveFromCenter()
@@ -142,22 +169,10 @@ namespace SpaceGroup
             borders_model = new GeometryModel3D(borders_mesh, borders_material);
         }
 
-        private void buildAxes(out GeometryModel3D axes_model)
-        {
-            // Make the axes model.
-            MeshGeometry3D axes_mesh = new MeshGeometry3D();
-            Point3D origin = new Point3D(0, 0, 0);
-            Point3D xmax = new Point3D(0.1, 0, 0);
-            Point3D ymax = new Point3D(0, 0.1, 0);
-            Point3D zmax = new Point3D(0, 0, 0.1);
-            AddSegment(axes_mesh, origin, xmax, new Vector3D(0, 1, 0));
-            AddSegment(axes_mesh, origin, zmax, new Vector3D(0, 1, 0));
-            AddSegment(axes_mesh, origin, ymax, new Vector3D(1, 0, 0));
+        //private void buildAxes(out GeometryModel3D axes_model)
+        //{
 
-            SolidColorBrush axes_brush = Brushes.Red;
-            DiffuseMaterial axes_material = new DiffuseMaterial(axes_brush);
-            axes_model = new GeometryModel3D(axes_mesh, axes_material);
-        }
+        //}
 
         private void buildStaticAxes(out GeometryModel3D static_Y_axis_model, out GeometryModel3D static_X_axis_model, out GeometryModel3D static_Z_axis_model)
         {
@@ -187,7 +202,7 @@ namespace SpaceGroup
             AddSegment(y_mesh, xmax, xmax + v1X1, new Vector3D(0, 0, 1));
             AddSegment(y_mesh, xmax, xmax + v2X1, new Vector3D(0, 0, 1));
 
-            SolidColorBrush axes_brush = Brushes.Blue;
+            SolidColorBrush axes_brush = Brushes.Green;
             DiffuseMaterial y_axis_material = new DiffuseMaterial(axes_brush);
 
             static_Y_axis_model = new GeometryModel3D(y_mesh, y_axis_material);
@@ -212,7 +227,7 @@ namespace SpaceGroup
             AddSegment(z_mesh, ymax, ymax + v1Y1, new Vector3D(0, 0, 1));
             AddSegment(z_mesh, ymax, ymax + v2Y1, new Vector3D(0, 0, 1));
 
-            axes_brush = Brushes.Green;
+            axes_brush = Brushes.Blue;
             DiffuseMaterial z_axis_material = new DiffuseMaterial(axes_brush);
 
             static_Z_axis_model = new GeometryModel3D(z_mesh, z_axis_material);
@@ -344,7 +359,7 @@ namespace SpaceGroup
         {
             int index = DataGridAtoms.SelectedIndex;
             Model3DGroup groupToRemove = atomReproductions[index];
-            MainModel3Dgroup.Children.Remove(groupToRemove);
+            cells_and_atoms.Children.Remove(groupToRemove);
             atomCell.atomCollection.Remove(DataGridAtoms.SelectedItem as Atom);
             //MessageBox.Show((DataGridAtoms.SelectedItem as Atom).Element);
             DataGridAtoms.Items.Refresh();
@@ -353,7 +368,8 @@ namespace SpaceGroup
 
         private void visualizeAtom(Model3DGroup model_group, Atom atom)
         {
-
+            atom.StringToColor();
+            atomColor = atom.Brush;
             SolidColorBrush brush1 = new SolidColorBrush();
 
             double atomSize = 0.7;
@@ -367,14 +383,16 @@ namespace SpaceGroup
                 brush1 = atom.Brush;
             }
 
-
             Model3DGroup atomRepro = new Model3DGroup();
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
                 MeshGeometry3D mesh1 = new MeshGeometry3D();
-                double x = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0) * atomCell.YAxisL; //Y
-                double y = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z) * atomCell.ZAxisL; //Z
-                double z = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0) * atomCell.XAxisL; //X
+                double X = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0);
+                double x = X * atomCell.YAxisL; //Y
+                double Y = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z);
+                double y = Y * atomCell.ZAxisL; //Z
+                double Z = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0);
+                double z = Z * atomCell.XAxisL; //X
 
                 if (x < 0)
                     x += atomCell.YAxisL;
@@ -388,7 +406,9 @@ namespace SpaceGroup
                 DiffuseMaterial material1 = new DiffuseMaterial(brush1);
                 GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
                 atomRepro.Children.Add(model1);
-                multipliedAtoms.Add(new Atom(atom.Element, z.ToString(), x.ToString(), y.ToString(), atomColor)); //NULLPTREXCEPTION
+                //multipliedAtoms.Add(new Atom(atom.Element, atom., x.ToString(), y.ToString(), atomColor)); //NULLPTREXCEPTION
+                multipliedAtoms.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atomColor)); //NULLPTREXCEPTION
+
             }
             atomReproductions.Add(atomRepro);
             model_group.Children.Add(atomRepro);
@@ -396,14 +416,14 @@ namespace SpaceGroup
 
         private void DrawPolyhedra()
         {
-            List<Atom> oxygens = Polyhedra.CalculatePolyhedra(multipliedAtoms);
+            List<Atom> oxygens = Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
             MeshGeometry3D polyhedra_mesh = new MeshGeometry3D();
             for (int i = 0; i < oxygens.Count; i += 4)
             {
-                Point3D point0 = new Point3D(oxygens[i].Y, oxygens[i].Z, oxygens[i].X);
-                Point3D point1 = new Point3D(oxygens[i+1].Y, oxygens[i+1].Z, oxygens[i+1].X);
-                Point3D point2 = new Point3D(oxygens[i+2].Y, oxygens[i+2].Z, oxygens[i+2].X);
-                Point3D point3 = new Point3D(oxygens[i+3].Y, oxygens[i+3].Z, oxygens[i+3].X);
+                Point3D point0 = new Point3D(oxygens[i].Y * atomCell.YAxisL, oxygens[i].Z * atomCell.ZAxisL, oxygens[i].X * atomCell.XAxisL);
+                Point3D point1 = new Point3D(oxygens[i+1].Y * atomCell.YAxisL, oxygens[i+1].Z * atomCell.ZAxisL, oxygens[i+1].X * atomCell.XAxisL);
+                Point3D point2 = new Point3D(oxygens[i+2].Y * atomCell.YAxisL, oxygens[i+2].Z * atomCell.ZAxisL, oxygens[i+2].X * atomCell.XAxisL);
+                Point3D point3 = new Point3D(oxygens[i+3].Y * atomCell.YAxisL, oxygens[i+3].Z * atomCell.ZAxisL, oxygens[i+3].X * atomCell.XAxisL);
 
                 AddSegment(polyhedra_mesh, point0, point1, new Vector3D(0, 1, 0));
                 AddSegment(polyhedra_mesh, point0, point2, new Vector3D(0, 1, 0));
@@ -418,6 +438,8 @@ namespace SpaceGroup
                 MainModel3Dgroup.Children.Add(polyhedra_model);
             }
         }
+
+
 
         private void AddSphere(MeshGeometry3D mesh, Point3D center,
     double radius, int num_phi, int num_theta)
@@ -660,9 +682,17 @@ namespace SpaceGroup
             TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void draw_translations(object sender, RoutedEventArgs e)
         {
-            Translate_Cell();
+            Translate_Cell("up");
+            Translate_Cell("down");
+            Translate_Cell("left");
+            Translate_Cell("right");
+            Translate_Cell("front");
+            Translate_Cell("back");
+
+            //Translate_Cell("up");
+
             //DrawPolyhedra();
         }
 
@@ -680,13 +710,6 @@ namespace SpaceGroup
             }
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Atom>));
             TextWriter writer = new StreamWriter("table.xml");
-
-            Console.WriteLine("B");
-            foreach(Atom a in atoms)
-            {
-                Console.WriteLine(a.X);
-            }
-            Console.WriteLine("E");
 
             xmlSerializer.Serialize(writer, atoms);
             writer.Close();
@@ -729,6 +752,11 @@ namespace SpaceGroup
 
 
             }
+        }
+
+        private void draw_polyhydras(object sender, RoutedEventArgs e)
+        {
+            DrawPolyhedra();
         }
     }
 }
