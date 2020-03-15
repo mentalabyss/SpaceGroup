@@ -44,6 +44,10 @@ namespace SpaceGroup
         private GeometryModel3D x_Axis;
         private GeometryModel3D y_Axis;
         private GeometryModel3D z_Axis;
+        private Model3DGroup Upper_Cell_Model;
+
+        bool polySwitch = false;
+        bool translationsSwitch = false;
 
 
         private SolidColorBrush atomColor;
@@ -98,7 +102,7 @@ namespace SpaceGroup
 
         private void Translate_Cell(string direction)
         {
-            Model3DGroup Upper_Cell_Model = cells_and_atoms.Clone();
+            Upper_Cell_Model = cells_and_atoms.Clone();
             var transform = new TranslateTransform3D();
 
             switch (direction)
@@ -684,12 +688,21 @@ namespace SpaceGroup
 
         private void draw_translations(object sender, RoutedEventArgs e)
         {
-            Translate_Cell("up");
-            Translate_Cell("down");
-            Translate_Cell("left");
-            Translate_Cell("right");
-            Translate_Cell("front");
-            Translate_Cell("back");
+            if (!translationsSwitch)
+            {
+                translationsSwitch = true;
+                Translate_Cell("up");
+                Translate_Cell("down");
+                Translate_Cell("left");
+                Translate_Cell("right");
+                Translate_Cell("front");
+                Translate_Cell("back");
+            }
+            else
+            {
+                translationsSwitch = false;
+                MainModel3Dgroup.Children.Remove(Upper_Cell_Model);
+            }
 
             //Translate_Cell("up");
 
@@ -756,7 +769,16 @@ namespace SpaceGroup
 
         private void draw_polyhydras(object sender, RoutedEventArgs e)
         {
-            DrawPolyhedra();
+            if (!polySwitch)
+            {
+                polySwitch = true;
+                DrawPolyhedra();
+            }
+            else
+            {
+                polySwitch = false;
+                MainModel3Dgroup.Children.Remove(polyhedra_model);
+            }
         }
     }
 }

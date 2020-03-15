@@ -62,6 +62,10 @@ namespace SpaceGroup
 
         static bool check_point_in_tetrahydron(Atom centerAtom, List<Atom> oxygens)
         {
+            double center_x = (oxygens[0].X + oxygens[1].X + oxygens[2].X + oxygens[3].X) / 4;
+            double center_y = (oxygens[0].Y + oxygens[1].Y + oxygens[2].Y + oxygens[3].Y) / 4;
+            double center_z = (oxygens[0].Z + oxygens[1].Z + oxygens[2].Z + oxygens[3].Z) / 4;
+
             double a;
             double b;
             double c;
@@ -77,12 +81,10 @@ namespace SpaceGroup
 
             Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
 
-            //if (a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d >= 0)
-            //    return false;
+            if ((a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d) * (a * center_x + b * center_y + c * center_z + d) <= 0)
+                return false;
 
             
-
-
             three_points = new List<Atom>();
 
             three_points.Add(oxygens[0]);
@@ -95,8 +97,8 @@ namespace SpaceGroup
             Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
 
 
-            //if (a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d >= 0)
-            //    return false;
+            if ((a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d) * (a * center_x + b * center_y + c * center_z + d) <= 0)
+                return false;
 
             three_points = new List<Atom>();
 
@@ -110,8 +112,8 @@ namespace SpaceGroup
             Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
 
 
-            //if (a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d >= 0)
-            //    return false;
+            if ((a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d) * (a * center_x + b * center_y + c * center_z + d) <= 0)
+                return false;
 
             three_points = new List<Atom>();
 
@@ -124,8 +126,8 @@ namespace SpaceGroup
 
             Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
 
-            //if (a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d >= 0)
-            //    return false;
+            if ((a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d) * (a * center_x + b * center_y + c * center_z + d) <= 0)
+                return false;
 
             return true;
         }
