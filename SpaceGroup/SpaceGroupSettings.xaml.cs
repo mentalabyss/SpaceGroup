@@ -170,6 +170,7 @@ namespace SpaceGroup
         {
             var selectedGroup = (SpaceGroupCl)combobox.SelectedItem;
             ((MainWindow)this.Owner).selectGroup(selectedGroup);
+            this.Close();
         }
     }
 }

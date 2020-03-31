@@ -54,8 +54,8 @@
 					<GroupBox Grid.Row="1" Header="Таблица добавленных эл-ов" Padding="0,10" 
                           Foreground="DarkBlue"
                           Height="195" Margin="10,0">
-						<Canvas Height="162" Margin="0,0,-2,-10" Width="166" HorizontalAlignment="Center">
-							<DataGrid x:Name="DataGridAtoms" Height="125" Canvas.Left="10" Canvas.Top="10" Width="146" CanUserAddRows="True" CanUserDeleteRows="True" AlternationCount="1"
+						<Canvas Height="162" Margin="10,0,29,-10" Width="188" HorizontalAlignment="Center">
+							<DataGrid x:Name="DataGridAtoms" Height="125" Canvas.Left="10" Canvas.Top="10" Width="178" CanUserAddRows="True" CanUserDeleteRows="True" AlternationCount="1"
 							  ItemsSource="{Binding Path=., Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"
 							  AutoGenerateColumns="False">
 								<DataGrid.Columns>
@@ -66,8 +66,8 @@
 									<DataGridTextColumn IsReadOnly="False" Header="Цвет" ></DataGridTextColumn>
 								</DataGrid.Columns>
 							</DataGrid>
-							<Button Name="deleteButton" Content="Удалить" Canvas.Left="81" Canvas.Top="140" Width="75" Click="deleteButtonClick"/>
-							<Button Name="saveTableButton" Content="Соранить" Canvas.Top="140" Width="75" Click="saveTableButton_Click"/>
+							<Button Name="deleteButton" Content="Удалить" Canvas.Left="113" Canvas.Top="142" Width="75" Click="deleteButtonClick"/>
+							<Button Name="saveTableButton" Content="Соранить" Canvas.Top="142" Width="75" Click="saveTableButton_Click" Canvas.Left="10"/>
 						</Canvas>
 					</GroupBox>
 
@@ -87,11 +87,8 @@
 							<Button Content="Цвет" Canvas.Left="81" Canvas.Top="111" Width="75" Click="pickColor"/>
 						</Canvas>
 					</GroupBox>
-					<TextBlock Grid.Row="2"><Run Text="Масштаб: "/><InlineUIContainer>
-						</InlineUIContainer></TextBlock>
-					<Button Grid.Row="2" Content="Трансляция" Width="75" Click="draw_translations" Margin="10,43,174,-43"/>
-					<Button Grid.Row="2" Content="Полиэдры" Margin="90,43,80,-43" Click="draw_polyhydras"/>
-					<ScrollBar Name= "atomResizer" Grid.Row="2" ValueChanged="ScrollBar_ValueChanged"/>
+					<Button Grid.Row="2" Content="Трансляция" Width="75" Click="draw_translations" Margin="36,10,148,-10"/>
+					<Button Grid.Row="2" Content="Полиэдры" Margin="128,10,41,-10" Click="draw_polyhydras"/>
 				</Grid>
 			</ScrollViewer>
 		</Grid>
