@@ -36,9 +36,17 @@ namespace SpaceGroup
         }
         // The main object model group.
         private Model3DGroup cells_and_atoms = new Model3DGroup();
+        private Model3DGroup atoms = new Model3DGroup();
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
-        private GeometryModel3D AxesModel;
+        private Model3DGroup Upper_Cell_Model;
+        private Model3DGroup DiscreteAxisGroup = new Model3DGroup();
+        private Model3DGroup MainAndDA = new Model3DGroup();
+        private Model3DGroup TranslationsGroup = new Model3DGroup();
+
+
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
+        private List<GeometryModel3D> SelectableModels = new List<GeometryModel3D>();
+
         private GeometryModel3D BordersModel;
         private GeometryModel3D polyhedra_model;
         private GeometryModel3D x_Axis;
@@ -47,13 +55,9 @@ namespace SpaceGroup
         private GeometryModel3D discrete_x_axis;
         private GeometryModel3D discrete_y_axis;
         private GeometryModel3D discrete_z_axis;
-        private Model3DGroup Upper_Cell_Model;
-        private Model3DGroup DiscreteAxisGroup = new Model3DGroup();
-        private Model3DGroup MainAndDA = new Model3DGroup();
-        private Model3DGroup TranslationsGroup = new Model3DGroup();
-
-        private List<GeometryModel3D> SelectableModels = new List<GeometryModel3D>();
         private GeometryModel3D SelectedModel = null;
+
+
         private Material SelectedMaterial = new DiffuseMaterial(Brushes.Black);
         private Material NormalMaterial = new DiffuseMaterial();
 
@@ -632,22 +636,24 @@ namespace SpaceGroup
             }
 
 
-            // Deselect the prevously selected model.
-            if (SelectedModel != null)
-            {
-                SelectedModel.Material = NormalMaterial;
-                SelectedModel = null;
-            }
+            
 
             // Get the mouse's position relative to the viewport.
             Point mouse_pos = e.GetPosition(MainViewport);
 
             // Perform the hit test.
-            HitTestResult result =
-                VisualTreeHelper.HitTest(MainViewport, mouse_pos);
+            HitTestResult result = VisualTreeHelper.HitTest(MainViewport, mouse_pos);
 
             // See if we hit a model.
             RayMeshGeometry3DHitTestResult mesh_result = result as RayMeshGeometry3DHitTestResult;
+
+            // Deselect the prevously selected model.
+            if (SelectedModel != null && mesh_result != null)
+            {
+                SelectedModel.Material = NormalMaterial;
+                SelectedModel = null;
+            }
+
             if (mesh_result != null)
             {
                 GeometryModel3D model = (GeometryModel3D)mesh_result.ModelHit;
@@ -656,7 +662,7 @@ namespace SpaceGroup
                     SelectedModel = model;
                     NormalMaterial = SelectedModel.Material;
                     SelectedModel.Material = SelectedMaterial;
-
+                    ShowSelectedAtomInfo(SelectedModel, NormalMaterial);
                 }
             }
         }
@@ -889,6 +895,12 @@ namespace SpaceGroup
                 string filename = openFileDialog.FileName;
 
                 atomCell.atomCollection = DeserializeTableList(filename);
+
+                cells_and_atoms.Children.Clear();
+
+                buildCellBorders(out BordersModel);
+                cells_and_atoms.Children.Add(BordersModel);
+
                 foreach(Atom a in atomCell.atomCollection)
                 {
                     visualizeAtom(cells_and_atoms, a);
@@ -897,8 +909,6 @@ namespace SpaceGroup
                 //visualizeAtom(MainModel3Dgroup, atom);
                 //atomCell.atomCollection.Add(atom);
                 DataGridAtoms.ItemsSource = atomCell.atomCollection;
-
-
             }
         }
 
@@ -913,6 +923,18 @@ namespace SpaceGroup
             {
                 polySwitch = false;
                 MainModel3Dgroup.Children.Remove(polyhedra_model);
+            }
+        }
+
+        private void ShowSelectedAtomInfo(GeometryModel3D selectedModel, Material selectedMaterial)
+        {
+            foreach(Model3DGroup model3DGroup in cells_and_atoms.Children)
+            {
+                int index = model3DGroup.Children.IndexOf(selectedModel);
+                if (index > -1)
+                {
+                    //selectedAtomX = model3DGroup.Children[index].
+                }
             }
         }
     }

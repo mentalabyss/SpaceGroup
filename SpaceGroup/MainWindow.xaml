@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SpaceGroup"
         mc:Ignorable="d"
         Title="MainWindow"
-		Loaded="Window_Loaded"
+		Loaded="Window_Loaded" Height="636"
 		>
 
 	<Grid>
@@ -21,7 +21,7 @@
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 
-		<Menu DockPanel.Dock="Top">
+		<Menu DockPanel.Dock="Top" Grid.ColumnSpan="3">
 			<MenuItem Header="_File">
 				<MenuItem Header="_New" />
 				<MenuItem Header="_Open" Click="openBtnClick" />
@@ -49,27 +49,8 @@
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
 					</Grid.RowDefinitions>
-
-					<GroupBox Grid.Row="1" Header="Таблица добавленных эл-ов" Padding="0,10" 
-                          Foreground="DarkBlue"
-                          Height="195" Margin="10,0">
-						<Canvas Height="162" Margin="10,0,29,-10" Width="188" HorizontalAlignment="Center">
-							<DataGrid x:Name="DataGridAtoms" Height="125" Canvas.Left="10" Canvas.Top="10" Width="178" CanUserAddRows="True" CanUserDeleteRows="True" AlternationCount="1"
-							  ItemsSource="{Binding Path=., Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"
-							  AutoGenerateColumns="False">
-								<DataGrid.Columns>
-									<DataGridTextColumn IsReadOnly="False" Header="Атом" Binding="{Binding Element}"></DataGridTextColumn>
-									<DataGridTextColumn IsReadOnly="False" Header="x" Binding="{Binding X}"></DataGridTextColumn>
-									<DataGridTextColumn IsReadOnly="False" Header="y" Binding="{Binding Y}"></DataGridTextColumn>
-									<DataGridTextColumn IsReadOnly="False" Header="z" Binding="{Binding Z}"></DataGridTextColumn>
-									<DataGridTextColumn IsReadOnly="False" Header="Цвет" ></DataGridTextColumn>
-								</DataGrid.Columns>
-							</DataGrid>
-							<Button Name="deleteButton" Content="Удалить" Canvas.Left="113" Canvas.Top="142" Width="75" Click="deleteButtonClick"/>
-							<Button Name="saveTableButton" Content="Соранить" Canvas.Top="142" Width="75" Click="saveTableButton_Click" Canvas.Left="10"/>
-						</Canvas>
-					</GroupBox>
 
 					<GroupBox  Grid.Row="0" Header="Добавить атом" Height="200" Width="168" Margin="8,5,0,0" VerticalAlignment="Top" Foreground="DarkBlue" Grid.ColumnSpan="2">
 						<Canvas Margin="0,10,0,-2">
@@ -87,8 +68,70 @@
 							<Button Content="Цвет" Canvas.Left="81" Canvas.Top="111" Width="75" Click="pickColor"/>
 						</Canvas>
 					</GroupBox>
-					<Button Grid.Row="2" Content="Трансляция" Width="75" Click="draw_translations" Margin="36,10,148,-10"/>
-					<Button Grid.Row="2" Content="Полиэдры" Margin="128,10,41,-10" Click="draw_polyhydras"/>
+					
+					<GroupBox Grid.Row="1" Header="Таблица добавленных эл-ов"
+                          Foreground="DarkBlue"
+                          Height="195" Width="Auto">
+						<Canvas Height="162" Width="Auto" >
+							<DataGrid x:Name="DataGridAtoms" Height="125" Canvas.Left="10" Canvas.Top="10" Width="227" CanUserAddRows="True" CanUserDeleteRows="True" AlternationCount="1"
+							  ItemsSource="{Binding Path=., Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"
+							  AutoGenerateColumns="False">
+								<DataGrid.Columns>
+									<DataGridTextColumn IsReadOnly="False" Header="Атом" Binding="{Binding Element}"></DataGridTextColumn>
+									<DataGridTextColumn IsReadOnly="False" Header="x" Binding="{Binding X}"></DataGridTextColumn>
+									<DataGridTextColumn IsReadOnly="False" Header="y" Binding="{Binding Y}"></DataGridTextColumn>
+									<DataGridTextColumn IsReadOnly="False" Header="z" Binding="{Binding Z}"></DataGridTextColumn>
+									<DataGridTextColumn IsReadOnly="False" Header="Цвет" ></DataGridTextColumn>
+								</DataGrid.Columns>
+							</DataGrid>
+							<Button Name="deleteButton" Content="Удалить" Canvas.Left="113" Canvas.Top="142" Width="75" Click="deleteButtonClick"/>
+							<Button Name="saveTableButton" Content="Соранить" Canvas.Top="142" Width="75" Click="saveTableButton_Click" Canvas.Left="10"/>
+						</Canvas>
+					</GroupBox>
+
+					
+
+					<GroupBox Grid.Row="2" Height="Auto" Margin="5,5,5,5">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Button Content="Трансляция" Click="draw_translations" Grid.Column="0" Margin="5,5,5,5"/>
+							<Button Content="Полиэдры" Click="draw_polyhydras" Grid.Column="1" Margin="5,5,5,5"/>
+						</Grid>
+					</GroupBox>
+
+					<GroupBox Grid.Row="3" Header="Выбранный элемент">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+
+							</Grid.RowDefinitions>
+
+							<Label Grid.Column="0" Grid.Row="0" Content="Атом: "/>
+							<Label Grid.Column="0" Grid.Row="1" Content="x: "/>
+							<Label Grid.Column="0" Grid.Row="2" Content="y: "/>
+							<Label Grid.Column="0" Grid.Row="3" Content="z: "/>
+
+							<Label Grid.Column="1" Grid.Row="0" Name="selectedAtomName"/>
+							<Label Grid.Column="1" Grid.Row="1" Name="selectedAtomX"/>
+							<Label Grid.Column="1" Grid.Row="2" Name="selectedAtomY"/>
+							<Label Grid.Column="1" Grid.Row="3" Name="selectedAtomZ"/>
+
+						</Grid>
+						
+
+					</GroupBox>
+
 				</Grid>
 			</ScrollViewer>
 		</Grid>
