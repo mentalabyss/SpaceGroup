@@ -46,6 +46,7 @@ namespace SpaceGroup
 
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
         private List<GeometryModel3D> SelectableModels = new List<GeometryModel3D>();
+        private List<List<Atom>> atomsList = new List<List<Atom>>(); 
 
         private GeometryModel3D BordersModel;
         private GeometryModel3D polyhedra_model;
@@ -491,6 +492,7 @@ namespace SpaceGroup
             }
 
             Model3DGroup atomRepro = new Model3DGroup();
+            List<Atom> atomReproList = new List<Atom>();
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
                 MeshGeometry3D mesh1 = new MeshGeometry3D();
@@ -508,6 +510,13 @@ namespace SpaceGroup
                 if (z < 0)
                     z += atomCell.XAxisL;
 
+                if (X < 0)
+                    X += 1;
+                if (Y < 0)
+                    Y += 1;
+                if (Z < 0)
+                    Z += 1;
+
                 AddSphere(mesh1, new Point3D(x, y, z), atomSize, 20, 30);
             //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
                 DiffuseMaterial material1 = new DiffuseMaterial(brush1);
@@ -516,8 +525,9 @@ namespace SpaceGroup
                 SelectableModels.Add(model1);
                 //multipliedAtoms.Add(new Atom(atom.Element, atom., x.ToString(), y.ToString(), atomColor)); //NULLPTREXCEPTION
                 multipliedAtoms.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atomColor)); //NULLPTREXCEPTION
-
+                atomReproList.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atom.Brush));
             }
+            atomsList.Add(atomReproList);
             atomReproductions.Add(atomRepro);
             model_group.Children.Add(atomRepro);
         }
@@ -928,12 +938,15 @@ namespace SpaceGroup
 
         private void ShowSelectedAtomInfo(GeometryModel3D selectedModel, Material selectedMaterial)
         {
-            foreach(Model3DGroup model3DGroup in cells_and_atoms.Children)
+            for(int i = 1; i < cells_and_atoms.Children.Count; i++)
             {
-                int index = model3DGroup.Children.IndexOf(selectedModel);
-                if (index > -1)
+                var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
+                if(iGroup.Children.IndexOf(selectedModel) > -1)
                 {
-                    //selectedAtomX = model3DGroup.Children[index].
+                    selectedAtomName.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].Element;
+                    selectedAtomX.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].X;
+                    selectedAtomY.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].Y;
+                    selectedAtomZ.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].Z;
                 }
             }
         }
