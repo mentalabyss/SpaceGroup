@@ -705,49 +705,53 @@ namespace SpaceGroup
 
         bool mouseDragged = false;
 
-        
 
-        public void OnViewportMouseDown(object sender, MouseEventArgs e)
+        public void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
         {
-            Point position = e.GetPosition(this);
-            mouseX = position.X;
-            mouseY = position.Y;
-            if (!mouseDragged)
+            if (e.ClickCount == 1)
             {
-                MouseOldX = position.X;
-                MouseOldY = position.Y;
-            }
-
-
-            
-
-            // Get the mouse's position relative to the viewport.
-            Point mouse_pos = e.GetPosition(MainViewport);
-
-            // Perform the hit test.
-            HitTestResult result = VisualTreeHelper.HitTest(MainViewport, mouse_pos);
-
-            // See if we hit a model.
-            RayMeshGeometry3DHitTestResult mesh_result = result as RayMeshGeometry3DHitTestResult;
-
-            
-
-            // Deselect the prevously selected model.
-            if (SelectedModel != null && mesh_result != null)
-            {
-                SelectedModel.Material = NormalMaterial;
-                SelectedModel = null;
-            }
-
-            if (mesh_result != null)
-            {
-                GeometryModel3D model = (GeometryModel3D)mesh_result.ModelHit;
-                if (SelectableModels.Contains(model))
+                Point position = e.GetPosition(this);
+                mouseX = position.X;
+                mouseY = position.Y;
+                if (!mouseDragged)
                 {
-                    SelectedModel = model;
-                    NormalMaterial = SelectedModel.Material;
-                    SelectedModel.Material = SelectedMaterial;
-                    ShowSelectedAtomInfo(SelectedModel, NormalMaterial);
+                    MouseOldX = position.X;
+                    MouseOldY = position.Y;
+                }
+            }
+
+
+            if (e.ClickCount == 2)
+            {
+                // Get the mouse's position relative to the viewport.
+                Point mouse_pos = e.GetPosition(MainViewport);
+
+                // Perform the hit test.
+                HitTestResult result = VisualTreeHelper.HitTest(MainViewport, mouse_pos);
+
+                // See if we hit a model.
+                RayMeshGeometry3DHitTestResult mesh_result = result as RayMeshGeometry3DHitTestResult;
+
+
+
+                // Deselect the prevously selected model.
+                if (SelectedModel != null)
+                {
+                    SelectedModel.Material = NormalMaterial;
+                    SelectedModel = null;
+                }
+
+                if (mesh_result != null)
+                {
+                    GeometryModel3D model = (GeometryModel3D)mesh_result.ModelHit;
+
+                    if (SelectableModels.Contains(model))
+                    {
+                        SelectedModel = model;
+                        NormalMaterial = SelectedModel.Material;
+                        SelectedModel.Material = SelectedMaterial;
+                        ShowSelectedAtomInfo(SelectedModel, NormalMaterial);
+                    }
                 }
             }
 
