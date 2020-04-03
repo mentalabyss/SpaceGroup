@@ -62,6 +62,7 @@
     </ApplicationDefinition>
     <Compile Include="Expr.cs" />
     <Compile Include="Math3D.cs" />
+    <Compile Include="MUtils.cs" />
     <Compile Include="Polyhedra.cs" />
     <Compile Include="SpaceGroupCl.cs" />
     <Compile Include="SpaceGroupSettings.xaml.cs">

@@ -63,6 +63,12 @@ namespace SpaceGroup
         private Material NormalMaterial = new DiffuseMaterial();
 
 
+        Label xLabel = new Label();
+        Label yLabel = new Label();
+        Label zLabel = new Label();
+
+
+
         bool polySwitch = false;
         bool translationsSwitch = false;
 
@@ -78,6 +84,12 @@ namespace SpaceGroup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            xLabel.Content = "Y";
+            yLabel.Content = "Z";
+            zLabel.Content = "X";
+            xLabel.FontSize = 25;
+            yLabel.FontSize = 25;
+            zLabel.FontSize = 25;
             multipliedAtoms = new List<Atom>();
             atomCell = new CrystalCell();
             selectedSpaceGroup = new SpaceGroupCl();
@@ -116,6 +128,8 @@ namespace SpaceGroup
 
             MainViewport.Children.Add(model_visual);
             moveFromCenter();
+            generateLabels();
+
         }
 
         private void Translate_Cell(string direction)
@@ -149,6 +163,28 @@ namespace SpaceGroup
 
             Upper_Cell_Model.Transform = transform;
             TranslationsGroup.Children.Add(Upper_Cell_Model);
+        }
+
+
+        private void generateLabels()
+        {
+            //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
+            canvasOn3D.Children.Clear();
+            //X
+            Point LabelXPoint = (Point)Point3DToScreen2D(new Point3D(25 - atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2), MainViewport);
+            Canvas.SetLeft(xLabel, LabelXPoint.X);
+            Canvas.SetTop(xLabel, LabelXPoint.Y);
+            canvasOn3D.Children.Add(xLabel);
+
+            Point LabelYPoint = (Point)Point3DToScreen2D(new Point3D(-atomCell.YAxisL / 2, 25 - atomCell.ZAxisL / 2, -atomCell.XAxisL / 2), MainViewport);
+            Canvas.SetLeft(yLabel, LabelYPoint.X);
+            Canvas.SetTop(yLabel, LabelYPoint.Y);
+            canvasOn3D.Children.Add(yLabel);
+
+            Point LabelZPoint = (Point)Point3DToScreen2D(new Point3D(-atomCell.YAxisL / 2, - atomCell.ZAxisL / 2, 25 - atomCell.XAxisL / 2), MainViewport);
+            Canvas.SetLeft(zLabel, LabelZPoint.X);
+            Canvas.SetTop(zLabel, LabelZPoint.Y);
+            canvasOn3D.Children.Add(zLabel);
         }
 
         private void buildDiscreteAxis(out GeometryModel3D discrete_y_axis_model, out GeometryModel3D discrete_x_axis_model, out GeometryModel3D discrete_z_axis_model)
@@ -632,7 +668,44 @@ namespace SpaceGroup
             mesh.TriangleIndices.Add(index1);
         }
 
+
+
+
+
+        public Point? Point3DToScreen2D(Point3D point3D, Viewport3D viewPort)
+        {
+            bool bOK = false;
+
+            // We need a Viewport3DVisual but we only have a Viewport3D.
+            
+            for(int i = 0; i < viewPort.Children.Count; i++)
+            {
+                Console.WriteLine(viewPort.Children[i].ToString());
+            }
+
+            Viewport3DVisual vpv = VisualTreeHelper.GetParent(viewPort.Children[0]) as Viewport3DVisual;
+
+            // Get the world to viewport transform matrix
+            Matrix3D m = MUtils.TryWorldToViewportTransform(vpv, out bOK);
+
+            if (bOK)
+            {
+                // Transform the 3D point to 2D
+                Point3D transformedPoint = m.Transform(point3D);
+
+                Point screen2DPoint = new Point(transformedPoint.X, transformedPoint.Y);
+
+                return new Nullable<Point>(screen2DPoint);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         bool mouseDragged = false;
+
+        
 
         public void OnViewportMouseDown(object sender, MouseEventArgs e)
         {
@@ -657,6 +730,8 @@ namespace SpaceGroup
             // See if we hit a model.
             RayMeshGeometry3DHitTestResult mesh_result = result as RayMeshGeometry3DHitTestResult;
 
+            
+
             // Deselect the prevously selected model.
             if (SelectedModel != null && mesh_result != null)
             {
@@ -675,6 +750,7 @@ namespace SpaceGroup
                     ShowSelectedAtomInfo(SelectedModel, NormalMaterial);
                 }
             }
+
         }
 
         double mouseX;
@@ -736,6 +812,8 @@ namespace SpaceGroup
             }
 
             //moveAxesWithCamera();
+            generateLabels();
+
         }
 
         public void MoveRight(double d)
@@ -948,6 +1026,55 @@ namespace SpaceGroup
                     selectedAtomY.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].Y;
                     selectedAtomZ.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].Z;
                 }
+            }
+        }
+
+        private void CheckBoxChecked(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            try
+            {
+                if (checkBox == checkboxXaxis)
+                {
+                    MainModel3Dgroup.Children.Add(y_Axis);
+                    zLabel.Visibility = Visibility.Visible;
+                }
+                else if (checkBox == checkboxYaxis)
+                {
+                    MainModel3Dgroup.Children.Add(x_Axis);
+                    xLabel.Visibility = Visibility.Visible;
+                }
+                else if (checkBox == checkboxZaxis)
+                {
+                    MainModel3Dgroup.Children.Add(z_Axis);
+                    yLabel.Visibility = Visibility.Visible;
+                }
+            }
+
+            catch (System.ArgumentException)
+            {
+                Console.WriteLine("first time check");
+            }
+        }
+
+        private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+
+            if (checkBox == checkboxXaxis)
+            {
+                MainModel3Dgroup.Children.Remove(y_Axis);
+                zLabel.Visibility = Visibility.Hidden;
+            }
+            else if (checkBox == checkboxYaxis)
+            {
+                MainModel3Dgroup.Children.Remove(x_Axis);
+                xLabel.Visibility = Visibility.Hidden;
+            }
+            else if (checkBox == checkboxZaxis)
+            {
+                MainModel3Dgroup.Children.Remove(z_Axis);
+                yLabel.Visibility = Visibility.Hidden;
             }
         }
     }
