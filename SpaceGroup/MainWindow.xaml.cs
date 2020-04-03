@@ -487,7 +487,7 @@ namespace SpaceGroup
             try
             {
                 string s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(atomName.Text.ToLower());
-                Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text, atomColor);
+                Atom atom = new Atom(s, xCoord.Text.Replace(',', '.'), yCoord.Text.Replace(',', '.'), zCoord.Text.Replace(',', '.'), atomColor);
                 visualizeAtom(cells_and_atoms, atom);
                 atomCell.atomCollection.Add(atom);
 
@@ -940,10 +940,16 @@ namespace SpaceGroup
 
         private void saveTableButton_Click(object sender, RoutedEventArgs e)
         {
-            SerializeTableList();
+            System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            saveFileDialog1.Filter = "SPG Image|*.spg";
+            saveFileDialog1.Title = "Save Atoms State";
+            saveFileDialog1.ShowDialog();
+
+            if(saveFileDialog1.FileName != "")
+                SerializeTableList(saveFileDialog1.FileName);
         }
 
-        private void SerializeTableList()
+        private void SerializeTableList(string fileName)
         {
             List<Atom> atoms = new List<Atom>();
             foreach(Atom a in atomCell.atomCollection)
@@ -951,7 +957,7 @@ namespace SpaceGroup
                 atoms.Add(a);
             }
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Atom>));
-            TextWriter writer = new StreamWriter("table.xml");
+            TextWriter writer = new StreamWriter(fileName);
 
             xmlSerializer.Serialize(writer, atoms);
             writer.Close();
@@ -989,14 +995,21 @@ namespace SpaceGroup
                 buildCellBorders(out BordersModel);
                 cells_and_atoms.Children.Add(BordersModel);
 
-                foreach(Atom a in atomCell.atomCollection)
+                try
                 {
-                    visualizeAtom(cells_and_atoms, a);
+                    foreach (Atom a in atomCell.atomCollection)
+                    {
+                        visualizeAtom(cells_and_atoms, a);
+                    }
+
+                    DataGridAtoms.ItemsSource = atomCell.atomCollection;
                 }
-                MessageBox.Show("loaded");
+                catch (System.NullReferenceException)
+                {
+                    MessageBox.Show("Не выбрана группа!"); //ВНИМАНИЕ
+                }
                 //visualizeAtom(MainModel3Dgroup, atom);
                 //atomCell.atomCollection.Add(atom);
-                DataGridAtoms.ItemsSource = atomCell.atomCollection;
             }
         }
 
