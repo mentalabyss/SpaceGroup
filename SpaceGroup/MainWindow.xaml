@@ -135,12 +135,8 @@
 							<Label Grid.Column="1" Grid.Row="1" Name="selectedAtomX"/>
 							<Label Grid.Column="1" Grid.Row="2" Name="selectedAtomY"/>
 							<Label Grid.Column="1" Grid.Row="3" Name="selectedAtomZ"/>
-
 						</Grid>
-						
-
 					</GroupBox>
-
 				</Grid>
 			</ScrollViewer>
 		</Grid>

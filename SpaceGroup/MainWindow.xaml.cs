@@ -1094,5 +1094,30 @@ namespace SpaceGroup
                 yLabel.Visibility = Visibility.Hidden;
             }
         }
+
+        private double DistanceTwoAtoms(Atom atom1, Atom atom2)
+        {
+            return Math.Sqrt((atom1.X - atom2.X) * (atom1.X - atom2.X)
+                + (atom1.Y - atom1.Y) * (atom1.Y - atom1.Y)
+                + (atom1.Z - atom2.Z) * (atom1.Z - atom2.Z));
+        }
+
+        private double ThreeAtomsAngle(Atom atomA, Atom atomB, Atom atomC)
+        {
+            double ABx = atomB.X - atomA.X;
+            double ABy = atomB.Y - atomA.Y;
+            double ABz = atomB.Z - atomA.Z;
+
+            double BCx = atomC.X - atomB.X;
+            double BCy = atomC.Y - atomB.Y;
+            double BCz = atomC.Z - atomB.Z;
+
+            double ABBC = ABx * BCx + ABy * BCy + ABz * BCz;
+
+            double AB_length = Math.Sqrt(ABx * ABx + ABy * ABy + ABz * ABz);
+            double BC_length = Math.Sqrt(BCx * BCx + BCy * BCy + BCz * BCz);
+
+            return Math.Acos(ABBC/(AB_length * BC_length)) * 180 / Math.PI;
+        }
     }
 }
