@@ -432,46 +432,6 @@ namespace SpaceGroup
 
         }
 
-        public void MoveRight(double d)
-        {
-            double u = 0.05;
-            PerspectiveCamera camera = (PerspectiveCamera)MainViewport.Camera;
-            Vector3D lookDirection = camera.LookDirection;
-            Point3D position = camera.Position;
-            lookDirection.Normalize();
-            position = position + u * RightDirection * d;
-
-            camera.Position = position;
-        }
-
-
-
-        public void MoveForward(double d)
-        {
-            double u = 0.05;
-            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
-            Vector3D lookDirection = camera.LookDirection;
-            Point3D position = camera.Position;
-
-            lookDirection.Normalize();
-            position = position + u * lookDirection * d;
-
-            camera.Position = position;
-        }
-
-        public void MoveUp(double d)
-        {
-            double u = 0.05;
-            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
-            Vector3D upDirection = camera.UpDirection;
-            Point3D position = camera.Position;
-
-            upDirection.Normalize();
-            position = position + u * upDirection * d;
-
-            camera.Position = position;
-        }
-
         private void newGroup_Click(object sender, RoutedEventArgs e)
         {
             SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings();
@@ -632,6 +592,8 @@ namespace SpaceGroup
             }
         }
 
+        // Camera
+
         public void PositionCamera()
         {
             TheCamera.Position = new Point3D(0, atomCell.ZAxisL / 2, +50);
@@ -662,6 +624,48 @@ namespace SpaceGroup
             TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
             TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
         }
+
+        public void MoveRight(double d)
+        {
+            double u = 0.05;
+            PerspectiveCamera camera = (PerspectiveCamera)MainViewport.Camera;
+            Vector3D lookDirection = camera.LookDirection;
+            Point3D position = camera.Position;
+            lookDirection.Normalize();
+            position = position + u * RightDirection * d;
+
+            camera.Position = position;
+        }
+
+
+
+        public void MoveForward(double d)
+        {
+            double u = 0.05;
+            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
+            Vector3D lookDirection = camera.LookDirection;
+            Point3D position = camera.Position;
+
+            lookDirection.Normalize();
+            position = position + u * lookDirection * d;
+
+            camera.Position = position;
+        }
+
+        public void MoveUp(double d)
+        {
+            double u = 0.05;
+            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
+            Vector3D upDirection = camera.UpDirection;
+            Point3D position = camera.Position;
+
+            upDirection.Normalize();
+            position = position + u * upDirection * d;
+
+            camera.Position = position;
+        }
+
+        // Serializers
 
         private void SerializeTableList(string fileName)
         {
