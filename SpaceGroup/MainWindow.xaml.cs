@@ -705,23 +705,28 @@ namespace SpaceGroup
 
         bool mouseDragged = false;
 
+        List<GeometryModel3D> SelectedModels = new List<GeometryModel3D>();
+        List<Material> SavedMaterials = new List<Material>();
 
         public void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 1)
+            if (e.ChangedButton == MouseButton.Left && e.ClickCount == 1)
             {
-                Point position = e.GetPosition(this);
-                mouseX = position.X;
-                mouseY = position.Y;
-                if (!mouseDragged)
+                if (!contextMenu1.IsOpen)
                 {
-                    MouseOldX = position.X;
-                    MouseOldY = position.Y;
+                    Point position = e.GetPosition(this);
+                    mouseX = position.X;
+                    mouseY = position.Y;
+                    if (!mouseDragged)
+                    {
+                        MouseOldX = position.X;
+                        MouseOldY = position.Y;
+                    }
                 }
             }
 
 
-            if (e.ClickCount == 2)
+            if (e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
             {
                 // Get the mouse's position relative to the viewport.
                 Point mouse_pos = e.GetPosition(MainViewport);
@@ -735,26 +740,121 @@ namespace SpaceGroup
 
 
                 // Deselect the prevously selected model.
-                if (SelectedModel != null)
-                {
-                    SelectedModel.Material = NormalMaterial;
-                    SelectedModel = null;
-                }
+                //if (SelectedModel != null)
+                //{
+                //    SelectedModel.Material = NormalMaterial;
+                //    SelectedModel = null;
+                //}
 
                 if (mesh_result != null)
                 {
                     GeometryModel3D model = (GeometryModel3D)mesh_result.ModelHit;
 
-                    if (SelectableModels.Contains(model))
+                    if (SelectableModels.Contains(model) && !SelectedModels.Contains(model))
                     {
                         SelectedModel = model;
                         NormalMaterial = SelectedModel.Material;
                         SelectedModel.Material = SelectedMaterial;
+
+                        SelectedModels.Add(SelectedModel);
+                        SavedMaterials.Add(NormalMaterial);
+
                         ShowSelectedAtomInfo(SelectedModel, NormalMaterial);
                     }
                 }
+                else
+                {
+                    for (int i = 0; i < SelectedModels.Count; i++)
+                    {
+                        SelectedModels[i].Material = SavedMaterials[i];
+                    }
+
+                    SelectedModels.Clear();
+                    SavedMaterials.Clear();
+                    SelectedModel = null;
+                }
+            }
+        }
+
+        public void DistanceButtonClicked(object sender, RoutedEventArgs e)
+        {
+            Atom atom1 = new Atom();
+            Atom atom2 = new Atom();
+
+            if(SelectedModels.Count == 2)
+            { 
+                for (int i = 1; i < cells_and_atoms.Children.Count; i++)
+                {
+                    var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
+
+                    if (iGroup.Children.IndexOf(SelectedModels[0]) > -1)
+                    {
+                        atom1 = atomsList[i - 1][iGroup.Children.IndexOf(SelectedModels[0])];
+                        break;
+                    }
+                }
+
+                for (int i = 1; i < cells_and_atoms.Children.Count; i++)
+                {
+                    var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
+
+                    if (iGroup.Children.IndexOf(SelectedModels[1]) > -1)
+                    {
+                        atom2 = atomsList[i - 1][iGroup.Children.IndexOf(SelectedModels[1])];
+                        break;
+                    }
+                }
+
+                System.Windows.Forms.MessageBox.Show(DistanceTwoAtoms(atom1, atom2).ToString());
             }
 
+
+        }
+
+
+        public void AngleButtonClicked(object sender, RoutedEventArgs e)
+        {
+            Atom atom1 = new Atom();
+            Atom atom2 = new Atom();
+            Atom atom3 = new Atom();
+
+            if (SelectedModels.Count == 3)
+            {
+                for (int i = 1; i < cells_and_atoms.Children.Count; i++)
+                {
+                    var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
+
+                    if (iGroup.Children.IndexOf(SelectedModels[0]) > -1)
+                    {
+                        atom1 = atomsList[i - 1][iGroup.Children.IndexOf(SelectedModels[0])];
+                        break;
+                    }
+                }
+
+                for (int i = 1; i < cells_and_atoms.Children.Count; i++)
+                {
+                    var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
+
+                    if (iGroup.Children.IndexOf(SelectedModels[1]) > -1)
+                    {
+                        atom2 = atomsList[i - 1][iGroup.Children.IndexOf(SelectedModels[1])];
+                        break;
+                    }
+                }
+
+                for (int i = 1; i < cells_and_atoms.Children.Count; i++)
+                {
+                    var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
+
+                    if (iGroup.Children.IndexOf(SelectedModels[2]) > -1)
+                    {
+                        atom3 = atomsList[i - 1][iGroup.Children.IndexOf(SelectedModels[2])];
+                        break;
+                    }
+                }
+
+                System.Windows.Forms.MessageBox.Show(ThreeAtomsAngle(atom1, atom2, atom3).ToString() + "°");
+            }
         }
 
         double mouseX;
@@ -1097,9 +1197,9 @@ namespace SpaceGroup
 
         private double DistanceTwoAtoms(Atom atom1, Atom atom2)
         {
-            return Math.Sqrt((atom1.X - atom2.X) * (atom1.X - atom2.X)
-                + (atom1.Y - atom1.Y) * (atom1.Y - atom1.Y)
-                + (atom1.Z - atom2.Z) * (atom1.Z - atom2.Z));
+            return Math.Sqrt((atom1.X - atom2.X) * (atom1.X - atom2.X) * atomCell.XAxisL * atomCell.XAxisL
+                + (atom1.Y - atom2.Y) * (atom1.Y - atom2.Y) * atomCell.YAxisL * atomCell.YAxisL
+                + (atom1.Z - atom2.Z) * (atom1.Z - atom2.Z) * atomCell.ZAxisL * atomCell.ZAxisL);
         }
 
         private double ThreeAtomsAngle(Atom atomA, Atom atomB, Atom atomC)
@@ -1117,7 +1217,7 @@ namespace SpaceGroup
             double AB_length = Math.Sqrt(ABx * ABx + ABy * ABy + ABz * ABz);
             double BC_length = Math.Sqrt(BCx * BCx + BCy * BCy + BCz * BCz);
 
-            return Math.Acos(ABBC/(AB_length * BC_length)) * 180 / Math.PI;
+            return 180 - Math.Acos(ABBC/(AB_length * BC_length)) * (180 / Math.PI);
         }
     }
 }

@@ -40,6 +40,14 @@
                 Background="Transparent" 
                 MouseDown="OnViewportMouseDown"
                 MouseMove="OnViewportMouseMove" Margin="0,0,0,0">
+			<Canvas.ContextMenu>
+				<ContextMenu x:Name="contextMenu1">
+					<MenuItem Header ="Расстояние" Click="DistanceButtonClicked">
+					</MenuItem>
+					<MenuItem Header="Угол" Click="AngleButtonClicked">
+					</MenuItem>
+				</ContextMenu>
+			</Canvas.ContextMenu>
 		</Canvas>
 
 		<Grid x:Name="scrollGrid" Grid.Column ="0" Grid.Row="1">
