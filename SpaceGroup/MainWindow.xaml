@@ -22,12 +22,14 @@
 		</Grid.RowDefinitions>
 
 		<Menu DockPanel.Dock="Top" Grid.ColumnSpan="3">
-			<MenuItem Header="_File">
+			<MenuItem Header="_Файл">
 				<MenuItem Header="_Открыть" Click="openBtnClick" />
 				<MenuItem Header="_Сохранить" Click="saveTableButton_Click"/>
-				<MenuItem Header="_Настройки группы" Click="newGroup_Click"/>
 				<Separator />
 				<MenuItem Header="_Выйти" />
+			</MenuItem>
+			<MenuItem Header="_Параметры">
+				<MenuItem Header="_Настройки группы" Click="newGroup_Click"/>
 			</MenuItem>
 		</Menu>
 
@@ -89,7 +91,6 @@
 									<DataGridTextColumn IsReadOnly="False" Header="x" Binding="{Binding X}"></DataGridTextColumn>
 									<DataGridTextColumn IsReadOnly="False" Header="y" Binding="{Binding Y}"></DataGridTextColumn>
 									<DataGridTextColumn IsReadOnly="False" Header="z" Binding="{Binding Z}"></DataGridTextColumn>
-									<DataGridTextColumn IsReadOnly="False" Header="Цвет" ></DataGridTextColumn>
 								</DataGrid.Columns>
 							</DataGrid>
 							<Button Name="deleteButton" Content="Удалить" Canvas.Left="113" Canvas.Top="142" Width="75" Click="deleteButtonClick"/>

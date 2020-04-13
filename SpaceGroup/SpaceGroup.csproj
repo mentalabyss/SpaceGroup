@@ -60,7 +60,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CameraControl.cs" />
     <Compile Include="Expr.cs" />
     <Compile Include="Math3D.cs" />
     <Compile Include="ModelBuilder.cs" />

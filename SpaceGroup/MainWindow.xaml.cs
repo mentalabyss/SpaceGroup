@@ -92,7 +92,7 @@ namespace SpaceGroup
             multipliedAtoms = new List<Atom>();
             atomCell = new CrystalCell();
             selectedSpaceGroup = new SpaceGroupCl();
-            atomCell.setCellParams(20.06999, 19.92, 13.42, 90, 90, 90); //hard code - заменить
+            atomCell.setCellParams(20.06999, 19.92, 13.42, 90, 90, 90);
             DataGridAtoms.ItemsSource = atomCell.atomCollection;
 
             // Give the camera its initial position.
@@ -318,7 +318,7 @@ namespace SpaceGroup
                     }
                 }
 
-                System.Windows.Forms.MessageBox.Show(Atom.DistanceTwoAtoms(atom1, atom2, atomCell).ToString());
+                System.Windows.Forms.MessageBox.Show(Atom.DistanceTwoAtoms(atom1, atom2, atomCell).ToString() + " Å");
             }
 
 

@@ -149,14 +149,6 @@ namespace SpaceGroup
             c = 0;
             d = 0;
 
-
-            //double k2 = x1 - x2;
-
-            //if (k2 == 0)
-            //{
-            //    return false;
-            //}
-
             double a1 = x2 - x1;
             double b1 = y2 - y1;
             double c1 = z2 - z1;
