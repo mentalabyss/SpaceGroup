@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,18 +46,43 @@ namespace SpaceGroup
         {
             char[] vars = new char[] { 'x', 'y', 'z' };
             string[] tmp = expression.Split(vars[0]);
-            expression = String.Join(Convert.ToString(x), tmp);
 
-            tmp = expression.Split(vars[1]);
-            expression = String.Join(Convert.ToString(y), tmp);
+            try
+            {
+                CultureInfo culture = new CultureInfo("en-US");
 
-            tmp = expression.Split(vars[2]);
-            expression = String.Join(Convert.ToString(z), tmp);
-            DataTable table = new DataTable();
-            table.Columns.Add("expression", typeof(string), expression);
-            DataRow row = table.NewRow();
-            table.Rows.Add(row);
-            return double.Parse((string)row["expression"]);
+                expression = String.Join(Convert.ToString(x, culture), tmp);
+
+                tmp = expression.Split(vars[1]);
+                expression = String.Join(Convert.ToString(y, culture), tmp);
+
+                tmp = expression.Split(vars[2]);
+                expression = String.Join(Convert.ToString(z, culture), tmp);
+                DataTable table = new DataTable();
+                table.Columns.Add("expression", typeof(string), expression);
+                DataRow row = table.NewRow();
+                table.Rows.Add(row);
+                return double.Parse((string)row["expression"], culture);
+            }
+            catch(Exception)
+            {
+                System.Windows.Forms.MessageBox.Show("Test");
+
+                CultureInfo culture = new CultureInfo("ru-RU");
+
+                expression = String.Join(Convert.ToString(x, culture), tmp);
+
+                tmp = expression.Split(vars[1]);
+                expression = String.Join(Convert.ToString(y, culture), tmp);
+
+                tmp = expression.Split(vars[2]);
+                expression = String.Join(Convert.ToString(z, culture), tmp);
+                DataTable table = new DataTable();
+                table.Columns.Add("expression", typeof(string), expression);
+                DataRow row = table.NewRow();
+                table.Rows.Add(row);
+                return double.Parse((string)row["expression"], culture);
+            }
         }
 
         public override string ToString()

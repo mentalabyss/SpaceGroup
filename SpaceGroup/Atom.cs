@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,15 +37,33 @@ namespace SpaceGroup
             try
             {
                 this.element = element;
-                this.x = Convert.ToDouble(x);
-                this.y = Convert.ToDouble(y);
-                this.z = Convert.ToDouble(z);
+
+                CultureInfo culture = new CultureInfo("en-US");
+                if (x.Contains('.'))
+                    this.x = Double.Parse(x, culture);
+                else if (x.Contains(','))
+                    this.x = Double.Parse(x, new CultureInfo("ru-RU"));
+                else
+                    this.x = Double.Parse(x);
+
+                if (y.Contains('.'))
+                    this.y = Double.Parse(y, culture);
+                else if (y.Contains(','))
+                    this.y = Double.Parse(y, new CultureInfo("ru-RU"));
+                else
+                    this.y = Double.Parse(y);
+                if (z.Contains('.'))
+                    this.z = Double.Parse(z, culture);
+                else if (z.Contains(','))
+                    this.z = Double.Parse(z, new CultureInfo("ru-RU"));
+                else
+                    this.z = Double.Parse(z);
                 this.brush = brush;
                 color = brush.ToString();
             }
-            catch(Exception e)
+            catch(NullReferenceException e)
             {
-                MessageBox.Show(e.Message);
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -83,6 +102,23 @@ namespace SpaceGroup
             return Math.Sqrt((atom1.X - atom2.X) * (atom1.X - atom2.X) * atomCell.XAxisL * atomCell.XAxisL
                 + (atom1.Y - atom2.Y) * (atom1.Y - atom2.Y) * atomCell.YAxisL * atomCell.YAxisL
                 + (atom1.Z - atom2.Z) * (atom1.Z - atom2.Z) * atomCell.ZAxisL * atomCell.ZAxisL);
+        }
+
+        private static double GetDouble(string value, double defaultValue)
+        {
+            double result;
+
+            // Try parsing in the current culture
+            if (
+                // Then try in US english
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out result) &&
+                // Then in neutral language
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = defaultValue;
+            }
+            return result;
         }
     }
 }

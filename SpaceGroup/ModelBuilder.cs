@@ -20,7 +20,7 @@ namespace SpaceGroup
 
             //Y (normal: X):
             Point3D xmax = new Point3D(5, 0, 0);
-            AddSegment(y_mesh, origin, xmax, new Vector3D(0, 1, 0), 1);
+            AddSegment(y_mesh, origin, xmax, new Vector3D(0, 1, 0), 0.1);
 
             Vector3D vX = xmax - origin;
             vX.Normalize();
@@ -28,15 +28,15 @@ namespace SpaceGroup
             perpX.Normalize();
             Vector3D v1X = ScaleVector(-vX + perpX, 1);
             Vector3D v2X = ScaleVector(-vX - perpX, 1);
-            AddSegment(y_mesh, xmax, xmax + v1X, new Vector3D(0, 1, 0), 1);
-            AddSegment(y_mesh, xmax, xmax + v2X, new Vector3D(0, 1, 0), 1);
+            AddSegment(y_mesh, xmax, xmax + v1X, new Vector3D(0, 1, 0), 0.1);
+            AddSegment(y_mesh, xmax, xmax + v2X, new Vector3D(0, 1, 0), 0.1);
 
             Vector3D perpX1 = Vector3D.CrossProduct(vX, new Vector3D(0, 0, 1));
             perpX1.Normalize();
             Vector3D v1X1 = ScaleVector(-vX + perpX1, 1);
             Vector3D v2X1 = ScaleVector(-vX - perpX1, 1);
-            AddSegment(y_mesh, xmax, xmax + v1X1, new Vector3D(0, 0, 1), 1);
-            AddSegment(y_mesh, xmax, xmax + v2X1, new Vector3D(0, 0, 1), 1);
+            AddSegment(y_mesh, xmax, xmax + v1X1, new Vector3D(0, 0, 1), 0.1);
+            AddSegment(y_mesh, xmax, xmax + v2X1, new Vector3D(0, 0, 1), 0.1);
 
             SolidColorBrush axes_brush = Brushes.Green;
             DiffuseMaterial y_axis_material = new DiffuseMaterial(axes_brush);
@@ -45,7 +45,7 @@ namespace SpaceGroup
 
             //Z (normal: Y):
             Point3D ymax = new Point3D(0, 5, 0);
-            AddSegment(z_mesh, origin, ymax, new Vector3D(1, 0, 0), 1);
+            AddSegment(z_mesh, origin, ymax, new Vector3D(1, 0, 0), 0.1);
 
             Vector3D vY = ymax - origin;
             vY.Normalize();
@@ -53,15 +53,15 @@ namespace SpaceGroup
             perpX.Normalize();
             Vector3D v1Y = ScaleVector(-vY + perpY, 1);
             Vector3D v2Y = ScaleVector(-vY - perpY, 1);
-            AddSegment(z_mesh, ymax, ymax + v1Y, new Vector3D(0, 1, 0), 1);
-            AddSegment(z_mesh, ymax, ymax + v2Y, new Vector3D(0, 1, 0), 1);
+            AddSegment(z_mesh, ymax, ymax + v1Y, new Vector3D(0, 1, 0), 0.1);
+            AddSegment(z_mesh, ymax, ymax + v2Y, new Vector3D(0, 1, 0), 0.1);
 
             Vector3D perpY1 = Vector3D.CrossProduct(vY, new Vector3D(0, 0, 1));
             perpX1.Normalize();
             Vector3D v1Y1 = ScaleVector(-vY + perpY1, 1);
             Vector3D v2Y1 = ScaleVector(-vY - perpY1, 1);
-            AddSegment(z_mesh, ymax, ymax + v1Y1, new Vector3D(0, 0, 1), 1);
-            AddSegment(z_mesh, ymax, ymax + v2Y1, new Vector3D(0, 0, 1), 1);
+            AddSegment(z_mesh, ymax, ymax + v1Y1, new Vector3D(0, 0, 1), 0.1);
+            AddSegment(z_mesh, ymax, ymax + v2Y1, new Vector3D(0, 0, 1), 0.1);
 
             axes_brush = Brushes.Blue;
             DiffuseMaterial z_axis_material = new DiffuseMaterial(axes_brush);
@@ -71,7 +71,7 @@ namespace SpaceGroup
 
             //X (normal: Z):
             Point3D zmax = new Point3D(0, 0, 5);
-            AddSegment(x_mesh, origin, zmax, new Vector3D(0, 1, 0), 1);
+            AddSegment(x_mesh, origin, zmax, new Vector3D(0, 1, 0), 0.1);
 
             Vector3D vZ = zmax - origin;
             vZ.Normalize();
@@ -79,15 +79,15 @@ namespace SpaceGroup
             perpX.Normalize();
             Vector3D v1Z = ScaleVector(-vZ + perpZ, 1);
             Vector3D v2Z = ScaleVector(-vZ - perpZ, 1);
-            AddSegment(x_mesh, zmax, zmax + v1Z, new Vector3D(0, 1, 0), 1);
-            AddSegment(x_mesh, zmax, zmax + v2Z, new Vector3D(0, 1, 0), 1);
+            AddSegment(x_mesh, zmax, zmax + v1Z, new Vector3D(0, 1, 0), 0.1);
+            AddSegment(x_mesh, zmax, zmax + v2Z, new Vector3D(0, 1, 0), 0.1);
 
             Vector3D perpZ1 = Vector3D.CrossProduct(vZ, new Vector3D(1, 0, 0));
             perpX1.Normalize();
             Vector3D v1Z1 = ScaleVector(-vZ + perpZ1, 1);
             Vector3D v2Z1 = ScaleVector(-vZ - perpZ1, 1);
-            AddSegment(x_mesh, zmax, zmax + v1Z1, new Vector3D(1, 0, 0), 1);
-            AddSegment(x_mesh, zmax, zmax + v2Z1, new Vector3D(1, 0, 0), 1);
+            AddSegment(x_mesh, zmax, zmax + v1Z1, new Vector3D(1, 0, 0), 0.1);
+            AddSegment(x_mesh, zmax, zmax + v2Z1, new Vector3D(1, 0, 0), 0.1);
 
             axes_brush = Brushes.Red;
             DiffuseMaterial x_axis_material = new DiffuseMaterial(axes_brush);

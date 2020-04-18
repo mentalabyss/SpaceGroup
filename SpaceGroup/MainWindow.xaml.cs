@@ -74,7 +74,8 @@ namespace SpaceGroup
 
         private SolidColorBrush atomColor;
         // The camera.
-        private OrthographicCamera TheCamera;
+        private OrthographicCamera TheCamera = new OrthographicCamera();
+        private OrthographicCamera AxisSceneCamera = new OrthographicCamera();
 
         public void selectGroup(SpaceGroupCl spaceGroup)
         {
@@ -96,11 +97,14 @@ namespace SpaceGroup
             DataGridAtoms.ItemsSource = atomCell.atomCollection;
 
             // Give the camera its initial position.
-            TheCamera = new OrthographicCamera();
+            //TheCamera = new OrthographicCamera();
+            //AxisSceneCamera = new OrthographicCamera();
             //TheCamera = new PerspectiveCamera();
-            TheCamera.Width = 60;
+            TheCamera.Width = 90;
+            AxisSceneCamera.Width = 90;
             //TheCamera.FieldOfView = 60;
             MainViewport.Camera = TheCamera;
+            AxisViewport.Camera = AxisSceneCamera;
             PositionCamera();
 
             DefineLights();
@@ -114,9 +118,15 @@ namespace SpaceGroup
 
             ModelVisual3D model_visual = new ModelVisual3D();
             model_visual.Content = MainAndDA;
-            MainModel3Dgroup.Children.Add(x_Axis);
-            MainModel3Dgroup.Children.Add(y_Axis);
-            MainModel3Dgroup.Children.Add(z_Axis);
+
+            ModelVisual3D axis_model_visual = new ModelVisual3D();
+            axis_model_visual.Content = DiscreteAxisGroup;
+
+            AxisViewport.Children.Add(axis_model_visual);
+
+            //MainModel3Dgroup.Children.Add(x_Axis);
+            //MainModel3Dgroup.Children.Add(y_Axis);
+            //MainModel3Dgroup.Children.Add(z_Axis);
 
             MainModel3Dgroup.Children.Add(cells_and_atoms);
 
@@ -131,22 +141,43 @@ namespace SpaceGroup
 
         }
 
+        //private void generateLabels()
+        //{
+        //    //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
+        //    canvasOn3D.Children.Clear();
+        //    //X
+        //    Point LabelXPoint = (Point)Point3DToScreen2D(new Point3D(25 - atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2), MainViewport);
+        //    Canvas.SetLeft(xLabel, LabelXPoint.X);
+        //    Canvas.SetTop(xLabel, LabelXPoint.Y);
+        //    canvasOn3D.Children.Add(xLabel);
+
+        //    Point LabelYPoint = (Point)Point3DToScreen2D(new Point3D(-atomCell.YAxisL / 2, 25 - atomCell.ZAxisL / 2, -atomCell.XAxisL / 2), MainViewport);
+        //    Canvas.SetLeft(yLabel, LabelYPoint.X);
+        //    Canvas.SetTop(yLabel, LabelYPoint.Y);
+        //    canvasOn3D.Children.Add(yLabel);
+
+        //    Point LabelZPoint = (Point)Point3DToScreen2D(new Point3D(-atomCell.YAxisL / 2, - atomCell.ZAxisL / 2, 25 - atomCell.XAxisL / 2), MainViewport);
+        //    Canvas.SetLeft(zLabel, LabelZPoint.X);
+        //    Canvas.SetTop(zLabel, LabelZPoint.Y);
+        //    canvasOn3D.Children.Add(zLabel);
+        //}
+
         private void generateLabels()
         {
             //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
             canvasOn3D.Children.Clear();
             //X
-            Point LabelXPoint = (Point)Point3DToScreen2D(new Point3D(25 - atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2), MainViewport);
+            Point LabelXPoint = (Point)Point3DToScreen2D(new Point3D(5, 0, 0), AxisViewport);
             Canvas.SetLeft(xLabel, LabelXPoint.X);
             Canvas.SetTop(xLabel, LabelXPoint.Y);
             canvasOn3D.Children.Add(xLabel);
 
-            Point LabelYPoint = (Point)Point3DToScreen2D(new Point3D(-atomCell.YAxisL / 2, 25 - atomCell.ZAxisL / 2, -atomCell.XAxisL / 2), MainViewport);
+            Point LabelYPoint = (Point)Point3DToScreen2D(new Point3D(0, 5, 0), AxisViewport);
             Canvas.SetLeft(yLabel, LabelYPoint.X);
             Canvas.SetTop(yLabel, LabelYPoint.Y);
             canvasOn3D.Children.Add(yLabel);
 
-            Point LabelZPoint = (Point)Point3DToScreen2D(new Point3D(-atomCell.YAxisL / 2, - atomCell.ZAxisL / 2, 25 - atomCell.XAxisL / 2), MainViewport);
+            Point LabelZPoint = (Point)Point3DToScreen2D(new Point3D(0, 0, 5), AxisViewport);
             Canvas.SetLeft(zLabel, LabelZPoint.X);
             Canvas.SetTop(zLabel, LabelZPoint.Y);
             canvasOn3D.Children.Add(zLabel);
@@ -166,6 +197,9 @@ namespace SpaceGroup
                 new DirectionalLight(Colors.Gray, new Vector3D(-1.0, -3.0, -2.0));
             MainModel3Dgroup.Children.Add(ambient_light);
             MainModel3Dgroup.Children.Add(directional_light);
+
+            DiscreteAxisGroup.Children.Add(ambient_light);
+            DiscreteAxisGroup.Children.Add(directional_light);
         }
 
         private void addAtomButton_Click(object sender, RoutedEventArgs e)
@@ -173,7 +207,7 @@ namespace SpaceGroup
             try
             {
                 string s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(atomName.Text.ToLower());
-                Atom atom = new Atom(s, xCoord.Text.Replace(',', '.'), yCoord.Text.Replace(',', '.'), zCoord.Text.Replace(',', '.'), atomColor);
+                Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text, atomColor);
                 ModelBuilder.visualizeAtom(ref cells_and_atoms, atom, atomColor, selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
                     ref atomsList, ref atomReproductions);
                 atomCell.atomCollection.Add(atom);
@@ -182,18 +216,31 @@ namespace SpaceGroup
             }
             catch (NullReferenceException)
             {
-                MessageBox.Show("Не выбрана группа!");
+                System.Windows.Forms.MessageBox.Show("Не выбран цвет!");
             }
+            catch (IndexOutOfRangeException)
+            {
+                System.Windows.Forms.MessageBox.Show("Указаны не все параметры!");
+                //MessageBox.Show("Не выбрана группа!");
+            }
+
         }
 
         private void deleteButtonClick(object sender, RoutedEventArgs e)
         {
-            int index = DataGridAtoms.SelectedIndex;
-            Model3DGroup groupToRemove = atomReproductions[index];
-            cells_and_atoms.Children.Remove(groupToRemove);
-            atomCell.atomCollection.Remove(DataGridAtoms.SelectedItem as Atom);
-            //MessageBox.Show((DataGridAtoms.SelectedItem as Atom).Element);
-            DataGridAtoms.Items.Refresh();
+            try
+            {
+                int index = DataGridAtoms.SelectedIndex;
+                Model3DGroup groupToRemove = atomReproductions[index];
+                cells_and_atoms.Children.Remove(groupToRemove);
+                atomCell.atomCollection.Remove(DataGridAtoms.SelectedItem as Atom);
+                //MessageBox.Show((DataGridAtoms.SelectedItem as Atom).Element);
+                DataGridAtoms.Items.Refresh();
+            }
+            catch(ArgumentOutOfRangeException)
+            {
+                MessageBox.Show("Не выбран элемент для удаления!");
+            }
             
         }
 
@@ -285,6 +332,7 @@ namespace SpaceGroup
                     SelectedModels.Clear();
                     SavedMaterials.Clear();
                     SelectedModel = null;
+                    ClearSelectedAtomInfo();
                 }
             }
         }
@@ -472,7 +520,7 @@ namespace SpaceGroup
         private void saveTableButton_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            saveFileDialog1.Filter = "SPG Image|*.spg";
+            saveFileDialog1.Filter = "SPG File|*.spg";
             saveFileDialog1.Title = "Save Atoms State";
             saveFileDialog1.ShowDialog();
 
@@ -526,6 +574,8 @@ namespace SpaceGroup
                 polySwitch = false;
                 MainModel3Dgroup.Children.Remove(polyhedra_model);
             }
+
+            System.Windows.Forms.MessageBox.Show(cells_and_atoms.Children.Count.ToString());
         }
 
         private void ShowSelectedAtomInfo(GeometryModel3D selectedModel, Material selectedMaterial)
@@ -543,6 +593,14 @@ namespace SpaceGroup
             }
         }
 
+        private void ClearSelectedAtomInfo()
+        {
+            selectedAtomName.Content = "";
+            selectedAtomX.Content = "";
+            selectedAtomY.Content = "";
+            selectedAtomZ.Content = "";
+        }
+
         private void CheckBoxChecked(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
@@ -550,17 +608,21 @@ namespace SpaceGroup
             {
                 if (checkBox == checkboxXaxis)
                 {
-                    MainModel3Dgroup.Children.Add(y_Axis);
+                    DiscreteAxisGroup.Children.Add(discrete_x_axis);
+
+                    //MainModel3Dgroup.Children.Add(y_Axis);
                     zLabel.Visibility = Visibility.Visible;
                 }
                 else if (checkBox == checkboxYaxis)
                 {
-                    MainModel3Dgroup.Children.Add(x_Axis);
+                    DiscreteAxisGroup.Children.Add(discrete_y_axis);
+                    //MainModel3Dgroup.Children.Add(x_Axis);
                     xLabel.Visibility = Visibility.Visible;
                 }
                 else if (checkBox == checkboxZaxis)
                 {
-                    MainModel3Dgroup.Children.Add(z_Axis);
+                    DiscreteAxisGroup.Children.Add(discrete_z_axis);
+                    //MainModel3Dgroup.Children.Add(z_Axis);
                     yLabel.Visibility = Visibility.Visible;
                 }
             }
@@ -577,16 +639,21 @@ namespace SpaceGroup
 
             if (checkBox == checkboxXaxis)
             {
+                DiscreteAxisGroup.Children.Remove(discrete_x_axis);
                 MainModel3Dgroup.Children.Remove(y_Axis);
                 zLabel.Visibility = Visibility.Hidden;
             }
             else if (checkBox == checkboxYaxis)
             {
+                DiscreteAxisGroup.Children.Remove(discrete_y_axis);
+
                 MainModel3Dgroup.Children.Remove(x_Axis);
                 xLabel.Visibility = Visibility.Hidden;
             }
             else if (checkBox == checkboxZaxis)
             {
+                DiscreteAxisGroup.Children.Remove(discrete_z_axis);
+
                 MainModel3Dgroup.Children.Remove(z_Axis);
                 yLabel.Visibility = Visibility.Hidden;
             }
@@ -599,6 +666,10 @@ namespace SpaceGroup
             TheCamera.Position = new Point3D(0, atomCell.ZAxisL / 2, +50);
             TheCamera.LookDirection = new Vector3D(0, 0, -1);
             TheCamera.UpDirection = new Vector3D(0, 1, 0);
+
+            AxisSceneCamera.Position = new Point3D(0, 0, 50);
+            AxisSceneCamera.LookDirection = new Vector3D(0, 0, -1);
+            AxisSceneCamera.UpDirection = new Vector3D(0, 1, 0);
         }
 
         public Vector3D LeftDirection
@@ -623,6 +694,10 @@ namespace SpaceGroup
             TheCamera.Position = q.Transform(TheCamera.Position);
             TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
             TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
+
+            AxisSceneCamera.Position = q.Transform(AxisSceneCamera.Position);
+            AxisSceneCamera.UpDirection = q.Transform(AxisSceneCamera.UpDirection);
+            AxisSceneCamera.LookDirection = q.Transform(AxisSceneCamera.LookDirection);
         }
 
         public void MoveRight(double d)
@@ -683,17 +758,40 @@ namespace SpaceGroup
 
         private ObservableCollection<Atom> DeserializeTableList(string filename)
         {
-
-            var mySerializer = new XmlSerializer(typeof(List<Atom>));
-            var myFileStream = new FileStream(filename, FileMode.Open);
-            List<Atom> myObject = (List<Atom>)mySerializer.Deserialize(myFileStream);
-            ObservableCollection<Atom> ret = new ObservableCollection<Atom>();
-            foreach (Atom a in myObject)
+            try
             {
-                a.StringToColor();
-                ret.Add(a);
+                var mySerializer = new XmlSerializer(typeof(List<Atom>));
+                var myFileStream = new FileStream(filename, FileMode.Open);
+                List<Atom> myObject = (List<Atom>)mySerializer.Deserialize(myFileStream);
+                ObservableCollection<Atom> ret = new ObservableCollection<Atom>();
+                foreach (Atom a in myObject)
+                {
+                    a.StringToColor();
+                    ret.Add(a);
+                }
+                return ret;
             }
-            return ret;
+            catch (InvalidOperationException)
+            {
+                System.Windows.Forms.MessageBox.Show("Невозможно открыть файл!");
+            }
+            return new ObservableCollection<Atom>();
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double newWidth = grid.ActualWidth;
+            double originalWidth = 509.0;
+            double originalNearPlaneDistance = 0.125;
+            double originalFieldOfView = 45.0;
+            double scale = newWidth / originalWidth * 1.5;
+
+            double fov = Math.Atan(Math.Tan(originalFieldOfView / 2.0 / 180.0 * Math.PI) * scale) * 2.0;
+            TheCamera.Width = fov / Math.PI * 180.0;
+            TheCamera.NearPlaneDistance = originalNearPlaneDistance * scale;
+
+            AxisSceneCamera.Width = fov / Math.PI * 180.0;
+            AxisSceneCamera.NearPlaneDistance = originalNearPlaneDistance * scale;        
         }
     }
 }

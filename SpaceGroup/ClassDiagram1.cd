@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SpaceGroup.Atom">
+    <Position X="0.5" Y="0.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAkBAAAYAAAgAAAAIAAAAAACAAABggQAAYAE=</HashCode>
+      <FileName>Atom.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpaceGroup.CrystalCell">
+    <Position X="4.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAEAAIABAAAAAQAAAAAAFAAAACQAABAAAAIQAAADAAA=</HashCode>
+      <FileName>CrystalCell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpaceGroup.Expr">
+    <Position X="2.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Expr.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpaceGroup.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="11.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AMHDAkKkJCIgmC4IAACcOMogGIFAAAVAeARAgQgFYAE=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SpaceGroup.ModelBuilder">
+    <Position X="2.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAIAAAAAAAAAAAAAABIAAAAAIAAAAAAAEAgAAAQAAE=</HashCode>
+      <FileName>ModelBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpaceGroup.Polyhedra">
+    <Position X="6" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgACAAAAAAAAAAAAAAAAAAAAAABAACAAAAAAAAA=</HashCode>
+      <FileName>Polyhedra.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpaceGroup.SpaceGroupCl">
+    <Position X="8.5" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAEAAAAAgQAAAAEAAAAAAEAAgAAAAI=</HashCode>
+      <FileName>SpaceGroupCl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpaceGroup.SpaceGroupSettings" BaseTypeListCollapsed="true">
+    <Position X="6" Y="3.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>gAABAAAQAAAAAAAAAAAAAAoQABAAABAgAAAAAoAAAEA=</HashCode>
+      <FileName>SpaceGroupSettings.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
