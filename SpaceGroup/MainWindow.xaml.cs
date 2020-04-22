@@ -564,18 +564,17 @@ namespace SpaceGroup
 
         private void draw_polyhydras(object sender, RoutedEventArgs e)
         {
-            if (!polySwitch)
+            if(polyhedra_model == null)
             {
-                polySwitch = true;
                 ModelBuilder.DrawPolyhedra(ref MainModel3Dgroup, ref polyhedra_model, atomCell, multipliedAtoms);
+                MainModel3Dgroup.Children.Add(polyhedra_model);
             }
             else
             {
-                polySwitch = false;
                 MainModel3Dgroup.Children.Remove(polyhedra_model);
+                polyhedra_model = null;
+                System.Windows.Forms.MessageBox.Show(SelectableModels.Count.ToString());
             }
-
-            System.Windows.Forms.MessageBox.Show(cells_and_atoms.Children.Count.ToString());
         }
 
         private void ShowSelectedAtomInfo(GeometryModel3D selectedModel, Material selectedMaterial)

@@ -306,7 +306,6 @@ namespace SpaceGroup
                 SolidColorBrush borders_brush = Brushes.Black;
                 DiffuseMaterial borders_material = new DiffuseMaterial(borders_brush);
                 polyhedra_model = new GeometryModel3D(polyhedra_mesh, borders_material);
-                MainModel3Dgroup.Children.Add(polyhedra_model);
             }
         }
 
