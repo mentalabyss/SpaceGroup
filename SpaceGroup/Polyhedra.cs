@@ -13,6 +13,7 @@ namespace SpaceGroup
             List<Atom> oxygens_with_translations = new List<Atom>();
             var result = atoms.Where(a => a.Element[0] == 'O');
             List<Atom> oxygens = result.ToList();
+            System.Windows.Forms.MessageBox.Show(oxygens.Count.ToString());
             foreach(Atom ox in oxygens)
             {
                 oxygens_with_translations.Add(ox);
@@ -22,7 +23,6 @@ namespace SpaceGroup
                 new_xyz = -new_xyz;
                 translAtom = new Atom(ox.Element, new_xyz.ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush);
                 oxygens_with_translations.Add(translAtom);
-
 
                 new_xyz = ox.Y + 1;
                 translAtom = new Atom(ox.Element, ox.X.ToString(), new_xyz.ToString(), ox.Z.ToString(), ox.Brush);

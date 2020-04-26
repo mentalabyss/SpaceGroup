@@ -58,6 +58,7 @@ namespace SpaceGroup
 
                 tmp = expression.Split(vars[2]);
                 expression = String.Join(Convert.ToString(z, culture), tmp);
+
                 DataTable table = new DataTable();
                 table.Columns.Add("expression", typeof(string), expression);
                 DataRow row = table.NewRow();

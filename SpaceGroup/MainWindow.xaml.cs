@@ -67,8 +67,6 @@ namespace SpaceGroup
         Label zLabel = new Label();
 
 
-
-        bool polySwitch = false;
         bool translationsSwitch = false;
 
 

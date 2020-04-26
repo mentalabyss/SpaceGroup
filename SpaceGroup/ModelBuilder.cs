@@ -444,6 +444,23 @@ namespace SpaceGroup
                 if (Z < 0)
                     Z += 1;
 
+
+                //???
+
+                if (x > atomCell.YAxisL)
+                    x -= atomCell.YAxisL;
+                if (y > atomCell.ZAxisL)
+                    y -= atomCell.ZAxisL;
+                if (z > atomCell.XAxisL)
+                    z -= atomCell.XAxisL;
+
+                if (X > 1)
+                    X -= 1;
+                if (Y > 1)
+                    Y -= 1;
+                if (Z > 1)
+                    Z -= 1;
+
                 AddSphere(mesh1, new Point3D(x, y, z), atomSize, 20, 30);
                 //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
                 DiffuseMaterial material1 = new DiffuseMaterial(brush1);
