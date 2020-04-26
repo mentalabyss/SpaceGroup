@@ -702,11 +702,12 @@ namespace SpaceGroup
         public void MoveRight(double d)
         {
             double u = 0.05;
-            PerspectiveCamera camera = (PerspectiveCamera)MainViewport.Camera;
+            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
             Vector3D lookDirection = camera.LookDirection;
             Point3D position = camera.Position;
+
             lookDirection.Normalize();
-            position = position + u * RightDirection * d;
+            position = position + u * RightDirection * Math.Sign(d);
 
             camera.Position = position;
         }
@@ -715,15 +716,15 @@ namespace SpaceGroup
 
         public void MoveForward(double d)
         {
-            double u = 0.05;
-            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
-            Vector3D lookDirection = camera.LookDirection;
-            Point3D position = camera.Position;
+            //double u = 0.05;
+            //OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
+            //Vector3D lookDirection = camera.LookDirection;
+            //Point3D position = camera.Position;
 
-            lookDirection.Normalize();
-            position = position + u * lookDirection * d;
+            //lookDirection.Normalize();
+            //position = position + u * lookDirection * d;
 
-            camera.Position = position;
+            //camera.Position = position;
         }
 
         public void MoveUp(double d)
@@ -734,7 +735,7 @@ namespace SpaceGroup
             Point3D position = camera.Position;
 
             upDirection.Normalize();
-            position = position + u * upDirection * d;
+            position = position + u * upDirection * Math.Sign(d);
 
             camera.Position = position;
         }
@@ -791,6 +792,14 @@ namespace SpaceGroup
 
             AxisSceneCamera.Width = fov / Math.PI * 180.0;
             AxisSceneCamera.NearPlaneDistance = originalNearPlaneDistance * scale;        
+        }
+
+        private void OnViewportMouseScroll(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+                TheCamera.Width -= 5;
+            else
+                TheCamera.Width += 5;
         }
     }
 }

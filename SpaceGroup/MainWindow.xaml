@@ -44,7 +44,8 @@
 				Grid.Row ="1"
                 Background="Transparent" 
                 MouseDown="OnViewportMouseDown"
-                MouseMove="OnViewportMouseMove" Margin="0,0,0,0">
+                MouseMove="OnViewportMouseMove" Margin="0,0,0,0"
+				MouseWheel="OnViewportMouseScroll">
 			<Canvas.ContextMenu>
 				<ContextMenu x:Name="contextMenu1">
 					<MenuItem Header ="Расстояние" Click="DistanceButtonClicked">
