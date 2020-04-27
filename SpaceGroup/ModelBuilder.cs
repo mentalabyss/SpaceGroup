@@ -302,10 +302,25 @@ namespace SpaceGroup
                 ModelBuilder.AddSegment(polyhedra_mesh, point1, point3, new Vector3D(0, 1, 0), 0.04);
                 ModelBuilder.AddSegment(polyhedra_mesh, point1, point2, new Vector3D(0, 1, 0), 0.04);
                 ModelBuilder.AddSegment(polyhedra_mesh, point2, point3, new Vector3D(0, 1, 0), 0.04);
+                
+                AddTriangle(polyhedra_mesh, point0, point1, point2);
+                AddTriangle(polyhedra_mesh, point0, point1, point3);
+                AddTriangle(polyhedra_mesh, point1, point2, point3);
+                AddTriangle(polyhedra_mesh, point0, point2, point3);
 
-                SolidColorBrush borders_brush = Brushes.Black;
-                DiffuseMaterial borders_material = new DiffuseMaterial(borders_brush);
-                polyhedra_model = new GeometryModel3D(polyhedra_mesh, borders_material);
+
+                DiffuseMaterial qDiffTransYellow =
+                new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(64, 255, 255, 0)));
+
+                SpecularMaterial qSpecTransWhite =
+               new SpecularMaterial(new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)), 30.0);
+                MaterialGroup qOuterMaterial = new MaterialGroup();
+                qOuterMaterial.Children.Add(qDiffTransYellow);
+                qOuterMaterial.Children.Add(qSpecTransWhite);
+
+
+                polyhedra_model = new GeometryModel3D(polyhedra_mesh, qOuterMaterial);
+                polyhedra_model.BackMaterial = qOuterMaterial;
             }
         }
 
@@ -407,10 +422,10 @@ namespace SpaceGroup
             atomColor = atom.Brush;
             SolidColorBrush brush1 = new SolidColorBrush();
 
-            double atomSize = 0.7;
+            double atomSize = 0.4;
             if (atom.Element[0] == 'O' && (atom.Element[1] != 's'))
             {
-                atomSize = 0.3;
+                atomSize = 0.2;
                 brush1.Color = Color.FromRgb(255, 0, 0); //oxygen to red
             }
             else

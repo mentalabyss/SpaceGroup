@@ -571,7 +571,6 @@ namespace SpaceGroup
             {
                 MainModel3Dgroup.Children.Remove(polyhedra_model);
                 polyhedra_model = null;
-                System.Windows.Forms.MessageBox.Show(SelectableModels.Count.ToString());
             }
         }
 

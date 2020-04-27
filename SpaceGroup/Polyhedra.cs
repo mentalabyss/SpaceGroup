@@ -13,29 +13,26 @@ namespace SpaceGroup
             List<Atom> oxygens_with_translations = new List<Atom>();
             var result = atoms.Where(a => a.Element[0] == 'O');
             List<Atom> oxygens = result.ToList();
-            System.Windows.Forms.MessageBox.Show(oxygens.Count.ToString());
             foreach(Atom ox in oxygens)
             {
                 oxygens_with_translations.Add(ox);
-                double new_xyz = ox.X + 1;
-                Atom translAtom = new Atom(ox.Element, new_xyz.ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush);
+                
+                Atom translAtom = new Atom(ox.Element, (ox.X + 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush);
                 oxygens_with_translations.Add(translAtom);
-                new_xyz = -new_xyz;
-                translAtom = new Atom(ox.Element, new_xyz.ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush);
-                oxygens_with_translations.Add(translAtom);
-
-                new_xyz = ox.Y + 1;
-                translAtom = new Atom(ox.Element, ox.X.ToString(), new_xyz.ToString(), ox.Z.ToString(), ox.Brush);
-                oxygens_with_translations.Add(translAtom);
-                new_xyz = -new_xyz;
-                translAtom = new Atom(ox.Element, ox.X.ToString(), new_xyz.ToString(), ox.Z.ToString(), ox.Brush);
+                
+                translAtom = new Atom(ox.Element, (ox.X - 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush);
                 oxygens_with_translations.Add(translAtom);
 
-                new_xyz = ox.Z + 1;
-                translAtom = new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), new_xyz.ToString(), ox.Brush);
+                translAtom = new Atom(ox.Element, ox.X.ToString(), (ox.Y + 1).ToString(), ox.Z.ToString(), ox.Brush);
                 oxygens_with_translations.Add(translAtom);
-                new_xyz = -new_xyz;
-                translAtom = new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), new_xyz.ToString(), ox.Brush);
+
+                translAtom = new Atom(ox.Element, ox.X.ToString(), (ox.Y - 1).ToString(), ox.Z.ToString(), ox.Brush);
+                oxygens_with_translations.Add(translAtom);
+
+                translAtom = new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z + 1).ToString(), ox.Brush);
+                oxygens_with_translations.Add(translAtom);
+
+                translAtom = new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z - 1).ToString(), ox.Brush);
                 oxygens_with_translations.Add(translAtom);
             }
 
@@ -44,7 +41,7 @@ namespace SpaceGroup
             foreach(Atom atom in atoms.Where(a => a.Element[0] != 'O'))
             {
                 var res = oxygens_with_translations.Where(a => a.Element[0] == 'O').OrderBy(a => Distance(atom, a)).Take(4);
-                if (check_point_in_tetrahydron(atom, res.ToList()))
+                //if (check_point_in_tetrahydron(atom, res.ToList()))
                     allOxygens = allOxygens.Concat(res.ToList()).ToList();
             }
 
