@@ -8,6 +8,15 @@ namespace SpaceGroup
 {
     public static class Polyhedra
     {
+        private static void AddToList(List<Atom> oxygens_with_translations, Atom atom)
+        {
+            if (! oxygens_with_translations.Any(item => atom.PositionEquals(item)))
+                oxygens_with_translations.Add(atom);
+            else
+                Console.WriteLine("Already exists");
+                //System.Windows.Forms.MessageBox.Show("Already exists");
+        }
+
         public static List<Atom> CalculatePolyhedra(List<Atom> atoms, double Yx, double Zy, double Xz)
         {
             List<Atom> oxygens_with_translations = new List<Atom>();
@@ -15,34 +24,36 @@ namespace SpaceGroup
             List<Atom> oxygens = result.ToList();
             foreach(Atom ox in oxygens)
             {
-                oxygens_with_translations.Add(ox);
-                
-                Atom translAtom = new Atom(ox.Element, (ox.X + 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush);
-                oxygens_with_translations.Add(translAtom);
-                
-                translAtom = new Atom(ox.Element, (ox.X - 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush);
-                oxygens_with_translations.Add(translAtom);
-
-                translAtom = new Atom(ox.Element, ox.X.ToString(), (ox.Y + 1).ToString(), ox.Z.ToString(), ox.Brush);
-                oxygens_with_translations.Add(translAtom);
-
-                translAtom = new Atom(ox.Element, ox.X.ToString(), (ox.Y - 1).ToString(), ox.Z.ToString(), ox.Brush);
-                oxygens_with_translations.Add(translAtom);
-
-                translAtom = new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z + 1).ToString(), ox.Brush);
-                oxygens_with_translations.Add(translAtom);
-
-                translAtom = new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z - 1).ToString(), ox.Brush);
-                oxygens_with_translations.Add(translAtom);
+                AddToList(oxygens_with_translations, ox);
+                AddToList(oxygens_with_translations, new Atom(ox.Element, (ox.X + 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush));
+                AddToList(oxygens_with_translations, new Atom(ox.Element, (ox.X - 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush));
+                AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), (ox.Y + 1).ToString(), ox.Z.ToString(), ox.Brush));
+                AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), (ox.Y - 1).ToString(), ox.Z.ToString(), ox.Brush));
+                AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z + 1).ToString(), ox.Brush));
+                AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z - 1).ToString(), ox.Brush));
             }
 
             List<Atom> allOxygens = new List<Atom>();
 
+            foreach (Atom atom in oxygens_with_translations.OrderBy(a => a.X).OrderBy(a => a.Y).OrderBy(a => a.Z))
+            {
+                Console.WriteLine(atom.ToString());
+            }
+
             foreach(Atom atom in atoms.Where(a => a.Element[0] != 'O'))
             {
                 var res = oxygens_with_translations.Where(a => a.Element[0] == 'O').OrderBy(a => Distance(atom, a)).Take(4);
-                //if (check_point_in_tetrahydron(atom, res.ToList()))
+                if (check_point_in_tetrahydron(atom, res.ToList()))
                     allOxygens = allOxygens.Concat(res.ToList()).ToList();
+                else
+                {
+                    string show = "";
+                    show = res.ToList()[0].X + " " + res.ToList()[1].X + " " + res.ToList()[2].X + " " + res.ToList()[3].X + "\n" +
+                        res.ToList()[0].Y + " " + res.ToList()[1].Y + " " + res.ToList()[2].Y + " " + res.ToList()[3].Y + "\n" +
+                        res.ToList()[0].Z + " " + res.ToList()[1].Z + " " + res.ToList()[2].Z + " " + res.ToList()[3].Z + "\n";
+
+                    //System.Windows.Forms.MessageBox.Show(show);
+                }
             }
 
             return allOxygens;
@@ -76,7 +87,7 @@ namespace SpaceGroup
             if (!calculate_plane_equation(out a, out b, out c, out d, three_points))
                 return false;
 
-            Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
+            //Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
 
             if ((a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d) * (a * center_x + b * center_y + c * center_z + d) <= 0)
                 return false;
@@ -91,7 +102,7 @@ namespace SpaceGroup
             if (!calculate_plane_equation(out a, out b, out c, out d, three_points))
                 return false;
 
-            Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
+            //Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
 
 
             if ((a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d) * (a * center_x + b * center_y + c * center_z + d) <= 0)
@@ -106,7 +117,7 @@ namespace SpaceGroup
             if (!calculate_plane_equation(out a, out b, out c, out d, three_points))
                 return false;
 
-            Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
+            //Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
 
 
             if ((a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d) * (a * center_x + b * center_y + c * center_z + d) <= 0)
@@ -121,7 +132,7 @@ namespace SpaceGroup
             if (!calculate_plane_equation(out a, out b, out c, out d, three_points))
                 return false;
 
-            Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
+            //Console.WriteLine($"{a} * {centerAtom.X} + {b} * {centerAtom.Y} + {c} * {centerAtom.Z} + {d} = {a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d}");
 
             if ((a * centerAtom.X + b * centerAtom.Y + c * centerAtom.Z + d) * (a * center_x + b * center_y + c * center_z + d) <= 0)
                 return false;

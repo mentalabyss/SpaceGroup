@@ -120,5 +120,24 @@ namespace SpaceGroup
             }
             return result;
         }
+
+        public bool PositionEquals(object obj)
+        {
+            if ((obj == null) || ! GetType().Equals(obj.GetType()))
+            {
+                return false;
+            }
+            else
+            {
+                Atom atom = (Atom)obj;
+                return (X == atom.X && Y == atom.Y && Z == atom.Z);
+            }
+        }
+
+
+        public override string ToString()
+        {
+            return X + " " + Y + " " + Z;
+        }
     }
 }
