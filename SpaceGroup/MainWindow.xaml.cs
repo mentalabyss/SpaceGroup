@@ -566,11 +566,25 @@ namespace SpaceGroup
             {
                 ModelBuilder.DrawPolyhedra(ref MainModel3Dgroup, ref polyhedra_model, atomCell, multipliedAtoms);
                 MainModel3Dgroup.Children.Add(polyhedra_model);
+                TranslatePolyhedra();
             }
             else
             {
                 MainModel3Dgroup.Children.Remove(polyhedra_model);
                 polyhedra_model = null;
+            }
+        }
+
+        private void TranslatePolyhedra()
+        {
+            if(polyhedra_model != null)
+            {
+                var polyhedra_model_translated = polyhedra_model.Clone();
+
+                var transform = new TranslateTransform3D(0, atomCell.ZAxisL, 0);
+
+                polyhedra_model_translated.Transform = transform;
+                MainModel3Dgroup.Children.Add(polyhedra_model_translated);
             }
         }
 
