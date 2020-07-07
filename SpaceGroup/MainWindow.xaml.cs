@@ -108,7 +108,7 @@ namespace SpaceGroup
             DefineLights();
 
             ModelBuilder.buildStaticAxes(out x_Axis, out y_Axis, out z_Axis);
-            ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis);
+            ModelBuilder.buildDiscreteAxis_TEST(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
             DiscreteAxisGroup.Children.Add(discrete_x_axis);
             DiscreteAxisGroup.Children.Add(discrete_y_axis);
             DiscreteAxisGroup.Children.Add(discrete_z_axis);
@@ -613,7 +613,8 @@ namespace SpaceGroup
 
         private void CheckBoxChecked(object sender, RoutedEventArgs e)
         {
-            CheckBox checkBox = (CheckBox)sender;
+            //CheckBox checkBox = (CheckBox)sender;
+            MenuItem checkBox = (MenuItem)sender;
             try
             {
                 if (checkBox == checkboxXaxis)
@@ -645,7 +646,7 @@ namespace SpaceGroup
 
         private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
         {
-            CheckBox checkBox = (CheckBox)sender;
+            MenuItem checkBox = (MenuItem)sender;
 
             if (checkBox == checkboxXaxis)
             {

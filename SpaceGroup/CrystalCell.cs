@@ -16,9 +16,9 @@ namespace SpaceGroup
         public double XAxisL { get => xAxisL; set => xAxisL = value; }
         public double YAxisL { get => yAxisL; set => yAxisL = value; }
         public double ZAxisL { get => zAxisL; set => zAxisL = value; }
-        public double Alpha { get => xAxisL; set => xAxisL = value; }
-        public double Beta { get => xAxisL; set => xAxisL = value; }
-        public double Gamma { get => xAxisL; set => xAxisL = value; }
+        public double Alpha { get => alpha; set => alpha = value; }
+        public double Beta { get => beta; set => beta = value; }
+        public double Gamma { get => gamma; set => gamma = value; }
         public double Volume { get => volume; set => volume = value; }
 
         public CrystalCell()
