@@ -248,10 +248,10 @@ namespace SpaceGroup
 
             // We need a Viewport3DVisual but we only have a Viewport3D.
             
-            for(int i = 0; i < viewPort.Children.Count; i++)
-            {
-                Console.WriteLine(viewPort.Children[i].ToString());
-            }
+            //for(int i = 0; i < viewPort.Children.Count; i++)
+            //{
+                //Console.WriteLine(viewPort.Children[i].ToString());
+            //}
 
             Viewport3DVisual vpv = VisualTreeHelper.GetParent(viewPort.Children[0]) as Viewport3DVisual;
 

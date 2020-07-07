@@ -18,6 +18,7 @@ namespace SpaceGroup
         double x, y, z;
         System.Windows.Media.SolidColorBrush brush;
         string color;
+        bool hasPolyhedra;
 
         public string Element
         {
@@ -138,6 +139,18 @@ namespace SpaceGroup
         public override string ToString()
         {
             return X + " " + Y + " " + Z;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as Atom;
+
+            if(item == null)
+            {
+                return false;
+            }
+
+            return this.X.Equals(item.X) && this.Y.Equals(item.Y) && this.Z.Equals(item.Z);
         }
     }
 }

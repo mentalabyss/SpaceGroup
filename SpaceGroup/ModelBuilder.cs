@@ -476,15 +476,23 @@ namespace SpaceGroup
                 if (Z > 1)
                     Z -= 1;
 
-                AddSphere(mesh1, new Point3D(x, y, z), atomSize, 20, 30);
-                //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
-                DiffuseMaterial material1 = new DiffuseMaterial(brush1);
-                GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
-                atomRepro.Children.Add(model1);
-                SelectableModels.Add(model1);
-                //multipliedAtoms.Add(new Atom(atom.Element, atom., x.ToString(), y.ToString(), atomColor)); //NULLPTREXCEPTION
-                multipliedAtoms.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atomColor)); //NULLPTREXCEPTION
-                atomReproList.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atom.Brush));
+                if (!multipliedAtoms.Contains(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atomColor)))
+                {
+                    AddSphere(mesh1, new Point3D(x, y, z), atomSize, 20, 30);
+                    //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
+                    DiffuseMaterial material1 = new DiffuseMaterial(brush1);
+                    GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
+                    atomRepro.Children.Add(model1);
+                    SelectableModels.Add(model1);
+                    //multipliedAtoms.Add(new Atom(atom.Element, atom., x.ToString(), y.ToString(), atomColor)); //NULLPTREXCEPTION
+                    multipliedAtoms.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atomColor)); //NULLPTREXCEPTION
+                    atomReproList.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atom.Brush));
+                }
+
+                else
+                {
+                    Console.WriteLine("Found duplicate");
+                }
             }
             atomsList.Add(atomReproList);
             atomReproductions.Add(atomRepro);
