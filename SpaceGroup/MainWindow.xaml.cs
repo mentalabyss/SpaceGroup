@@ -41,6 +41,7 @@ namespace SpaceGroup
         private Model3DGroup DiscreteAxisGroup = new Model3DGroup();
         private Model3DGroup MainAndDA = new Model3DGroup();
         private Model3DGroup TranslationsGroup = new Model3DGroup();
+        private Model3DGroup PolyhedraGroup = new Model3DGroup();
 
 
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
@@ -48,7 +49,6 @@ namespace SpaceGroup
         private List<List<Atom>> atomsList = new List<List<Atom>>(); 
 
         private GeometryModel3D BordersModel;
-        private GeometryModel3D polyhedra_model;
         private GeometryModel3D x_Axis;
         private GeometryModel3D y_Axis;
         private GeometryModel3D z_Axis;
@@ -127,7 +127,7 @@ namespace SpaceGroup
             //MainModel3Dgroup.Children.Add(z_Axis);
 
             MainModel3Dgroup.Children.Add(cells_and_atoms);
-
+            MainModel3Dgroup.Children.Add(PolyhedraGroup);
           
             MainAndDA.Children.Add(MainModel3Dgroup);
 
@@ -562,31 +562,39 @@ namespace SpaceGroup
 
         private void draw_polyhydras(object sender, RoutedEventArgs e)
         {
-            if(polyhedra_model == null)
+            if (PolyhedraGroup.Children.Count == 0)
             {
-                ModelBuilder.DrawPolyhedra(ref MainModel3Dgroup, ref polyhedra_model, atomCell, multipliedAtoms);
-                MainModel3Dgroup.Children.Add(polyhedra_model);
-                TranslatePolyhedra();
+                ModelBuilder.DrawPolyhedra_TEST(ref PolyhedraGroup, atomCell, multipliedAtoms);
             }
+
             else
             {
-                MainModel3Dgroup.Children.Remove(polyhedra_model);
-                polyhedra_model = null;
+                PolyhedraGroup.Children.Clear();
             }
+
+            // if(polyhedra_model == null)
+            //{
+            //TranslatePolyhedra();
+            //}
+            //else
+            //{
+            //MainModel3Dgroup.Children.Remove(polyhedra_model);
+            //polyhedra_model = null;
+            //}
         }
 
-        private void TranslatePolyhedra()
-        {
-            if(polyhedra_model != null)
-            {
-                var polyhedra_model_translated = polyhedra_model.Clone();
+        //private void TranslatePolyhedra()
+        //{
+        //    if(polyhedra_model != null)
+        //    {
+        //        var polyhedra_model_translated = polyhedra_model.Clone();
 
-                var transform = new TranslateTransform3D(0, atomCell.ZAxisL, 0);
+        //        var transform = new TranslateTransform3D(0, atomCell.ZAxisL, 0);
 
-                polyhedra_model_translated.Transform = transform;
-                MainModel3Dgroup.Children.Add(polyhedra_model_translated);
-            }
-        }
+        //        polyhedra_model_translated.Transform = transform;
+        //        MainModel3Dgroup.Children.Add(polyhedra_model_translated);
+        //    }
+        //}
 
         private void ShowSelectedAtomInfo(GeometryModel3D selectedModel, Material selectedMaterial)
         {

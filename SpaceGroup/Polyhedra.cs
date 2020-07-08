@@ -22,29 +22,35 @@ namespace SpaceGroup
             List<Atom> oxygens_with_translations = new List<Atom>();
             var result = atoms.Where(a => a.Element[0] == 'O');
             List<Atom> oxygens = result.ToList();
-            foreach(Atom ox in oxygens)
-            {
-                AddToList(oxygens_with_translations, ox);
-                AddToList(oxygens_with_translations, new Atom(ox.Element, (ox.X + 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush));
-                AddToList(oxygens_with_translations, new Atom(ox.Element, (ox.X - 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush));
-                AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), (ox.Y + 1).ToString(), ox.Z.ToString(), ox.Brush));
-                AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), (ox.Y - 1).ToString(), ox.Z.ToString(), ox.Brush));
-                AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z + 1).ToString(), ox.Brush));
-                AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z - 1).ToString(), ox.Brush));
-            }
+
+            //foreach(Atom ox in oxygens)
+            //{
+            //    AddToList(oxygens_with_translations, ox);
+            //    AddToList(oxygens_with_translations, new Atom(ox.Element, (ox.X + 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush));
+            //    AddToList(oxygens_with_translations, new Atom(ox.Element, (ox.X - 1).ToString(), ox.Y.ToString(), ox.Z.ToString(), ox.Brush));
+            //    AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), (ox.Y + 1).ToString(), ox.Z.ToString(), ox.Brush));
+            //    AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), (ox.Y - 1).ToString(), ox.Z.ToString(), ox.Brush));
+            //    AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z + 1).ToString(), ox.Brush));
+            //    AddToList(oxygens_with_translations, new Atom(ox.Element, ox.X.ToString(), ox.Y.ToString(), (ox.Z - 1).ToString(), ox.Brush));
+            //}
 
             List<Atom> allOxygens = new List<Atom>();
 
-            foreach (Atom atom in oxygens_with_translations.OrderBy(a => a.X).OrderBy(a => a.Y).OrderBy(a => a.Z))
-            {
-                Console.WriteLine(atom.ToString());
-            }
+            //foreach (Atom atom in oxygens_with_translations.OrderBy(a => a.X).OrderBy(a => a.Y).OrderBy(a => a.Z))
+            //{
+            //    Console.WriteLine(atom.ToString());
+            //}
 
             foreach(Atom atom in atoms.Where(a => a.Element[0] != 'O'))
             {
-                var res = oxygens_with_translations.Where(a => a.Element[0] == 'O').OrderBy(a => Distance(atom, a)).Take(4);
+                var res = oxygens.Where(a => a.Element[0] == 'O').OrderBy(a => Distance(atom, a)).Take(4); //oxygens_with_translations
                 if (check_point_in_tetrahydron(atom, res.ToList()))
+                {
                     allOxygens = allOxygens.Concat(res.ToList()).ToList();
+                    atom.hasPolyhedra = true;
+                    atom.PolyhedraAtoms = res.ToList();
+                }
+
                 else
                 {
                     string show = "";

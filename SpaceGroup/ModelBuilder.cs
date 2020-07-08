@@ -324,6 +324,56 @@ namespace SpaceGroup
             }
         }
 
+        public static void DrawSinglePolyhedra(Atom atom, CrystalCell atomCell, Model3DGroup polyhedraGroup)
+        {
+            GeometryModel3D polyhedraModel;
+            MeshGeometry3D polyhedra_mesh = new MeshGeometry3D();
+
+            int i = 0;
+            Point3D point0 = new Point3D(atom.PolyhedraAtoms[i].Y * atomCell.YAxisL, atom.PolyhedraAtoms[i].Z * atomCell.ZAxisL, atom.PolyhedraAtoms[i].X * atomCell.XAxisL);
+            Point3D point1 = new Point3D(atom.PolyhedraAtoms[i + 1].Y * atomCell.YAxisL, atom.PolyhedraAtoms[i + 1].Z * atomCell.ZAxisL, atom.PolyhedraAtoms[i + 1].X * atomCell.XAxisL);
+            Point3D point2 = new Point3D(atom.PolyhedraAtoms[i + 2].Y * atomCell.YAxisL, atom.PolyhedraAtoms[i + 2].Z * atomCell.ZAxisL, atom.PolyhedraAtoms[i + 2].X * atomCell.XAxisL);
+            Point3D point3 = new Point3D(atom.PolyhedraAtoms[i + 3].Y * atomCell.YAxisL, atom.PolyhedraAtoms[i + 3].Z * atomCell.ZAxisL, atom.PolyhedraAtoms[i + 3].X * atomCell.XAxisL);
+
+            AddSegment(polyhedra_mesh, point0, point1, new Vector3D(0, 1, 0), 0.04);
+            AddSegment(polyhedra_mesh, point0, point2, new Vector3D(0, 1, 0), 0.04);
+            AddSegment(polyhedra_mesh, point0, point3, new Vector3D(0, 1, 0), 0.04);
+            AddSegment(polyhedra_mesh, point1, point3, new Vector3D(0, 1, 0), 0.04);
+            AddSegment(polyhedra_mesh, point1, point2, new Vector3D(0, 1, 0), 0.04);
+            AddSegment(polyhedra_mesh, point2, point3, new Vector3D(0, 1, 0), 0.04);
+
+            AddTriangle(polyhedra_mesh, point0, point1, point2);
+            AddTriangle(polyhedra_mesh, point0, point1, point3);
+            AddTriangle(polyhedra_mesh, point1, point2, point3);
+            AddTriangle(polyhedra_mesh, point0, point2, point3);
+
+
+            DiffuseMaterial qDiffTransYellow =
+            new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(64, 255, 255, 0)));
+
+            SpecularMaterial qSpecTransWhite =
+           new SpecularMaterial(new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)), 30.0);
+            MaterialGroup qOuterMaterial = new MaterialGroup();
+            qOuterMaterial.Children.Add(qDiffTransYellow);
+            qOuterMaterial.Children.Add(qSpecTransWhite);
+
+            polyhedraModel = new GeometryModel3D(polyhedra_mesh, qOuterMaterial);
+            polyhedraModel.BackMaterial = qOuterMaterial;
+
+            polyhedraGroup.Children.Add(polyhedraModel);
+        }
+
+        public static void DrawPolyhedra_TEST(ref Model3DGroup PolyhedraGroup, CrystalCell atomCell, List<Atom> multipliedAtoms)
+        {
+            List<Atom> oxygens = Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
+            MeshGeometry3D polyhedra_mesh = new MeshGeometry3D();
+
+            foreach (Atom atom in multipliedAtoms.Where(a => a.hasPolyhedra))
+            {
+                DrawSinglePolyhedra(atom, atomCell, PolyhedraGroup);
+            }
+        }
+
         public static void Translate_Cell(string direction, ref Model3DGroup Upper_Cell_Model, ref Model3DGroup cells_and_atoms, CrystalCell atomCell, ref Model3DGroup TranslationsGroup)
         {
             Upper_Cell_Model = cells_and_atoms.Clone();

@@ -18,7 +18,9 @@ namespace SpaceGroup
         double x, y, z;
         System.Windows.Media.SolidColorBrush brush;
         string color;
-        bool hasPolyhedra;
+        public bool hasPolyhedra = false;
+
+        public List<Atom> PolyhedraAtoms { get; set; }
 
         public string Element
         {
@@ -37,6 +39,8 @@ namespace SpaceGroup
         {
             try
             {
+                PolyhedraAtoms = new List<Atom>();
+
                 this.element = element;
 
                 CultureInfo culture = new CultureInfo("en-US");
