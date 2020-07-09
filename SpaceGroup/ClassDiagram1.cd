@@ -3,7 +3,7 @@
   <Class Name="SpaceGroup.Atom">
     <Position X="0.5" Y="0.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAgAkBAAAYAAAgAAAAIAAAAAACAAABggQAAYAE=</HashCode>
+      <HashCode>EAAAAAAgAkBAAIYEgAgAAAAIAAAAAACAAABggQAAYAE=</HashCode>
       <FileName>Atom.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -24,7 +24,7 @@
   <Class Name="SpaceGroup.MainWindow" BaseTypeListCollapsed="true">
     <Position X="11.75" Y="0.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AMHDAkKkJCIgmC4IAACcOMogGIFAAAVAeARAgQgFYAE=</HashCode>
+      <HashCode>AIHBAkKkJCIgiC5IAICcGMogCMBAgAVAeCQAgQgFcAE=</HashCode>
       <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
@@ -32,14 +32,14 @@
   <Class Name="SpaceGroup.ModelBuilder">
     <Position X="2.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAIAAAAAAAAAAAAAABIAAAAAIAAAAAAAEAgAAAQAAE=</HashCode>
+      <HashCode>AQAIAAAAAgAAAAAAAABIAAAAAIAAAIAAAEAgCCAQAAE=</HashCode>
       <FileName>ModelBuilder.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SpaceGroup.Polyhedra">
     <Position X="6" Y="0.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAgACAAAAAAAAAAAAAAAAAAAAAABAACAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAgACAAAAAAAAAAAAAAAAQAAAAABAACAAAAAAAAA=</HashCode>
       <FileName>Polyhedra.cs</FileName>
     </TypeIdentifier>
   </Class>

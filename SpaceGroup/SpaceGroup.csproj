@@ -60,6 +60,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Compound.cs" />
+    <Compile Include="OrthographicCameraExtension.cs" />
+    <Compile Include="CellParamsWindow.xaml.cs">
+      <DependentUpon>CellParamsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Expr.cs" />
     <Compile Include="Math3D.cs" />
     <Compile Include="ModelBuilder.cs" />
@@ -70,6 +75,10 @@
       <DependentUpon>SpaceGroupSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
+    <Page Include="CellParamsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -116,5 +125,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

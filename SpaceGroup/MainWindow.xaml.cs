@@ -75,6 +75,7 @@ namespace SpaceGroup
         private OrthographicCamera TheCamera = new OrthographicCamera();
         private OrthographicCamera AxisSceneCamera = new OrthographicCamera();
 
+
         public void selectGroup(SpaceGroupCl spaceGroup)
         {
             selectedSpaceGroup = spaceGroup;
@@ -103,7 +104,8 @@ namespace SpaceGroup
             //TheCamera.FieldOfView = 60;
             MainViewport.Camera = TheCamera;
             AxisViewport.Camera = AxisSceneCamera;
-            PositionCamera();
+            TheCamera.PositionCamera(atomCell);
+            AxisSceneCamera.PositionCamera();
 
             DefineLights();
 
@@ -439,7 +441,8 @@ namespace SpaceGroup
                 double angleX = mouseDeltaX * 0.1;
                 double angleY = mouseDeltaY * 0.1;
 
-                RotateCamera(angleX, angleY);
+                TheCamera.RotateCamera(angleX, angleY);
+                AxisSceneCamera.RotateCamera(angleX, angleY);
             }
             else
             {
@@ -456,8 +459,8 @@ namespace SpaceGroup
                 mouseDeltaX = (mouseX - MouseOldX);
                 mouseDeltaY = (mouseY - MouseOldY);
 
-                MoveRight(- mouseDeltaX * 0.5);
-                MoveUp(mouseDeltaY * 0.5);
+                TheCamera.MoveRight(- mouseDeltaX * 0.5);
+                TheCamera.MoveUp(mouseDeltaY * 0.5);
             }
 
             if(e.RightButton == MouseButtonState.Pressed)
@@ -470,7 +473,7 @@ namespace SpaceGroup
                 mouseDeltaX = (mouseX - MouseOldX);
                 mouseDeltaY = (mouseY - MouseOldY);
 
-                MoveForward(mouseDeltaY * 0.5);
+                //TheCamera.MoveForward(mouseDeltaY * 0.5);
             }
 
             //moveAxesWithCamera();
@@ -678,88 +681,6 @@ namespace SpaceGroup
             }
         }
 
-        // Camera
-
-        public void PositionCamera()
-        {
-            TheCamera.Position = new Point3D(0, atomCell.ZAxisL / 2, +50);
-            TheCamera.LookDirection = new Vector3D(0, 0, -1);
-            TheCamera.UpDirection = new Vector3D(0, 1, 0);
-
-            AxisSceneCamera.Position = new Point3D(0, 0, 50);
-            AxisSceneCamera.LookDirection = new Vector3D(0, 0, -1);
-            AxisSceneCamera.UpDirection = new Vector3D(0, 1, 0);
-        }
-
-        public Vector3D LeftDirection
-        {
-            get { return TheCamera.UpDirection.Cross(TheCamera.LookDirection); }
-        }
-
-        public Vector3D RightDirection
-        {
-            get { return TheCamera.LookDirection.Cross(TheCamera.UpDirection); }
-        }
-
-        private void RotateCamera(double angleX, double angleY)
-        {
-            Rotate(new Vector3D(0, 1, 0), -angleX * 2);
-            Rotate(RightDirection, 2 * angleY);
-        }
-
-        public void Rotate(Vector3D axis, double angle)
-        {
-            Quaternion q = Math3D.Rotation(axis, angle);
-            TheCamera.Position = q.Transform(TheCamera.Position);
-            TheCamera.UpDirection = q.Transform(TheCamera.UpDirection);
-            TheCamera.LookDirection = q.Transform(TheCamera.LookDirection);
-
-            AxisSceneCamera.Position = q.Transform(AxisSceneCamera.Position);
-            AxisSceneCamera.UpDirection = q.Transform(AxisSceneCamera.UpDirection);
-            AxisSceneCamera.LookDirection = q.Transform(AxisSceneCamera.LookDirection);
-        }
-
-        public void MoveRight(double d)
-        {
-            double u = 0.05;
-            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
-            Vector3D lookDirection = camera.LookDirection;
-            Point3D position = camera.Position;
-
-            lookDirection.Normalize();
-            position = position + u * RightDirection * Math.Sign(d);
-
-            camera.Position = position;
-        }
-
-
-
-        public void MoveForward(double d)
-        {
-            //double u = 0.05;
-            //OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
-            //Vector3D lookDirection = camera.LookDirection;
-            //Point3D position = camera.Position;
-
-            //lookDirection.Normalize();
-            //position = position + u * lookDirection * d;
-
-            //camera.Position = position;
-        }
-
-        public void MoveUp(double d)
-        {
-            double u = 0.05;
-            OrthographicCamera camera = (OrthographicCamera)MainViewport.Camera;
-            Vector3D upDirection = camera.UpDirection;
-            Point3D position = camera.Position;
-
-            upDirection.Normalize();
-            position = position + u * upDirection * Math.Sign(d);
-
-            camera.Position = position;
-        }
-
         // Serializers
 
         private void SerializeTableList(string fileName)
@@ -810,8 +731,8 @@ namespace SpaceGroup
             TheCamera.Width = fov / Math.PI * 180.0;
             TheCamera.NearPlaneDistance = originalNearPlaneDistance * scale;
 
-            AxisSceneCamera.Width = fov / Math.PI * 180.0;
-            AxisSceneCamera.NearPlaneDistance = originalNearPlaneDistance * scale;        
+            //AxisSceneCamera.Width = fov / Math.PI * 180.0 * 0.1;
+            //AxisSceneCamera.NearPlaneDistance = originalNearPlaneDistance * scale;        
         }
 
         private void OnViewportMouseScroll(object sender, MouseWheelEventArgs e)
@@ -820,6 +741,13 @@ namespace SpaceGroup
                 TheCamera.Width -= 5;
             else
                 TheCamera.Width += 5;
+        }
+
+        private void OnAddCompoundButtonClick(object sender, RoutedEventArgs e)
+        {
+            CellParamsWindow addCompoundName = new CellParamsWindow();
+            addCompoundName.Owner = this;
+            addCompoundName.Show();
         }
     }
 }

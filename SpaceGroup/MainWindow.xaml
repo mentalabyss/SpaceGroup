@@ -29,6 +29,10 @@
 				<Separator />
 				<MenuItem Header="_Выйти" />
 			</MenuItem>
+			<MenuItem Header="_Соединение">
+				<MenuItem Header="_Добавить новое..." Click="OnAddCompoundButtonClick"/>
+				<MenuItem Header="_Редактировать существующее..." Click="OnAddCompoundButtonClick"/>
+			</MenuItem>
 			<MenuItem Header="_Параметры">
 				<MenuItem Header="_Настройки группы" Click="newGroup_Click"/>
 				<MenuItem Header="_Отображать ось X" x:Name="checkboxXaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
@@ -43,7 +47,7 @@
 
 		<Viewport3D Grid.Column ="2" Grid.Row ="1"  Name ="MainViewport">
 		</Viewport3D>
-		<Viewport3D Grid.Column="2" Grid.Row="1" Name ="AxisViewport" VerticalAlignment="Top" MinHeight="140" MinWidth="140" MaxHeight="150" >
+		<Viewport3D Grid.Column="2" Grid.Row="1" Name ="AxisViewport" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="140" MinWidth="140" MaxHeight="150" >
 		</Viewport3D>
 
 		<Canvas x:Name="canvasOn3D"
