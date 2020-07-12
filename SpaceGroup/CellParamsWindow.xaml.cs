@@ -32,6 +32,8 @@ namespace SpaceGroup
 
         private Compound selectedCompound;
 
+        private Compound dummy;
+
         public CellParamsWindow()
         {
             InitializeComponent();
@@ -41,12 +43,6 @@ namespace SpaceGroup
         {
             //load or create compound list
             DeserializeTableList("Compounds.comp");
-
-            Compound dummy = new Compound();
-            dummy.dummy = true;
-            dummy.Name = "Добавить соединение...";
-
-            compoundsList.Add(dummy);
 
             addedAtomsList = new ObservableCollection<Atom>();
             DataGridAtoms.ItemsSource = addedAtomsList;
@@ -117,6 +113,13 @@ namespace SpaceGroup
             catch (FileNotFoundException)
             {
                 compoundsList = new ObservableCollection<Compound>();
+
+                dummy = new Compound();
+                dummy.dummy = true;
+                dummy.Name = "Добавить соединение...";
+
+                compoundsList.Add(dummy);
+
                 SerializeTableList("Compounds.comp");
             }
         }
@@ -161,7 +164,11 @@ namespace SpaceGroup
 
                 compound.Atoms = new List<Atom>(addedAtomsList);
 
+                compoundsList.Remove(dummy);
+
                 compoundsList.Add(compound);
+
+                compoundsList.Add(dummy);
             }
 
             SerializeTableList("Compounds.comp");
@@ -177,6 +184,21 @@ namespace SpaceGroup
                 saveTableButton.Content = "Добавить";
 
                 compoundNameTextBox.Text = String.Empty;
+
+                saveTableButton.Content = "Изменить";
+
+                DataGridAtoms.ItemsSource = selectedCompound.Atoms;
+
+                DataGridAtoms.Items.Refresh();
+
+                aText.Text = "";
+                bText.Text = "";
+                cText.Text = "";
+
+                alphaText.Text = "";
+                betaText.Text = "";
+                gammaText.Text = "";
+
                 //Creating the new item
 
                 //Adding to the datasource
@@ -184,7 +206,7 @@ namespace SpaceGroup
                 //Removing and adding the dummy item from the collection, thus it is always the last on the 'list'
                 //Select the new item
             }
-            else
+            else if (selectedCompound != null)
             {
                 saveTableButton.Content = "Изменить";
 
@@ -203,6 +225,20 @@ namespace SpaceGroup
                 gammaText.Text = selectedCompound.CrystalCell.Gamma.ToString();
 
             }
+
+
+        }
+
+        public void saveToNewFormat(Compound compound)
+        {
+            compoundsList.Add(compound);
+        }
+
+        private void selectCompoundButton_Click(object sender, RoutedEventArgs e)
+        {
+            ((MainWindow)Owner).initCompound(selectedCompound);
+            ((MainWindow)Owner).buildCompound();
+            this.Close();
         }
     }
 }

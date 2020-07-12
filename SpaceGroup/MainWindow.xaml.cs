@@ -29,13 +29,16 @@ namespace SpaceGroup
         List<Atom> multipliedAtoms;
         CrystalCell atomCell;
         SpaceGroupCl selectedSpaceGroup;
+        Compound selectedCompound;
+
         public MainWindow()
         {
             InitializeComponent();
         }
+
+
         // The main object model group.
         private Model3DGroup cells_and_atoms = new Model3DGroup();
-        private Model3DGroup atoms = new Model3DGroup();
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
         private Model3DGroup Upper_Cell_Model;
         private Model3DGroup DiscreteAxisGroup = new Model3DGroup();
@@ -75,7 +78,7 @@ namespace SpaceGroup
         private OrthographicCamera TheCamera = new OrthographicCamera();
         private OrthographicCamera AxisSceneCamera = new OrthographicCamera();
 
-
+        Compound loadedCompound = new Compound();
         public void selectGroup(SpaceGroupCl spaceGroup)
         {
             selectedSpaceGroup = spaceGroup;
@@ -92,7 +95,7 @@ namespace SpaceGroup
             multipliedAtoms = new List<Atom>();
             atomCell = new CrystalCell();
             selectedSpaceGroup = new SpaceGroupCl();
-            atomCell.setCellParams(20.06999, 19.92, 13.42, 90, 90, 90);
+            //atomCell.setCellParams(20.06999, 19.92, 13.42, 90, 90, 90);
             DataGridAtoms.ItemsSource = atomCell.atomCollection;
 
             // Give the camera its initial position.
@@ -109,36 +112,58 @@ namespace SpaceGroup
 
             DefineLights();
 
-            ModelBuilder.buildStaticAxes(out x_Axis, out y_Axis, out z_Axis);
+            //ModelBuilder.buildStaticAxes(out x_Axis, out y_Axis, out z_Axis);
+            
+
+            //MainModel3Dgroup.Children.Add(x_Axis);
+            //MainModel3Dgroup.Children.Add(y_Axis);
+            //MainModel3Dgroup.Children.Add(z_Axis);
+
+            moveFromCenter();
+            //generateLabels();
+
+            MainModel3Dgroup.Children.Add(cells_and_atoms);
+            MainModel3Dgroup.Children.Add(PolyhedraGroup);
+
+            MainAndDA.Children.Add(MainModel3Dgroup);
+
+            ModelVisual3D model_visual = new ModelVisual3D();
+            model_visual.Content = MainAndDA;
+
+            MainViewport.Children.Add(model_visual);
+        }
+
+        public void initCompound(Compound compound)
+        {
+            this.selectedCompound = compound;
+        }
+
+        public void buildCompound()
+        {
+            atomCell = selectedCompound.CrystalCell;
+
+            ModelBuilder.buildCellBorders(out BordersModel, atomCell);
+
+            cells_and_atoms.Children.Add(BordersModel);
+
+            moveFromCenter();
+
+
             ModelBuilder.buildDiscreteAxis_TEST(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
             DiscreteAxisGroup.Children.Add(discrete_x_axis);
             DiscreteAxisGroup.Children.Add(discrete_y_axis);
             DiscreteAxisGroup.Children.Add(discrete_z_axis);
-            ModelBuilder.buildCellBorders(out BordersModel, atomCell);
-
-            ModelVisual3D model_visual = new ModelVisual3D();
-            model_visual.Content = MainAndDA;
 
             ModelVisual3D axis_model_visual = new ModelVisual3D();
             axis_model_visual.Content = DiscreteAxisGroup;
 
             AxisViewport.Children.Add(axis_model_visual);
 
-            //MainModel3Dgroup.Children.Add(x_Axis);
-            //MainModel3Dgroup.Children.Add(y_Axis);
-            //MainModel3Dgroup.Children.Add(z_Axis);
-
-            MainModel3Dgroup.Children.Add(cells_and_atoms);
-            MainModel3Dgroup.Children.Add(PolyhedraGroup);
-          
-            MainAndDA.Children.Add(MainModel3Dgroup);
-
-            cells_and_atoms.Children.Add(BordersModel);
-
-            MainViewport.Children.Add(model_visual);
-            moveFromCenter();
-            generateLabels();
-
+            foreach (Atom atom in selectedCompound.Atoms)
+            {
+                ModelBuilder.visualizeAtom(ref cells_and_atoms, atom, atomColor, selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
+                    ref atomsList, ref atomReproductions);
+            }
         }
 
         //private void generateLabels()
@@ -476,8 +501,7 @@ namespace SpaceGroup
                 //TheCamera.MoveForward(mouseDeltaY * 0.5);
             }
 
-            //moveAxesWithCamera();
-            generateLabels();
+            //generateLabels();
 
         }
 
@@ -539,12 +563,24 @@ namespace SpaceGroup
             {
                 string filename = openFileDialog.FileName;
 
+                atomCell.setCellParams(20.06999, 19.92, 13.42, 90, 90, 90);
+
                 atomCell.atomCollection = DeserializeTableList(filename);
+
+
+                //TEMP
+                loadedCompound.CrystalCell = atomCell;
+                loadedCompound.Atoms = atomCell.atomCollection.ToList();
+
+                //TEMP
 
                 cells_and_atoms.Children.Clear();
 
                 ModelBuilder.buildCellBorders(out BordersModel, atomCell);
+
                 cells_and_atoms.Children.Add(BordersModel);
+
+                moveFromCenter();
 
                 try
                 {
@@ -748,6 +784,7 @@ namespace SpaceGroup
             CellParamsWindow addCompoundName = new CellParamsWindow();
             addCompoundName.Owner = this;
             addCompoundName.Show();
+            addCompoundName.saveToNewFormat(loadedCompound);
         }
     }
 }

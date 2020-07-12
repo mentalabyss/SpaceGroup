@@ -21,10 +21,11 @@
 		</Grid.RowDefinitions>
 
 
-		<DockPanel Grid.Row="0">
+		<DockPanel Grid.Row="0" Grid.ColumnSpan="2">
 			<Label Content="Название соединения"/>
 			<TextBox Grid.Row="0" MinWidth="90" Margin="5" Name="compoundNameTextBox"/>
-			<ComboBox Name="combobox" Margin="5" MinWidth="90" SelectionChanged="ComboBox_SelectionChanged"/>
+			<ComboBox Name="combobox" Margin="5" MinWidth="90" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Left"/>
+			<Button Name="compoundSelect" Margin="5" Content="Выбрать" HorizontalAlignment="Left" Click="selectCompoundButton_Click"/>
 		</DockPanel>
 
 		<GroupBox Header="Параметры ячейки" Grid.Column="0" Grid.Row="1">

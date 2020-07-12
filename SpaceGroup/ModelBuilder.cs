@@ -468,6 +468,7 @@ namespace SpaceGroup
         public static void visualizeAtom(ref Model3DGroup model_group, Atom atom, SolidColorBrush atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
             ref List<GeometryModel3D> SelectableModels, ref List<Atom> multipliedAtoms, ref List<List<Atom>> atomsList, ref List<Model3DGroup> atomReproductions)
         {
+
             atom.StringToColor();
             atomColor = atom.Brush;
             SolidColorBrush brush1 = new SolidColorBrush();
@@ -481,6 +482,7 @@ namespace SpaceGroup
             else
             {
                 brush1 = atom.Brush;
+                brush1 = new SolidColorBrush(Color.FromArgb(255, 255, 139, 0));
             }
 
             Model3DGroup atomRepro = new Model3DGroup();
