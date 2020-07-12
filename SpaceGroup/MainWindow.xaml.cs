@@ -149,7 +149,7 @@ namespace SpaceGroup
             moveFromCenter();
 
 
-            ModelBuilder.buildDiscreteAxis_TEST(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
+            ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
             DiscreteAxisGroup.Children.Add(discrete_x_axis);
             DiscreteAxisGroup.Children.Add(discrete_y_axis);
             DiscreteAxisGroup.Children.Add(discrete_z_axis);
@@ -603,7 +603,7 @@ namespace SpaceGroup
         {
             if (PolyhedraGroup.Children.Count == 0)
             {
-                ModelBuilder.DrawPolyhedra_TEST(ref PolyhedraGroup, atomCell, multipliedAtoms);
+                ModelBuilder.DrawPolyhedra(ref PolyhedraGroup, atomCell, multipliedAtoms);
             }
 
             else

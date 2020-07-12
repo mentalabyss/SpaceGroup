@@ -61,6 +61,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Compound.cs" />
+    <Compile Include="MeshExtension.cs" />
     <Compile Include="OrthographicCameraExtension.cs" />
     <Compile Include="CellParamsWindow.xaml.cs">
       <DependentUpon>CellParamsWindow.xaml</DependentUpon>
@@ -75,6 +76,7 @@
       <DependentUpon>SpaceGroupSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
+    <Compile Include="Compound_Visual3D.cs" />
     <Page Include="CellParamsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
