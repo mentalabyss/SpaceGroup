@@ -48,6 +48,8 @@ namespace SpaceGroup
             DataGridAtoms.ItemsSource = addedAtomsList;
 
             combobox.ItemsSource = compoundsList;
+
+            combobox.Items.Refresh();
         }
 
         private void addAtomButton_Click(object sender, RoutedEventArgs e)
@@ -104,6 +106,7 @@ namespace SpaceGroup
                 var myFileStream = new FileStream(filename, FileMode.Open);
                 List<Compound> myObject = (List<Compound>)mySerializer.Deserialize(myFileStream);
                 compoundsList = new ObservableCollection<Compound>();
+
                 foreach (Compound a in myObject)
                 {
                     compoundsList.Add(a);
@@ -181,13 +184,14 @@ namespace SpaceGroup
 
             if (selectedCompound != null && selectedCompound.dummy)
             {
+
                 saveTableButton.Content = "Добавить";
 
                 compoundNameTextBox.Text = String.Empty;
 
-                saveTableButton.Content = "Изменить";
+                addedAtomsList = new ObservableCollection<Atom>(selectedCompound.Atoms);
 
-                DataGridAtoms.ItemsSource = selectedCompound.Atoms;
+                DataGridAtoms.ItemsSource = addedAtomsList;
 
                 DataGridAtoms.Items.Refresh();
 
@@ -198,21 +202,18 @@ namespace SpaceGroup
                 alphaText.Text = "";
                 betaText.Text = "";
                 gammaText.Text = "";
-
-                //Creating the new item
-
-                //Adding to the datasource
-
-                //Removing and adding the dummy item from the collection, thus it is always the last on the 'list'
-                //Select the new item
             }
+
             else if (selectedCompound != null)
             {
+
                 saveTableButton.Content = "Изменить";
 
-                compoundNameTextBox.Text = selectedCompound.Name;
+                addedAtomsList = new ObservableCollection<Atom>(selectedCompound.Atoms);
 
-                DataGridAtoms.ItemsSource = selectedCompound.Atoms;
+                DataGridAtoms.ItemsSource = addedAtomsList;
+
+                compoundNameTextBox.Text = selectedCompound.Name;
 
                 DataGridAtoms.Items.Refresh();
 
@@ -224,6 +225,7 @@ namespace SpaceGroup
                 betaText.Text = selectedCompound.CrystalCell.Beta.ToString();
                 gammaText.Text = selectedCompound.CrystalCell.Gamma.ToString();
 
+                System.Windows.Forms.MessageBox.Show(selectedCompound.Atoms.Count().ToString());
             }
 
 
@@ -236,6 +238,7 @@ namespace SpaceGroup
 
         private void selectCompoundButton_Click(object sender, RoutedEventArgs e)
         {
+            selectedCompound.GetAtomKeyValuePairs();
             ((MainWindow)Owner).initCompound(selectedCompound);
             ((MainWindow)Owner).buildCompound();
             this.Close();

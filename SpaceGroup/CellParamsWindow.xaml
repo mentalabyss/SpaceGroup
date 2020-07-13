@@ -123,7 +123,7 @@
 
 
 				<DataGrid x:Name="DataGridAtoms" Grid.Row="0" Grid.ColumnSpan="2" CanUserAddRows="True" CanUserDeleteRows="True" AlternationCount="1"
-						  ItemsSource="{Binding Path=., Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"
+						  ItemsSource="{Binding Path=addedAtomsList, Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"
 						  AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
 					<DataGrid.Columns>
 						<DataGridTextColumn IsReadOnly="False" Header="Атом" Width="0.25*" Binding="{Binding Element}"></DataGridTextColumn>

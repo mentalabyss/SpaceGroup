@@ -12,6 +12,12 @@ namespace SpaceGroup
     {
         public static void DrawSinglePolyhedra(this MeshGeometry3D polyhedraMesh, Atom atom, CrystalCell atomCell, Model3DGroup polyhedraGroup)
         {
+            // GENERAL CASE FOR N > 2
+
+
+
+            // GENERAL CASE//
+
             int i = 0;
             Point3D point0 = new Point3D(atom.PolyhedraAtoms[i].Y * atomCell.YAxisL, atom.PolyhedraAtoms[i].Z * atomCell.ZAxisL, atom.PolyhedraAtoms[i].X * atomCell.XAxisL);
             Point3D point1 = new Point3D(atom.PolyhedraAtoms[i + 1].Y * atomCell.YAxisL, atom.PolyhedraAtoms[i + 1].Z * atomCell.ZAxisL, atom.PolyhedraAtoms[i + 1].X * atomCell.XAxisL);

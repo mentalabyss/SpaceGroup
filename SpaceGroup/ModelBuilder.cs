@@ -185,25 +185,24 @@ namespace SpaceGroup
         }
 
 
-        public static void visualizeAtom(ref Model3DGroup model_group, Atom atom, SolidColorBrush atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
+        public static void visualizeAtom(ref Model3DGroup model_group, Atom atom, string atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
             ref List<GeometryModel3D> SelectableModels, ref List<Atom> multipliedAtoms, ref List<List<Atom>> atomsList, ref List<Model3DGroup> atomReproductions)
         {
-
-            atom.StringToColor();
-            atomColor = atom.Brush;
-            SolidColorBrush brush1 = new SolidColorBrush();
+            //atom.StringToColor();
+            //atomColor = atom.Brush;
+            SolidColorBrush brush1 = (SolidColorBrush)(new BrushConverter().ConvertFrom(atomColor));
 
             double atomSize = 0.4;
             if (atom.Element[0] == 'O' && (atom.Element[1] != 's'))
             {
                 atomSize = 0.2;
-                brush1.Color = Color.FromRgb(255, 0, 0); //oxygen to red
+               // brush1.Color = Color.FromRgb(255, 0, 0); //oxygen to red
             }
-            else
-            {
-                brush1 = atom.Brush;
-                brush1 = new SolidColorBrush(Color.FromArgb(255, 255, 139, 0));
-            }
+            //else
+            //{
+            //    brush1 = atom.Brush;
+            //    brush1 = new SolidColorBrush(Color.FromArgb(255, 255, 139, 0));
+            //}
 
             Model3DGroup atomRepro = new Model3DGroup();
             List<Atom> atomReproList = new List<Atom>();
@@ -248,7 +247,7 @@ namespace SpaceGroup
                 if (Z > 1)
                     Z -= 1;
 
-                if (!multipliedAtoms.Contains(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atomColor)))
+                if (!multipliedAtoms.Contains(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null)))
                 {
                     mesh1.AddSphere(new Point3D(x, y, z), atomSize, 20, 30);
                     //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
@@ -257,7 +256,7 @@ namespace SpaceGroup
                     atomRepro.Children.Add(model1);
                     SelectableModels.Add(model1);
                     //multipliedAtoms.Add(new Atom(atom.Element, atom., x.ToString(), y.ToString(), atomColor)); //NULLPTREXCEPTION
-                    multipliedAtoms.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atomColor)); //NULLPTREXCEPTION
+                    multipliedAtoms.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null)); //NULLPTREXCEPTION
                     atomReproList.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atom.Brush));
                 }
 

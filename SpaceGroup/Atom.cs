@@ -18,6 +18,7 @@ namespace SpaceGroup
         double x, y, z;
         System.Windows.Media.SolidColorBrush brush;
         string color;
+        private int typeID;
         public bool hasPolyhedra = false;
 
         public List<Atom> PolyhedraAtoms { get; set; }
@@ -64,7 +65,7 @@ namespace SpaceGroup
                 else
                     this.z = Double.Parse(z);
                 this.brush = brush;
-                color = brush.ToString();
+                //color = brush.ToString();
             }
             catch(NullReferenceException e)
             {
@@ -77,6 +78,8 @@ namespace SpaceGroup
             get { return color; }
             set { color = value; }
         }
+
+        public int TypeID { get => typeID; set => typeID = value; }
 
         public void StringToColor()
         {
