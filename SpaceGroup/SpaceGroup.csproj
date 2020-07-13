@@ -61,6 +61,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Compound.cs" />
+    <Compile Include="ConvexHullCalculator.cs" />
     <Compile Include="MeshExtension.cs" />
     <Compile Include="OrthographicCameraExtension.cs" />
     <Compile Include="CellParamsWindow.xaml.cs">

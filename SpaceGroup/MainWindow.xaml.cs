@@ -41,7 +41,7 @@ namespace SpaceGroup
         // The main object model group.
         private Model3DGroup cells_and_atoms = new Model3DGroup();
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
-        private Model3DGroup Upper_Cell_Model;
+        private Model3DGroup TranslationsModelsGroup;
         private Model3DGroup DiscreteAxisGroup = new Model3DGroup();
         private Model3DGroup MainAndDA = new Model3DGroup();
         private Model3DGroup TranslationsGroup = new Model3DGroup();
@@ -495,17 +495,22 @@ namespace SpaceGroup
             }
         }
 
+        private int originalPolyCount = 0;
+
         private void draw_translations(object sender, RoutedEventArgs e)
         {
             if (!translationsSwitch)
             {
                 translationsSwitch = true;
-                ModelBuilder.Translate_Cell("up", ref Upper_Cell_Model, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("down", ref Upper_Cell_Model, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("left", ref Upper_Cell_Model, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("right", ref Upper_Cell_Model, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("front", ref Upper_Cell_Model, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("back", ref Upper_Cell_Model, ref cells_and_atoms, atomCell, ref TranslationsGroup);
+                //TODO
+                ModelBuilder.Translate_Cell("up", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
+                ModelBuilder.Translate_Cell("down", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
+                ModelBuilder.Translate_Cell("left", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
+                ModelBuilder.Translate_Cell("right", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
+                ModelBuilder.Translate_Cell("front", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
+                ModelBuilder.Translate_Cell("back", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
+                originalPolyCount = PolyhedraGroup.Children.Count;
+                ModelBuilder.Translate_Polyhedra(PolyhedraGroup, atomCell);
                 MainModel3Dgroup.Children.Add(TranslationsGroup);
             }
             else
@@ -513,6 +518,10 @@ namespace SpaceGroup
                 translationsSwitch = false;
                 MainModel3Dgroup.Children.Remove(TranslationsGroup);
                 TranslationsGroup.Children.Clear();
+                for (int i = originalPolyCount; i < PolyhedraGroup.Children.Count; i++)
+                {
+                    PolyhedraGroup.Children.RemoveAt(i);
+                }
             }
         }
 
@@ -585,30 +594,7 @@ namespace SpaceGroup
             {
                 PolyhedraGroup.Children.Clear();
             }
-
-            // if(polyhedra_model == null)
-            //{
-            //TranslatePolyhedra();
-            //}
-            //else
-            //{
-            //MainModel3Dgroup.Children.Remove(polyhedra_model);
-            //polyhedra_model = null;
-            //}
         }
-
-        //private void TranslatePolyhedra()
-        //{
-        //    if(polyhedra_model != null)
-        //    {
-        //        var polyhedra_model_translated = polyhedra_model.Clone();
-
-        //        var transform = new TranslateTransform3D(0, atomCell.ZAxisL, 0);
-
-        //        polyhedra_model_translated.Transform = transform;
-        //        MainModel3Dgroup.Children.Add(polyhedra_model_translated);
-        //    }
-        //}
 
         private void ShowSelectedAtomInfo(GeometryModel3D selectedModel, Material selectedMaterial)
         {

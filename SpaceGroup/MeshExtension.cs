@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,25 @@ namespace SpaceGroup
 {
     public static class MeshExtension
     {
-        public static void DrawSinglePolyhedra(this MeshGeometry3D polyhedraMesh, Atom atom, CrystalCell atomCell, Model3DGroup polyhedraGroup)
+        public static void DrawSinglePolyhedra(this MeshGeometry3D polyhedraMesh, Atom atom, CrystalCell atomCell, Model3DGroup polyhedraGroup, int nOfVertices)
         {
-            // GENERAL CASE FOR N > 2
 
+            if (nOfVertices > 4)
+            {
 
+                // GENERAL CASE FOR N > 4 (CONVEX HULL)
 
+                List<Point3D> polyhedraPoints = new List<Point3D>();
+
+                foreach (Atom polyhedraAtom in atom.PolyhedraAtoms)
+                {
+                    Point3D point = new Point3D(polyhedraAtom.Y * atomCell.YAxisL, polyhedraAtom.Z * atomCell.ZAxisL, polyhedraAtom.X * atomCell.XAxisL);
+
+                }
+
+                return;
+            }
+            
             // GENERAL CASE//
 
             int i = 0;
@@ -38,10 +52,10 @@ namespace SpaceGroup
 
 
             DiffuseMaterial qDiffTransYellow =
-            new DiffuseMaterial(new SolidColorBrush(Color.FromArgb(64, 255, 255, 0)));
+            new DiffuseMaterial(new SolidColorBrush(System.Windows.Media.Color.FromArgb(64, 255, 255, 0)));
 
             SpecularMaterial qSpecTransWhite =
-           new SpecularMaterial(new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)), 30.0);
+           new SpecularMaterial(new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 255, 255, 255)), 30.0);
             MaterialGroup qOuterMaterial = new MaterialGroup();
             qOuterMaterial.Children.Add(qDiffTransYellow);
             qOuterMaterial.Children.Add(qSpecTransWhite);

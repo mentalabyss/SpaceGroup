@@ -147,7 +147,7 @@ namespace SpaceGroup
             foreach (Atom atom in multipliedAtoms.Where(a => a.hasPolyhedra))
             {
                 MeshGeometry3D polyhedraMesh = new MeshGeometry3D();
-                polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, PolyhedraGroup);
+                polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, PolyhedraGroup, 4);
             }
         }
 
@@ -181,7 +181,21 @@ namespace SpaceGroup
             }
 
             Upper_Cell_Model.Transform = transform;
+
             TranslationsGroup.Children.Add(Upper_Cell_Model);
+        }
+
+        public static void Translate_Polyhedra(Model3DGroup polyhedraGroup, CrystalCell atomCell)
+        {
+            //TODO
+            int count = polyhedraGroup.Children.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var translatedPolyhedra = polyhedraGroup.Children[i].Clone();
+                translatedPolyhedra.Transform = new TranslateTransform3D(0, atomCell.ZAxisL, 0);
+                polyhedraGroup.Children.Add(translatedPolyhedra);
+
+            }
         }
 
 
