@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -202,6 +203,12 @@ namespace SpaceGroup
         public static void visualizeAtom(ref Model3DGroup model_group, Atom atom, string atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
             ref List<GeometryModel3D> SelectableModels, ref List<Atom> multipliedAtoms, ref List<List<Atom>> atomsList, ref List<Model3DGroup> atomReproductions)
         {
+            if (selectedSpaceGroup == null)
+            {
+                throw new NotImplementedException();
+            }
+
+
             //atom.StringToColor();
             //atomColor = atom.Brush;
             SolidColorBrush brush1 = (SolidColorBrush)(new BrushConverter().ConvertFrom(atomColor));

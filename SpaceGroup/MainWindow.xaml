@@ -105,9 +105,9 @@
 					</GroupBox>
 
 					<GroupBox Grid.Row="1" Header="Параметры изображения">
-						<DataGrid>
+						<Grid Name="imageSettingsGrid">
 							
-						</DataGrid>
+						</Grid>
 					</GroupBox>
 					
 					

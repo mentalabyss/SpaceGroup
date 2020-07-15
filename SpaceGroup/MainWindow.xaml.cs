@@ -19,6 +19,7 @@ using System.Xml.Serialization;
 using System.Runtime.Serialization;
 using System.Collections.ObjectModel;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace SpaceGroup
 {
@@ -64,6 +65,8 @@ namespace SpaceGroup
 
         private Dictionary<int, string> colorTypeDictionary = new Dictionary<int, string>();
 
+        private bool groupSelected;
+
         Label xLabel = new Label();
         Label yLabel = new Label();
         Label zLabel = new Label();
@@ -81,7 +84,13 @@ namespace SpaceGroup
         Compound loadedCompound = new Compound();
         public void selectGroup(SpaceGroupCl spaceGroup)
         {
-            selectedSpaceGroup = spaceGroup;
+            if (!groupSelected)
+            {
+                selectedSpaceGroup = spaceGroup;
+
+                visualizeAtom();
+            }
+
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -94,7 +103,7 @@ namespace SpaceGroup
             zLabel.FontSize = 25;
             multipliedAtoms = new List<Atom>();
             atomCell = new CrystalCell();
-            selectedSpaceGroup = new SpaceGroupCl();
+            //selectedSpaceGroup = new SpaceGroupCl();
             TheCamera.Width = 90;
             AxisSceneCamera.Width = 90;
             MainViewport.Camera = TheCamera;
@@ -120,6 +129,8 @@ namespace SpaceGroup
 
             //add red-oxygen pair to dictionary
             colorTypeDictionary.Add(0, "#FFFF0000");
+
+            groupSelected = false;
         }
         
         public void initCompound(Compound compound)
@@ -130,6 +141,22 @@ namespace SpaceGroup
             {
                 var color = String.Format("#{0:X6}", random.Next(0x1000000)); // = "#A197B9"
                 colorTypeDictionary.Add(i, color);
+                imageSettingsGrid.RowDefinitions.Add(new RowDefinition());
+
+                var colorPickerButton = new Button();
+                colorPickerButton.MinWidth = 5;
+                colorPickerButton.MinHeight = 20;
+                colorPickerButton.Margin = new Thickness(5);
+                colorPickerButton.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom(color));
+
+                var elementLabel = new Label();
+
+                //elementLabel.Content
+
+                //var dockPanel = new DockPanel();
+
+                imageSettingsGrid.Children.Add(colorPickerButton);
+                Grid.SetRow(colorPickerButton, imageSettingsGrid.RowDefinitions.Count - 1);
             }
         }
 
@@ -154,11 +181,7 @@ namespace SpaceGroup
 
             AxisViewport.Children.Add(axis_model_visual);
 
-            foreach (Atom atom in selectedCompound.Atoms)
-            {
-                ModelBuilder.visualizeAtom(ref cells_and_atoms, atom, colorTypeDictionary[atom.TypeID], selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
-                    ref atomsList, ref atomReproductions);
-            }
+            visualizeAtom();
         }
 
         private void generateLabels()
@@ -566,20 +589,32 @@ namespace SpaceGroup
 
                 moveFromCenter();
 
+                visualizeAtom();
+            }
+        }
+
+        private void visualizeAtom()
+        {
+            foreach (Atom atom in selectedCompound.Atoms)
+            {
                 try
                 {
-                    foreach (Atom a in atomCell.atomCollection)
-                    {
-                        ModelBuilder.visualizeAtom(ref cells_and_atoms, a, colorTypeDictionary[a.TypeID], selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
-                    ref atomsList, ref atomReproductions);
-                    }
+                    ModelBuilder.visualizeAtom(ref cells_and_atoms, atom, colorTypeDictionary[atom.TypeID], selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
+                       ref atomsList, ref atomReproductions);
 
-                    //DataGridAtoms.ItemsSource = atomCell.atomCollection;
+                    groupSelected = true;
                 }
-                catch (System.NullReferenceException)
+                catch (NullReferenceException)
                 {
-                    MessageBox.Show("Не выбрана группа!"); //ВНИМАНИЕ
+                    System.Windows.Forms.MessageBox.Show("Не выбрана группа!");
+                    break;
                 }
+                catch (NotImplementedException)
+                {
+                    System.Windows.Forms.MessageBox.Show("Test");
+                    break;
+                }
+
             }
         }
 
