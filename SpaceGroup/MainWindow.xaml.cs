@@ -33,20 +33,14 @@ namespace SpaceGroup
         SpaceGroupCl selectedSpaceGroup;
         Compound selectedCompound;
 
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
-
-
         // The main object model group.
         private Model3DGroup cells_and_atoms = new Model3DGroup();
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
-        private Model3DGroup TranslationsModelsGroup;
         private Model3DGroup DiscreteAxisGroup = new Model3DGroup();
         private Model3DGroup MainAndDA = new Model3DGroup();
         private Model3DGroup TranslationsGroup = new Model3DGroup();
         private Model3DGroup PolyhedraGroup = new Model3DGroup();
+        private Model3DGroup TranslationsGr;
 
 
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
@@ -66,6 +60,7 @@ namespace SpaceGroup
         private Dictionary<int, string> colorTypeDictionary = new Dictionary<int, string>();
 
         private bool groupSelected;
+        private bool compoundSelected;
 
         Label xLabel = new Label();
         Label yLabel = new Label();
@@ -82,16 +77,12 @@ namespace SpaceGroup
         private OrthographicCamera AxisSceneCamera = new OrthographicCamera();
 
         Compound loadedCompound = new Compound();
-        public void selectGroup(SpaceGroupCl spaceGroup)
+
+        public MainWindow()
         {
-            if (!groupSelected)
-            {
-                selectedSpaceGroup = spaceGroup;
-
-                visualizeAtom();
-            }
-
+            InitializeComponent();
         }
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -115,7 +106,6 @@ namespace SpaceGroup
 
 
             moveFromCenter();
-            //generateLabels();
 
             MainModel3Dgroup.Children.Add(cells_and_atoms);
             MainModel3Dgroup.Children.Add(PolyhedraGroup);
@@ -131,8 +121,19 @@ namespace SpaceGroup
             colorTypeDictionary.Add(0, "#FFFF0000");
 
             groupSelected = false;
+            compoundSelected = false;
         }
-        
+
+        public void selectGroup(SpaceGroupCl spaceGroup)
+        {
+            if (!groupSelected)
+            {
+                selectedSpaceGroup = spaceGroup;
+
+                visualizeAtom();
+            }
+        }
+
         public void initCompound(Compound compound)
         {
             selectedCompound = compound;
@@ -158,6 +159,8 @@ namespace SpaceGroup
                 imageSettingsGrid.Children.Add(colorPickerButton);
                 Grid.SetRow(colorPickerButton, imageSettingsGrid.RowDefinitions.Count - 1);
             }
+
+            compoundSelected = true;
         }
 
         public void buildCompound()
@@ -169,7 +172,6 @@ namespace SpaceGroup
             cells_and_atoms.Children.Add(BordersModel);
 
             moveFromCenter();
-
 
             ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
             DiscreteAxisGroup.Children.Add(discrete_x_axis);
@@ -186,23 +188,30 @@ namespace SpaceGroup
 
         private void generateLabels()
         {
-            //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
-            canvasOn3D.Children.Clear();
-            //X
-            Point LabelXPoint = (Point)Point3DToScreen2D(new Point3D(5, 0, 0), AxisViewport);
-            Canvas.SetLeft(xLabel, LabelXPoint.X);
-            Canvas.SetTop(xLabel, LabelXPoint.Y);
-            canvasOn3D.Children.Add(xLabel);
+            try
+            {
+                //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
+                canvasOn3D.Children.Clear();
+                //X
+                Point LabelXPoint = (Point)Point3DToScreen2D(new Point3D(5, 0, 0), AxisViewport);
+                Canvas.SetLeft(xLabel, LabelXPoint.X);
+                Canvas.SetTop(xLabel, LabelXPoint.Y);
+                canvasOn3D.Children.Add(xLabel);
 
-            Point LabelYPoint = (Point)Point3DToScreen2D(new Point3D(0, 5, 0), AxisViewport);
-            Canvas.SetLeft(yLabel, LabelYPoint.X);
-            Canvas.SetTop(yLabel, LabelYPoint.Y);
-            canvasOn3D.Children.Add(yLabel);
+                Point LabelYPoint = (Point)Point3DToScreen2D(new Point3D(0, 5, 0), AxisViewport);
+                Canvas.SetLeft(yLabel, LabelYPoint.X);
+                Canvas.SetTop(yLabel, LabelYPoint.Y);
+                canvasOn3D.Children.Add(yLabel);
 
-            Point LabelZPoint = (Point)Point3DToScreen2D(new Point3D(0, 0, 5), AxisViewport);
-            Canvas.SetLeft(zLabel, LabelZPoint.X);
-            Canvas.SetTop(zLabel, LabelZPoint.Y);
-            canvasOn3D.Children.Add(zLabel);
+                Point LabelZPoint = (Point)Point3DToScreen2D(new Point3D(0, 0, 5), AxisViewport);
+                Canvas.SetLeft(zLabel, LabelZPoint.X);
+                Canvas.SetTop(zLabel, LabelZPoint.Y);
+                canvasOn3D.Children.Add(zLabel);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                Console.WriteLine("no Axis");
+            }
         }
 
         private void moveFromCenter()
@@ -223,48 +232,6 @@ namespace SpaceGroup
             DiscreteAxisGroup.Children.Add(ambient_light);
             DiscreteAxisGroup.Children.Add(directional_light);
         }
-
-        //private void addAtomButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        string s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(atomName.Text.ToLower());
-        //        Atom atom = new Atom(s, xCoord.Text, yCoord.Text, zCoord.Text, atomColor);
-        //        ModelBuilder.visualizeAtom(ref cells_and_atoms, atom, atomColor, selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
-        //            ref atomsList, ref atomReproductions);
-        //        atomCell.atomCollection.Add(atom);
-
-        //        DataGridAtoms.Items.Refresh();
-        //    }
-        //    catch (NullReferenceException)
-        //    {
-        //        System.Windows.Forms.MessageBox.Show("Не выбран цвет!");
-        //    }
-        //    catch (IndexOutOfRangeException)
-        //    {
-        //        System.Windows.Forms.MessageBox.Show("Указаны не все параметры!");
-        //        //MessageBox.Show("Не выбрана группа!");
-        //    }
-
-        //}
-
-        //private void deleteButtonClick(object sender, RoutedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        int index = DataGridAtoms.SelectedIndex;
-        //        Model3DGroup groupToRemove = atomReproductions[index];
-        //        cells_and_atoms.Children.Remove(groupToRemove);
-        //        atomCell.atomCollection.Remove(DataGridAtoms.SelectedItem as Atom);
-        //        //MessageBox.Show((DataGridAtoms.SelectedItem as Atom).Element);
-        //        DataGridAtoms.Items.Refresh();
-        //    }
-        //    catch(ArgumentOutOfRangeException)
-        //    {
-        //        MessageBox.Show("Не выбран элемент для удаления!");
-        //    }
-            
-        //}
 
         public Point? Point3DToScreen2D(Point3D point3D, Viewport3D viewPort)
         {
@@ -302,6 +269,8 @@ namespace SpaceGroup
         List<GeometryModel3D> SelectedModels = new List<GeometryModel3D>();
         List<Material> SavedMaterials = new List<Material>();
 
+
+
         public void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left && e.ClickCount == 1)
@@ -316,45 +285,32 @@ namespace SpaceGroup
                         MouseOldX = position.X;
                         MouseOldY = position.Y;
                     }
+
+                    //SelectedModel = GetHitModel(e);
+                    var hitModel = GetHitModel(e);
+
+                    if (hitModel != null)
+                        SelectedModels.Add(hitModel);
+                    else
+                        SelectedModels.Clear();
                 }
             }
+        }
 
-
-            if (e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
+        public void SinglePolyhedraButtonClicked(object sender, RoutedEventArgs e)
+        {
+            foreach (var selectedModel in SelectedModels)
             {
-                Point mouse_pos = e.GetPosition(MainViewport);
-
-                HitTestResult result = VisualTreeHelper.HitTest(MainViewport, mouse_pos);
-
-                RayMeshGeometry3DHitTestResult mesh_result = result as RayMeshGeometry3DHitTestResult;
-
-                if (mesh_result != null)
+                for (int i = 1; i < cells_and_atoms.Children.Count; i++)
                 {
-                    GeometryModel3D model = (GeometryModel3D)mesh_result.ModelHit;
-
-                    if (SelectableModels.Contains(model) && !SelectedModels.Contains(model))
+                    var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
+                    if (iGroup.Children.IndexOf(selectedModel) > -1)
                     {
-                        SelectedModel = model;
-                        NormalMaterial = SelectedModel.Material;
-                        SelectedModel.Material = SelectedMaterial;
-
-                        SelectedModels.Add(SelectedModel);
-                        SavedMaterials.Add(NormalMaterial);
-
-                        ShowSelectedAtomInfo(SelectedModel, NormalMaterial);
+                        MeshGeometry3D polyhedraMesh = new MeshGeometry3D();
+                        //Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
+                        var polyhedraModel = polyhedraMesh.DrawSinglePolyhedra(multipliedAtoms[iGroup.Children.IndexOf(selectedModel) + iGroup.Children.Count * (i - 1)], atomCell, PolyhedraGroup, 4);
+                        SelectableModels.Remove(selectedModel);
                     }
-                }
-                else
-                {
-                    for (int i = 0; i < SelectedModels.Count; i++)
-                    {
-                        SelectedModels[i].Material = SavedMaterials[i];
-                    }
-
-                    SelectedModels.Clear();
-                    SavedMaterials.Clear();
-                    SelectedModel = null;
-                    ClearSelectedAtomInfo();
                 }
             }
         }
@@ -447,8 +403,47 @@ namespace SpaceGroup
         double mouseDeltaX;
         double mouseDeltaY;
 
+        private GeometryModel3D GetHitModel(MouseEventArgs e)
+        {
+            Point mouse_pos = e.GetPosition(MainViewport);
+
+            HitTestResult result = VisualTreeHelper.HitTest(MainViewport, mouse_pos);
+
+            RayMeshGeometry3DHitTestResult mesh_result = result as RayMeshGeometry3DHitTestResult;
+
+            if (mesh_result != null)
+            {
+                GeometryModel3D model = (GeometryModel3D)mesh_result.ModelHit;
+
+                if (PolyhedraGroup.Children.Contains(model))
+                {
+                    var polyModel = model;
+                    PolyhedraGroup.Children.Remove(polyModel);
+
+                    mouse_pos = e.GetPosition(MainViewport);
+
+                    result = VisualTreeHelper.HitTest(MainViewport, mouse_pos);
+
+                    mesh_result = result as RayMeshGeometry3DHitTestResult;
+
+                    PolyhedraGroup.Children.Add(polyModel);
+                }
+
+                if (mesh_result != null)
+                {
+                    model = (GeometryModel3D)mesh_result.ModelHit;
+                    return model;
+                }
+            }
+
+            return null;
+        }
+
         public void OnViewportMouseMove(object sender, MouseEventArgs e)
         {
+            var hitModel = GetHitModel(e);
+            ShowSelectedAtomInfo(hitModel);
+
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 mouseDragged = true;
@@ -498,8 +493,7 @@ namespace SpaceGroup
                 //TheCamera.MoveForward(mouseDeltaY * 0.5);
             }
 
-            //generateLabels();
-
+            generateLabels();
         }
 
         private void newGroup_Click(object sender, RoutedEventArgs e)
@@ -526,12 +520,12 @@ namespace SpaceGroup
             {
                 translationsSwitch = true;
                 //TODO
-                ModelBuilder.Translate_Cell("up", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("down", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("left", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("right", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("front", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
-                ModelBuilder.Translate_Cell("back", ref TranslationsModelsGroup, ref cells_and_atoms, atomCell, ref TranslationsGroup);
+                ModelBuilder.Translate_Cell("up", TranslationsGr, cells_and_atoms, atomCell, TranslationsGroup);
+                ModelBuilder.Translate_Cell("down", TranslationsGr, cells_and_atoms, atomCell, TranslationsGroup);
+                ModelBuilder.Translate_Cell("left", TranslationsGr, cells_and_atoms, atomCell, TranslationsGroup);
+                ModelBuilder.Translate_Cell("right", TranslationsGr, cells_and_atoms, atomCell, TranslationsGroup);
+                ModelBuilder.Translate_Cell("front", TranslationsGr, cells_and_atoms, atomCell, TranslationsGroup);
+                ModelBuilder.Translate_Cell("back", TranslationsGr, cells_and_atoms, atomCell, TranslationsGroup);
                 originalPolyCount = PolyhedraGroup.Children.Count;
                 ModelBuilder.Translate_Polyhedra(PolyhedraGroup, atomCell);
                 MainModel3Dgroup.Children.Add(TranslationsGroup);
@@ -595,34 +589,34 @@ namespace SpaceGroup
 
         private void visualizeAtom()
         {
-            foreach (Atom atom in selectedCompound.Atoms)
-            {
-                try
+            if (compoundSelected)
+                foreach (Atom atom in selectedCompound.Atoms)
                 {
-                    ModelBuilder.visualizeAtom(ref cells_and_atoms, atom, colorTypeDictionary[atom.TypeID], selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
-                       ref atomsList, ref atomReproductions);
+                    try
+                    {
+                        ModelBuilder.visualizeAtom(cells_and_atoms, atom, colorTypeDictionary[atom.TypeID], selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
+                           ref atomsList, ref atomReproductions);
 
-                    groupSelected = true;
+                        groupSelected = true;
+                    }
+                    catch (NullReferenceException)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Не выбрана группа!");
+                        break;
+                    }
+                    catch (NotImplementedException)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Test");
+                        break;
+                    }
                 }
-                catch (NullReferenceException)
-                {
-                    System.Windows.Forms.MessageBox.Show("Не выбрана группа!");
-                    break;
-                }
-                catch (NotImplementedException)
-                {
-                    System.Windows.Forms.MessageBox.Show("Test");
-                    break;
-                }
-
-            }
         }
 
         private void draw_polyhydras(object sender, RoutedEventArgs e)
         {
             if (PolyhedraGroup.Children.Count == 0)
             {
-                ModelBuilder.DrawPolyhedra(ref PolyhedraGroup, atomCell, multipliedAtoms);
+                ModelBuilder.DrawPolyhedra(PolyhedraGroup, atomCell, multipliedAtoms, ref SelectableModels, ref atomsList);
             }
 
             else
@@ -631,7 +625,7 @@ namespace SpaceGroup
             }
         }
 
-        private void ShowSelectedAtomInfo(GeometryModel3D selectedModel, Material selectedMaterial)
+        private void ShowSelectedAtomInfo(GeometryModel3D selectedModel)
         {
             for(int i = 1; i < cells_and_atoms.Children.Count; i++)
             {

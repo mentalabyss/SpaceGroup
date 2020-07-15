@@ -11,7 +11,7 @@ namespace SpaceGroup
 {
     public static class MeshExtension
     {
-        public static void DrawSinglePolyhedra(this MeshGeometry3D polyhedraMesh, Atom atom, CrystalCell atomCell, Model3DGroup polyhedraGroup, int nOfVertices)
+        public static GeometryModel3D DrawSinglePolyhedra(this MeshGeometry3D polyhedraMesh, Atom atom, CrystalCell atomCell, Model3DGroup polyhedraGroup, int nOfVertices)
         {
 
             if (nOfVertices > 4)
@@ -24,10 +24,9 @@ namespace SpaceGroup
                 foreach (Atom polyhedraAtom in atom.PolyhedraAtoms)
                 {
                     Point3D point = new Point3D(polyhedraAtom.Y * atomCell.YAxisL, polyhedraAtom.Z * atomCell.ZAxisL, polyhedraAtom.X * atomCell.XAxisL);
-
                 }
 
-                return;
+                return null;
             }
             
             // GENERAL CASE//
@@ -62,8 +61,9 @@ namespace SpaceGroup
 
             GeometryModel3D polyhedraModel = new GeometryModel3D(polyhedraMesh, qOuterMaterial);
             polyhedraModel.BackMaterial = qOuterMaterial;
-
             polyhedraGroup.Children.Add(polyhedraModel);
+
+            return polyhedraModel;
         }
 
         public static void AddSegment(this MeshGeometry3D mesh, Point3D point1, Point3D point2, Vector3D up, double thickness)

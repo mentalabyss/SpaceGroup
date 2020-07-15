@@ -141,18 +141,24 @@ namespace SpaceGroup
                 vector.Z * scale);
         }
 
-        public static void DrawPolyhedra(ref Model3DGroup PolyhedraGroup, CrystalCell atomCell, List<Atom> multipliedAtoms)
+        public static void DrawPolyhedra(Model3DGroup PolyhedraGroup, CrystalCell atomCell, List<Atom> multipliedAtoms, ref List<GeometryModel3D> SelectableModels, ref List<List<Atom>> atomsList)
         {
-            List<Atom> oxygens = Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
+            //foreach(List<Atom> aList in atomsList)
+            //{
+            //   Polyhedra.CalculatePolyhedra(aList, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
+            //}
+
+            Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
 
             foreach (Atom atom in multipliedAtoms.Where(a => a.hasPolyhedra))
             {
                 MeshGeometry3D polyhedraMesh = new MeshGeometry3D();
-                polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, PolyhedraGroup, 4);
+                var polyhedraModel = polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, PolyhedraGroup, 4);
+                //SelectableModels.Add(polyhedraModel);
             }
         }
 
-        public static void Translate_Cell(string direction, ref Model3DGroup Upper_Cell_Model, ref Model3DGroup cells_and_atoms, CrystalCell atomCell, ref Model3DGroup TranslationsGroup)
+        public static void Translate_Cell(string direction, Model3DGroup Upper_Cell_Model, Model3DGroup cells_and_atoms, CrystalCell atomCell, Model3DGroup TranslationsGroup)
         {
             Upper_Cell_Model = cells_and_atoms.Clone();
             var transform = new TranslateTransform3D();
@@ -200,7 +206,7 @@ namespace SpaceGroup
         }
 
 
-        public static void visualizeAtom(ref Model3DGroup model_group, Atom atom, string atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
+        public static void visualizeAtom(Model3DGroup model_group, Atom atom, string atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
             ref List<GeometryModel3D> SelectableModels, ref List<Atom> multipliedAtoms, ref List<List<Atom>> atomsList, ref List<Model3DGroup> atomReproductions)
         {
             if (selectedSpaceGroup == null)
