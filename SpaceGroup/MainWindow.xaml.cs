@@ -41,6 +41,7 @@ namespace SpaceGroup
         private Model3DGroup TranslationsGroup = new Model3DGroup();
         private Model3DGroup PolyhedraGroup = new Model3DGroup();
         private Model3DGroup TranslationsGr;
+        private Model3DGroup AtomsWithBuiltPolyhedras = new Model3DGroup();
 
 
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
@@ -299,8 +300,9 @@ namespace SpaceGroup
 
         public void SinglePolyhedraButtonClicked(object sender, RoutedEventArgs e)
         {
-            foreach (var selectedModel in SelectedModels)
+            foreach (var selectedModel in SelectedModels.Where(a => !AtomsWithBuiltPolyhedras.Children.Contains(a)))
             {
+
                 for (int i = 1; i < cells_and_atoms.Children.Count; i++)
                 {
                     var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
@@ -308,11 +310,16 @@ namespace SpaceGroup
                     {
                         MeshGeometry3D polyhedraMesh = new MeshGeometry3D();
                         //Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
-                        var polyhedraModel = polyhedraMesh.DrawSinglePolyhedra(multipliedAtoms[iGroup.Children.IndexOf(selectedModel) + iGroup.Children.Count * (i - 1)], atomCell, PolyhedraGroup, 4);
-                        SelectableModels.Remove(selectedModel);
+                        polyhedraMesh.DrawSinglePolyhedra(multipliedAtoms
+                            [iGroup.Children.IndexOf(selectedModel) + iGroup.Children.Count * (i - 1)],
+                            atomCell, PolyhedraGroup, 4);
+                        //SelectableModels.Remove(selectedModel);
                     }
                 }
+
+                AtomsWithBuiltPolyhedras.Children.Add(selectedModel);
             }
+            SelectedModels.Clear();
         }
 
         public void DistanceButtonClicked(object sender, RoutedEventArgs e)
@@ -441,8 +448,20 @@ namespace SpaceGroup
 
         public void OnViewportMouseMove(object sender, MouseEventArgs e)
         {
+            const double dimCoef = 0.5;
             var hitModel = GetHitModel(e);
             ShowSelectedAtomInfo(hitModel);
+            if (hitModel != null && SelectableModels.Contains(hitModel))
+            {
+                // CAST NOT WORKING TODO
+                //DiffuseMaterial newMaterial = (DiffuseMaterial)hitModel.Material;
+                //var newMaterialColor = newMaterial.Color;
+                //var newBrush = new SolidColorBrush(Color.FromRgb(
+                //    (byte)(newMaterialColor.R * dimCoef),
+                //    (byte)(newMaterialColor.G * dimCoef),
+                //    (byte)(newMaterialColor.B * dimCoef)));
+                //hitModel.Material = new DiffuseMaterial(newBrush);
+            }
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -489,6 +508,7 @@ namespace SpaceGroup
                 mouseY = position.Y;
                 mouseDeltaX = (mouseX - MouseOldX);
                 mouseDeltaY = (mouseY - MouseOldY);
+
 
                 //TheCamera.MoveForward(mouseDeltaY * 0.5);
             }
@@ -594,8 +614,9 @@ namespace SpaceGroup
                 {
                     try
                     {
-                        ModelBuilder.visualizeAtom(cells_and_atoms, atom, colorTypeDictionary[atom.TypeID], selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
-                           ref atomsList, ref atomReproductions);
+                        ModelBuilder.visualizeAtom(cells_and_atoms, atom, colorTypeDictionary[atom.TypeID],
+                            selectedSpaceGroup, atomCell, ref SelectableModels, ref multipliedAtoms,
+                            ref atomsList, ref atomReproductions);
 
                         groupSelected = true;
                     }
