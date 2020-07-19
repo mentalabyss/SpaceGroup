@@ -153,7 +153,7 @@ namespace SpaceGroup
             foreach (Atom atom in multipliedAtoms.Where(a => a.hasPolyhedra))
             {
                 MeshGeometry3D polyhedraMesh = new MeshGeometry3D();
-                var polyhedraModel = polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, PolyhedraGroup, 4);
+                var polyhedraModel = polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, 4);
                 //SelectableModels.Add(polyhedraModel);
             }
         }
@@ -233,6 +233,7 @@ namespace SpaceGroup
 
             Model3DGroup atomRepro = new Model3DGroup();
             List<Atom> atomReproList = new List<Atom>();
+
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
                 MeshGeometry3D mesh1 = new MeshGeometry3D();
@@ -277,7 +278,6 @@ namespace SpaceGroup
                 if (!multipliedAtoms.Contains(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null)))
                 {
                     mesh1.AddSphere(new Point3D(x, y, z), atomSize, 20, 30);
-                    //AddSphere(mesh1, new Point3D(-1, 0, 0), 0.25, 5, 10);
                     DiffuseMaterial material1 = new DiffuseMaterial(brush1);
                     GeometryModel3D model1 = new GeometryModel3D(mesh1, material1);
                     atomRepro.Children.Add(model1);

@@ -33,6 +33,10 @@ namespace SpaceGroup
         SpaceGroupCl selectedSpaceGroup;
         Compound selectedCompound;
 
+        //NEW
+        CompoundVisual compoundVisual;
+        //NEW
+
         // The main object model group.
         private Model3DGroup cells_and_atoms = new Model3DGroup();
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
@@ -77,7 +81,7 @@ namespace SpaceGroup
         private OrthographicCamera TheCamera = new OrthographicCamera();
         private OrthographicCamera AxisSceneCamera = new OrthographicCamera();
 
-        Compound loadedCompound = new Compound();
+        //Compound loadedCompound = new Compound();
 
         public MainWindow()
         {
@@ -106,23 +110,25 @@ namespace SpaceGroup
             DefineLights();
 
 
-            moveFromCenter();
 
-            MainModel3Dgroup.Children.Add(cells_and_atoms);
-            MainModel3Dgroup.Children.Add(PolyhedraGroup);
+            //CompoundVisual compoundVisual = new CompoundVisual();
+            //MainViewport.Children.Add(compoundVisual);
 
-            MainAndDA.Children.Add(MainModel3Dgroup);
+            //MainModel3Dgroup.Children.Add(cells_and_atoms);
+            //MainModel3Dgroup.Children.Add(PolyhedraGroup);
 
-            ModelVisual3D model_visual = new ModelVisual3D();
-            model_visual.Content = MainAndDA;
+            //MainAndDA.Children.Add(MainModel3Dgroup);
 
-            MainViewport.Children.Add(model_visual);
+            //ModelVisual3D model_visual = new ModelVisual3D();
+            //model_visual.Content = MainAndDA;
 
-            //add red-oxygen pair to dictionary
-            colorTypeDictionary.Add(0, "#FFFF0000");
+            //MainViewport.Children.Add(model_visual);
 
-            groupSelected = false;
-            compoundSelected = false;
+            ////add red-oxygen pair to dictionary
+            //colorTypeDictionary.Add(0, "#FFFF0000");
+
+            //groupSelected = false;
+            //compoundSelected = false;
         }
 
         public void selectGroup(SpaceGroupCl spaceGroup)
@@ -137,54 +143,65 @@ namespace SpaceGroup
 
         public void initCompound(Compound compound)
         {
-            selectedCompound = compound;
-            
-            for (int i = 1; i < compound.atomTypesDict.Count; i++)
-            {
-                var color = String.Format("#{0:X6}", random.Next(0x1000000)); // = "#A197B9"
-                colorTypeDictionary.Add(i, color);
-                imageSettingsGrid.RowDefinitions.Add(new RowDefinition());
+            atomCell = compound.CrystalCell;
+            compoundVisual = new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtoms);
+            MainViewport.Children.Add(compoundVisual);
+            moveFromCenter();
+            System.Windows.Forms.MessageBox.Show("Test");
+            //selectedCompound = compound;
 
-                var colorPickerButton = new Button();
-                colorPickerButton.MinWidth = 5;
-                colorPickerButton.MinHeight = 20;
-                colorPickerButton.Margin = new Thickness(5);
-                colorPickerButton.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom(color));
+            //for (int i = 1; i < compound.atomTypesDict.Count; i++)
+            //{
+            //    var color = String.Format("#{0:X6}", random.Next(0x1000000)); // = "#A197B9"
+            //    colorTypeDictionary.Add(i, color);
+            //    imageSettingsGrid.RowDefinitions.Add(new RowDefinition());
 
-                var elementLabel = new Label();
+            //    var colorPickerButton = new Button();
+            //    colorPickerButton.MinWidth = 5;
+            //    colorPickerButton.MinHeight = 20;
+            //    colorPickerButton.Margin = new Thickness(5);
+            //    colorPickerButton.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom(color));
 
-                //elementLabel.Content
+            //    var elementLabel = new Label();
 
-                //var dockPanel = new DockPanel();
+            //    //elementLabel.Content
 
-                imageSettingsGrid.Children.Add(colorPickerButton);
-                Grid.SetRow(colorPickerButton, imageSettingsGrid.RowDefinitions.Count - 1);
-            }
+            //    //var dockPanel = new DockPanel();
 
-            compoundSelected = true;
+            //    imageSettingsGrid.Children.Add(colorPickerButton);
+            //    Grid.SetRow(colorPickerButton, imageSettingsGrid.RowDefinitions.Count - 1);
+            //}
+
+            //compoundSelected = true;
         }
 
         public void buildCompound()
         {
-            atomCell = selectedCompound.CrystalCell;
+            //NEW
 
-            ModelBuilder.buildCellBorders(out BordersModel, atomCell);
 
-            cells_and_atoms.Children.Add(BordersModel);
+            //NEW
 
-            moveFromCenter();
 
-            ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
-            DiscreteAxisGroup.Children.Add(discrete_x_axis);
-            DiscreteAxisGroup.Children.Add(discrete_y_axis);
-            DiscreteAxisGroup.Children.Add(discrete_z_axis);
+            //atomCell = selectedCompound.CrystalCell;
 
-            ModelVisual3D axis_model_visual = new ModelVisual3D();
-            axis_model_visual.Content = DiscreteAxisGroup;
+            //ModelBuilder.buildCellBorders(out BordersModel, atomCell);
 
-            AxisViewport.Children.Add(axis_model_visual);
+            //cells_and_atoms.Children.Add(BordersModel);
 
-            visualizeAtom();
+            //moveFromCenter();
+
+            //ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
+            //DiscreteAxisGroup.Children.Add(discrete_x_axis);
+            //DiscreteAxisGroup.Children.Add(discrete_y_axis);
+            //DiscreteAxisGroup.Children.Add(discrete_z_axis);
+
+            //ModelVisual3D axis_model_visual = new ModelVisual3D();
+            //axis_model_visual.Content = DiscreteAxisGroup;
+
+            //AxisViewport.Children.Add(axis_model_visual);
+
+            //visualizeAtom();
         }
 
         private void generateLabels()
@@ -219,7 +236,7 @@ namespace SpaceGroup
         {
             //var transform = new TranslateTransform3D(-atomCell.XAxisL / 2, -atomCell.YAxisL / 2, -atomCell.ZAxisL / 2);
             var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2);
-            MainModel3Dgroup.Transform = transform;
+            compoundVisual.Transform = transform;
         }
 
         private void DefineLights()
@@ -312,7 +329,7 @@ namespace SpaceGroup
                         //Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
                         polyhedraMesh.DrawSinglePolyhedra(multipliedAtoms
                             [iGroup.Children.IndexOf(selectedModel) + iGroup.Children.Count * (i - 1)],
-                            atomCell, PolyhedraGroup, 4);
+                            atomCell, 4);
                         //SelectableModels.Remove(selectedModel);
                     }
                 }
@@ -451,17 +468,6 @@ namespace SpaceGroup
             const double dimCoef = 0.5;
             var hitModel = GetHitModel(e);
             ShowSelectedAtomInfo(hitModel);
-            if (hitModel != null && SelectableModels.Contains(hitModel))
-            {
-                // CAST NOT WORKING TODO
-                //DiffuseMaterial newMaterial = (DiffuseMaterial)hitModel.Material;
-                //var newMaterialColor = newMaterial.Color;
-                //var newBrush = new SolidColorBrush(Color.FromRgb(
-                //    (byte)(newMaterialColor.R * dimCoef),
-                //    (byte)(newMaterialColor.G * dimCoef),
-                //    (byte)(newMaterialColor.B * dimCoef)));
-                //hitModel.Material = new DiffuseMaterial(newBrush);
-            }
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {

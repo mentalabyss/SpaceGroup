@@ -11,7 +11,7 @@ namespace SpaceGroup
 {
     public static class MeshExtension
     {
-        public static GeometryModel3D DrawSinglePolyhedra(this MeshGeometry3D polyhedraMesh, Atom atom, CrystalCell atomCell, Model3DGroup polyhedraGroup, int nOfVertices)
+        public static GeometryModel3D DrawSinglePolyhedra(this MeshGeometry3D polyhedraMesh, Atom atom, CrystalCell atomCell, int nOfVertices)
         {
 
             if (nOfVertices > 4)
@@ -61,7 +61,6 @@ namespace SpaceGroup
 
             GeometryModel3D polyhedraModel = new GeometryModel3D(polyhedraMesh, qOuterMaterial);
             polyhedraModel.BackMaterial = qOuterMaterial;
-            polyhedraGroup.Children.Add(polyhedraModel);
 
             return polyhedraModel;
         }

@@ -60,7 +60,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AtomVisual.cs" />
     <Compile Include="Compound.cs" />
+    <Compile Include="CompoundVisual.cs" />
     <Compile Include="ConvexHullCalculator.cs" />
     <Compile Include="MeshExtension.cs" />
     <Compile Include="OrthographicCameraExtension.cs" />
