@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -19,18 +20,20 @@ namespace SpaceGroup
         double atomVisualSize;
         string atomColor;
         
-        Atom atom;
-        Model3DGroup MiscModel3DGroup;
+        private Atom atom;
+        GeometryModel3D polyhedraModel;
+        Model3DGroup MiscModel3DGroup = new Model3DGroup();
 
         public AtomVisual() { }
 
-        public AtomVisual(double x, double y, double z, double atomVisualSize, string atomColor) //для создания атомов размножений
+        public AtomVisual(double x, double y, double z, double atomVisualSize, string atomColor, ref Atom atom, CrystalCell crystalCell) //для создания атомов размножений
         {
             this.x = x;
             this.y = y;
             this.z = z;
             this.atomVisualSize = atomVisualSize;
             this.atomColor = atomColor;
+            this.atom = atom;
 
             MeshGeometry3D atomMesh = new MeshGeometry3D();
 
@@ -42,16 +45,17 @@ namespace SpaceGroup
 
             GeometryModel3D atomModel = new GeometryModel3D(atomMesh, material1);
 
-            Content = atomModel;
+            //Content = atomModel;
+            MiscModel3DGroup.Children.Add(atomModel);
+            Content = MiscModel3DGroup;
         }
 
         public AtomVisual(Atom atom, string atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
             ref List<GeometryModel3D> SelectableModels, ref List<Atom> multipliedAtoms)
         {
             if (selectedSpaceGroup == null)
-            {
                 throw new NotImplementedException();
-            }
+
 
             this.atom = atom;
 
@@ -104,13 +108,12 @@ namespace SpaceGroup
                 if (Z > 1)
                     Z -= 1;
 
-                if (!multipliedAtoms.Contains(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null)))
+                var addedAtom = new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null);
+                if (!multipliedAtoms.Contains(addedAtom))
                 {
-                    AtomVisual multipliedAtomVisual = new AtomVisual(x, y, z, atomVisualSize, atomColor);
+                    multipliedAtoms.Add(addedAtom);
+                    AtomVisual multipliedAtomVisual = new AtomVisual(x, y, z, atomVisualSize, atomColor, ref addedAtom, atomCell);
                     Children.Add(multipliedAtomVisual);
-                    //AtomsModel3DGroup.Children.Add(atomModel);
-                    //SelectableModels.Add(multipliedAtomVisual);
-                    multipliedAtoms.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null));
                     atomReproList.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atom.Brush));
                 }
 
@@ -121,14 +124,25 @@ namespace SpaceGroup
             }
         }
 
+        public Atom Atom { get => atom; set => atom = value; }
+
         public void AddPolyhedra(CrystalCell atomCell)
         {
             if (atom.hasPolyhedra)
             {
                 MeshGeometry3D polyhedraMesh = new MeshGeometry3D();
-                var polyhedraModel = polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, 4);
-                MiscModel3DGroup.Children.Add(polyhedraModel);
+                polyhedraModel = polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, 4);
             }
+        }
+
+        public void showPolyhedra()
+        {
+            if (!MiscModel3DGroup.Children.Contains(polyhedraModel) && atom.hasPolyhedra)
+            MiscModel3DGroup.Children.Add(polyhedraModel);
+        }
+        public void hidePolyhedra()
+        {
+            MiscModel3DGroup.Children.Remove(polyhedraModel);
         }
     }
 }

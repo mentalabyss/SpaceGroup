@@ -13,22 +13,6 @@ namespace SpaceGroup
     {
         public static GeometryModel3D DrawSinglePolyhedra(this MeshGeometry3D polyhedraMesh, Atom atom, CrystalCell atomCell, int nOfVertices)
         {
-
-            if (nOfVertices > 4)
-            {
-
-                // GENERAL CASE FOR N > 4 (CONVEX HULL)
-
-                List<Point3D> polyhedraPoints = new List<Point3D>();
-
-                foreach (Atom polyhedraAtom in atom.PolyhedraAtoms)
-                {
-                    Point3D point = new Point3D(polyhedraAtom.Y * atomCell.YAxisL, polyhedraAtom.Z * atomCell.ZAxisL, polyhedraAtom.X * atomCell.XAxisL);
-                }
-
-                return null;
-            }
-            
             // GENERAL CASE//
 
             int i = 0;

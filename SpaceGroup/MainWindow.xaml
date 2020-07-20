@@ -41,7 +41,8 @@
 				<MenuItem Header="_Трансляция" IsCheckable="True" Checked="draw_translations" Unchecked="draw_translations" IsChecked="False"/>
 			</MenuItem>
 			<MenuItem Header="_Полиэдры">
-				<MenuItem Header="_Показать все" Click="draw_polyhydras"/>
+				<MenuItem Header="_Показать все" Click="ShowAllPolyhedras"/>
+				<MenuItem Header="_Удалить все" Click="DeleteAllPolyhedras"/>
 			</MenuItem>
 		</Menu>
 
@@ -62,6 +63,7 @@
 					<MenuItem Header ="Расстояние" Click="DistanceButtonClicked"/>
 					<MenuItem Header="Угол" Click="AngleButtonClicked"/>
 					<MenuItem Header="Построить полиэдр" Click="SinglePolyhedraButtonClicked"/>
+					<MenuItem Header="Удалить полиэдр" Click="SinglePolyhedraDeleteButtonClicked"/>
 				</ContextMenu>
 			</Canvas.ContextMenu>
 		</Canvas>

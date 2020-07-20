@@ -32,6 +32,7 @@ namespace SpaceGroup
         CrystalCell atomCell;
         SpaceGroupCl selectedSpaceGroup;
         Compound selectedCompound;
+        private AtomVisual selectedAtomVisual;
 
         //NEW
         CompoundVisual compoundVisual;
@@ -41,11 +42,9 @@ namespace SpaceGroup
         private Model3DGroup cells_and_atoms = new Model3DGroup();
         private Model3DGroup MainModel3Dgroup = new Model3DGroup();
         private Model3DGroup DiscreteAxisGroup = new Model3DGroup();
-        private Model3DGroup MainAndDA = new Model3DGroup();
         private Model3DGroup TranslationsGroup = new Model3DGroup();
         private Model3DGroup PolyhedraGroup = new Model3DGroup();
         private Model3DGroup TranslationsGr;
-        private Model3DGroup AtomsWithBuiltPolyhedras = new Model3DGroup();
 
 
         private List<Model3DGroup> atomReproductions = new List<Model3DGroup>();
@@ -56,11 +55,6 @@ namespace SpaceGroup
         private GeometryModel3D discrete_x_axis;
         private GeometryModel3D discrete_y_axis;
         private GeometryModel3D discrete_z_axis;
-        private GeometryModel3D SelectedModel = null;
-
-
-        private Material SelectedMaterial = new DiffuseMaterial(Brushes.Black);
-        private Material NormalMaterial = new DiffuseMaterial();
 
         private Dictionary<int, string> colorTypeDictionary = new Dictionary<int, string>();
 
@@ -75,8 +69,6 @@ namespace SpaceGroup
 
         bool translationsSwitch = false;
 
-
-        private SolidColorBrush atomColor;
         // The camera.
         private OrthographicCamera TheCamera = new OrthographicCamera();
         private OrthographicCamera AxisSceneCamera = new OrthographicCamera();
@@ -106,7 +98,6 @@ namespace SpaceGroup
             AxisViewport.Camera = AxisSceneCamera;
             TheCamera.PositionCamera(atomCell);
             AxisSceneCamera.PositionCamera();
-            AxisViewport.Children.Add(DiscreteAxisGroup);
         }
 
         public void selectGroup(SpaceGroupCl spaceGroup)
@@ -123,6 +114,9 @@ namespace SpaceGroup
         {
             atomCell = compound.CrystalCell;
             compoundVisual = new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtoms);
+
+
+
             MainViewport.Children.Add(compoundVisual);
             moveFromCenter();
 
@@ -131,6 +125,19 @@ namespace SpaceGroup
             DiscreteAxisGroup.Children.Add(discrete_x_axis);
             DiscreteAxisGroup.Children.Add(discrete_y_axis);
             DiscreteAxisGroup.Children.Add(discrete_z_axis);
+
+            ModelVisual3D axisModelVisual = new ModelVisual3D();
+
+            AmbientLight ambient_light = new AmbientLight(Colors.Gray);
+            DirectionalLight directional_light =
+                new DirectionalLight(Colors.Gray, new Vector3D(-1.0, -3.0, -2.0));
+
+            DiscreteAxisGroup.Children.Add(ambient_light);
+            DiscreteAxisGroup.Children.Add(directional_light);
+
+            axisModelVisual.Content = DiscreteAxisGroup;
+            AxisViewport.Children.Add(axisModelVisual);
+
             //selectedCompound = compound;
 
             //for (int i = 1; i < compound.atomTypesDict.Count; i++)
@@ -197,11 +204,6 @@ namespace SpaceGroup
             bool bOK = false;
 
             // We need a Viewport3DVisual but we only have a Viewport3D.
-            
-            //for(int i = 0; i < viewPort.Children.Count; i++)
-            //{
-                //Console.WriteLine(viewPort.Children[i].ToString());
-            //}
 
             Viewport3DVisual vpv = VisualTreeHelper.GetParent(viewPort.Children[0]) as Viewport3DVisual;
 
@@ -242,11 +244,12 @@ namespace SpaceGroup
                         MouseOldY = position.Y;
                     }
 
-                    //SelectedModel = GetHitModel(e);
                     var hitModel = GetHitModel(e);
 
                     if (hitModel != null)
+                    {
                         SelectedModels.Add(hitModel);
+                    }
                     else
                         SelectedModels.Clear();
                 }
@@ -255,26 +258,26 @@ namespace SpaceGroup
 
         public void SinglePolyhedraButtonClicked(object sender, RoutedEventArgs e)
         {
-            foreach (var selectedModel in SelectedModels.Where(a => !AtomsWithBuiltPolyhedras.Children.Contains(a)))
+            foreach (var selectedModel in SelectedModels)
             {
-
-                for (int i = 1; i < cells_and_atoms.Children.Count; i++)
+                var selectedVisual = GetHitModelAtomVisual(selectedModel);
+                if (selectedVisual != null)
                 {
-                    var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
-                    if (iGroup.Children.IndexOf(selectedModel) > -1)
-                    {
-                        MeshGeometry3D polyhedraMesh = new MeshGeometry3D();
-                        //Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
-                        polyhedraMesh.DrawSinglePolyhedra(multipliedAtoms
-                            [iGroup.Children.IndexOf(selectedModel) + iGroup.Children.Count * (i - 1)],
-                            atomCell, 4);
-                        //SelectableModels.Remove(selectedModel);
-                    }
+                    selectedVisual.showPolyhedra();
                 }
-
-                AtomsWithBuiltPolyhedras.Children.Add(selectedModel);
             }
-            SelectedModels.Clear();
+        }
+
+        public void SinglePolyhedraDeleteButtonClicked(object sender, RoutedEventArgs e)
+        {
+            foreach (var selectedModel in SelectedModels)
+            {
+                var selectedVisual = GetHitModelAtomVisual(selectedModel);
+                if (selectedVisual != null)
+                {
+                    selectedVisual.hidePolyhedra();
+                }
+            }
         }
 
         public void DistanceButtonClicked(object sender, RoutedEventArgs e)
@@ -403,9 +406,10 @@ namespace SpaceGroup
 
         public void OnViewportMouseMove(object sender, MouseEventArgs e)
         {
-            const double dimCoef = 0.5;
             var hitModel = GetHitModel(e);
-            ShowSelectedAtomInfo(hitModel);
+            var hitModelAtomVisual = GetHitModelAtomVisual(hitModel);
+            ShowSelectedAtomInfo(hitModelAtomVisual);
+            selectedAtomVisual = hitModelAtomVisual;
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -467,14 +471,14 @@ namespace SpaceGroup
             spaceGroupSettings.Show();
         }
 
-        private void pickColor(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Forms.ColorDialog colorDialog = new System.Windows.Forms.ColorDialog();
-            if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                atomColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
-            }
-        }
+        //private void pickColor(object sender, RoutedEventArgs e)
+        //{
+        //    System.Windows.Forms.ColorDialog colorDialog = new System.Windows.Forms.ColorDialog();
+        //    if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+        //    {
+        //        atomColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
+        //    }
+        //}
 
         private int originalPolyCount = 0;
 
@@ -577,32 +581,41 @@ namespace SpaceGroup
                 }
         }
 
-        private void draw_polyhydras(object sender, RoutedEventArgs e)
+        private void ShowAllPolyhedras(object sender, RoutedEventArgs e)
         {
-            if (PolyhedraGroup.Children.Count == 0)
-            {
-                ModelBuilder.DrawPolyhedra(PolyhedraGroup, atomCell, multipliedAtoms, ref SelectableModels, ref atomsList);
-            }
+            foreach (AtomVisual atomVisual in compoundVisual.Children)
+                foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                    atomVisualRep.showPolyhedra();
+        }
 
-            else
+        private void DeleteAllPolyhedras(object sender, RoutedEventArgs e)
+        {
+            foreach (AtomVisual atomVisual in compoundVisual.Children)
+                foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                    atomVisualRep.hidePolyhedra();
+        }
+
+        private void ShowSelectedAtomInfo(AtomVisual atomVisual)
+        {
+            if (atomVisual != null)
             {
-                PolyhedraGroup.Children.Clear();
+                selectedAtomName.Content = atomVisual.Atom.Element;
+                selectedAtomX.Content = atomVisual.Atom.X;
+                selectedAtomY.Content = atomVisual.Atom.Y;
+                selectedAtomZ.Content = atomVisual.Atom.Z;
             }
         }
 
-        private void ShowSelectedAtomInfo(GeometryModel3D selectedModel)
+        private AtomVisual GetHitModelAtomVisual(GeometryModel3D selectedModel)
         {
-            for(int i = 1; i < cells_and_atoms.Children.Count; i++)
-            {
-                var iGroup = (Model3DGroup)cells_and_atoms.Children[i];
-                if(iGroup.Children.IndexOf(selectedModel) > -1)
-                {
-                    selectedAtomName.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].Element;
-                    selectedAtomX.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].X;
-                    selectedAtomY.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].Y;
-                    selectedAtomZ.Content = atomsList[i - 1][iGroup.Children.IndexOf(selectedModel)].Z;
-                }
-            }
+            if (selectedModel != null & compoundVisual != null)
+                foreach (AtomVisual atomVisual in compoundVisual.Children)
+                    foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                        foreach (GeometryModel3D model in ((Model3DGroup)atomVisualRep.Content).Children)
+                            if (model == selectedModel)
+                                return atomVisualRep;
+
+            return null;
         }
 
         private void ClearSelectedAtomInfo()
@@ -613,6 +626,7 @@ namespace SpaceGroup
             selectedAtomZ.Content = "";
         }
 
+        //HOMAGE TO GAME DEVS
         private void CheckBoxChecked(object sender, RoutedEventArgs e)
         {
             //CheckBox checkBox = (CheckBox)sender;

@@ -36,8 +36,16 @@ namespace SpaceGroup
             this.SelectableModels = SelectableModels;
             this.multipliedAtoms = multipliedAtoms;
             MiscModel3DGroup.Children.Add(BuildCellBorders());
+
             initializeDictionary();
+
             AddAtoms();
+
+            Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
+
+            foreach (AtomVisual atomVisual in Children)
+                foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                    atomVisualRep.AddPolyhedra(atomCell);
         }
 
         private GeometryModel3D BuildCellBorders()
@@ -122,11 +130,6 @@ namespace SpaceGroup
 
             MiscModel3DGroup.Children.Add(ambient_light);
             MiscModel3DGroup.Children.Add(directional_light);
-            //MainModel3Dgroup.Children.Add(ambient_light);
-            //MainModel3Dgroup.Children.Add(directional_light);
-
-            //DiscreteAxisGroup.Children.Add(ambient_light);
-            //DiscreteAxisGroup.Children.Add(directional_light);
         }
     }
 }

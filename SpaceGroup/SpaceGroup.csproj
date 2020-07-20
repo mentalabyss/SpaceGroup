@@ -79,7 +79,6 @@
       <DependentUpon>SpaceGroupSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
-    <Compile Include="Compound_Visual3D.cs" />
     <Page Include="CellParamsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
