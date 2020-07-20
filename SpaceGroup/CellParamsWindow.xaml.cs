@@ -240,7 +240,7 @@ namespace SpaceGroup
         {
             selectedCompound.GetAtomKeyValuePairs();
             ((MainWindow)Owner).initCompound(selectedCompound);
-            ((MainWindow)Owner).buildCompound();
+            //((MainWindow)Owner).buildCompound();
             this.Close();
         }
     }

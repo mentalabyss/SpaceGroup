@@ -106,29 +106,7 @@ namespace SpaceGroup
             AxisViewport.Camera = AxisSceneCamera;
             TheCamera.PositionCamera(atomCell);
             AxisSceneCamera.PositionCamera();
-
-            DefineLights();
-
-
-
-            //CompoundVisual compoundVisual = new CompoundVisual();
-            //MainViewport.Children.Add(compoundVisual);
-
-            //MainModel3Dgroup.Children.Add(cells_and_atoms);
-            //MainModel3Dgroup.Children.Add(PolyhedraGroup);
-
-            //MainAndDA.Children.Add(MainModel3Dgroup);
-
-            //ModelVisual3D model_visual = new ModelVisual3D();
-            //model_visual.Content = MainAndDA;
-
-            //MainViewport.Children.Add(model_visual);
-
-            ////add red-oxygen pair to dictionary
-            //colorTypeDictionary.Add(0, "#FFFF0000");
-
-            //groupSelected = false;
-            //compoundSelected = false;
+            AxisViewport.Children.Add(DiscreteAxisGroup);
         }
 
         public void selectGroup(SpaceGroupCl spaceGroup)
@@ -147,7 +125,12 @@ namespace SpaceGroup
             compoundVisual = new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtoms);
             MainViewport.Children.Add(compoundVisual);
             moveFromCenter();
-            System.Windows.Forms.MessageBox.Show("Test");
+
+            ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
+
+            DiscreteAxisGroup.Children.Add(discrete_x_axis);
+            DiscreteAxisGroup.Children.Add(discrete_y_axis);
+            DiscreteAxisGroup.Children.Add(discrete_z_axis);
             //selectedCompound = compound;
 
             //for (int i = 1; i < compound.atomTypesDict.Count; i++)
@@ -173,35 +156,6 @@ namespace SpaceGroup
             //}
 
             //compoundSelected = true;
-        }
-
-        public void buildCompound()
-        {
-            //NEW
-
-
-            //NEW
-
-
-            //atomCell = selectedCompound.CrystalCell;
-
-            //ModelBuilder.buildCellBorders(out BordersModel, atomCell);
-
-            //cells_and_atoms.Children.Add(BordersModel);
-
-            //moveFromCenter();
-
-            //ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
-            //DiscreteAxisGroup.Children.Add(discrete_x_axis);
-            //DiscreteAxisGroup.Children.Add(discrete_y_axis);
-            //DiscreteAxisGroup.Children.Add(discrete_z_axis);
-
-            //ModelVisual3D axis_model_visual = new ModelVisual3D();
-            //axis_model_visual.Content = DiscreteAxisGroup;
-
-            //AxisViewport.Children.Add(axis_model_visual);
-
-            //visualizeAtom();
         }
 
         private void generateLabels()
@@ -234,21 +188,8 @@ namespace SpaceGroup
 
         private void moveFromCenter()
         {
-            //var transform = new TranslateTransform3D(-atomCell.XAxisL / 2, -atomCell.YAxisL / 2, -atomCell.ZAxisL / 2);
             var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2);
             compoundVisual.Transform = transform;
-        }
-
-        private void DefineLights()
-        {
-            AmbientLight ambient_light = new AmbientLight(Colors.Gray);
-            DirectionalLight directional_light =
-                new DirectionalLight(Colors.Gray, new Vector3D(-1.0, -3.0, -2.0));
-            MainModel3Dgroup.Children.Add(ambient_light);
-            MainModel3Dgroup.Children.Add(directional_light);
-
-            DiscreteAxisGroup.Children.Add(ambient_light);
-            DiscreteAxisGroup.Children.Add(directional_light);
         }
 
         public Point? Point3DToScreen2D(Point3D point3D, Viewport3D viewPort)
@@ -285,9 +226,6 @@ namespace SpaceGroup
         bool mouseDragged = false;
 
         List<GeometryModel3D> SelectedModels = new List<GeometryModel3D>();
-        List<Material> SavedMaterials = new List<Material>();
-
-
 
         public void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
         {

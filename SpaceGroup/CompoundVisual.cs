@@ -29,6 +29,7 @@ namespace SpaceGroup
         {
             MiscModel3DGroup = new Model3DGroup();
             Content = MiscModel3DGroup;
+            DefineLights();
             this.compound = compound;
             atomCell = compound.CrystalCell;
             selectedSpaceGroup = spaceGroup;
@@ -111,6 +112,21 @@ namespace SpaceGroup
                 colorPickerButton.Margin = new Thickness(5);
                 colorPickerButton.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom(color));
             }
+        }
+
+        internal void DefineLights()
+        {
+            AmbientLight ambient_light = new AmbientLight(Colors.Gray);
+            DirectionalLight directional_light =
+                new DirectionalLight(Colors.Gray, new Vector3D(-1.0, -3.0, -2.0));
+
+            MiscModel3DGroup.Children.Add(ambient_light);
+            MiscModel3DGroup.Children.Add(directional_light);
+            //MainModel3Dgroup.Children.Add(ambient_light);
+            //MainModel3Dgroup.Children.Add(directional_light);
+
+            //DiscreteAxisGroup.Children.Add(ambient_light);
+            //DiscreteAxisGroup.Children.Add(directional_light);
         }
     }
 }
