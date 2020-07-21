@@ -60,8 +60,8 @@
 				MouseWheel="OnViewportMouseScroll">
 			<Canvas.ContextMenu>
 				<ContextMenu x:Name="contextMenu1">
-					<MenuItem Header ="Расстояние" Click="DistanceButtonClicked"/>
-					<MenuItem Header="Угол" Click="AngleButtonClicked"/>
+					<MenuItem Header ="Расстояние"/>
+					<MenuItem Header="Угол"/>
 					<MenuItem Header="Построить полиэдр" Click="SinglePolyhedraButtonClicked"/>
 					<MenuItem Header="Удалить полиэдр" Click="SinglePolyhedraDeleteButtonClicked"/>
 				</ContextMenu>
