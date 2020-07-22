@@ -25,7 +25,7 @@
 		<Menu DockPanel.Dock="Top" Grid.ColumnSpan="3">
 			<MenuItem Header="_Файл">
 				<MenuItem Header="_Открыть" Click="openBtnClick" />
-				<MenuItem Header="_Сохранить" Click="saveTableButton_Click"/>
+				<MenuItem Header="_Сохранить" Click="SaveTableButtonClick"/>
 				<Separator />
 				<MenuItem Header="_Выйти" />
 			</MenuItem>
@@ -38,7 +38,7 @@
 				<MenuItem Header="_Отображать ось X" x:Name="checkboxXaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
 				<MenuItem Header="_Отображать ось Y" x:Name="checkboxYaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
 				<MenuItem Header="_Отображать ось Z" x:Name="checkboxZaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
-				<MenuItem Header="_Трансляция" IsCheckable="True" Checked="draw_translations" Unchecked="draw_translations" IsChecked="False"/>
+				<MenuItem Header="_Трансляция" IsCheckable="True" Checked="VisualizeTranslations" Unchecked="VisualizeTranslations" IsChecked="False"/>
 			</MenuItem>
 			<MenuItem Header="_Полиэдры">
 				<MenuItem Header="_Показать все" Click="ShowAllPolyhedras"/>

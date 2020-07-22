@@ -49,10 +49,6 @@ namespace SpaceGroup
         Label yLabel = new Label();
         Label zLabel = new Label();
 
-        private Random random = new Random();
-
-        bool translationsSwitch = false;
-
         // The camera.
         private OrthographicCamera TheCamera = new OrthographicCamera();
         private OrthographicCamera AxisSceneCamera = new OrthographicCamera();
@@ -107,7 +103,7 @@ namespace SpaceGroup
                 compoundVisual = new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtoms);
 
                 MainViewport.Children.Add(compoundVisual);
-                moveFromCenter();
+                MoveFromCenter(compoundVisual);
 
                 ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
 
@@ -129,7 +125,7 @@ namespace SpaceGroup
             }
         }
 
-        private void generateLabels()
+        private void GenerateLabels()
         {
             try
             {
@@ -157,10 +153,11 @@ namespace SpaceGroup
             }
         }
 
-        private void moveFromCenter()
+        private void MoveFromCenter(ModelVisual3D model)
         {
             var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2);
-            compoundVisual.Transform = transform;
+            //compoundVisual.Transform = transform;
+            model.Transform = transform;
         }
 
         public Point? Point3DToScreen2D(Point3D point3D, Viewport3D viewPort)
@@ -323,7 +320,7 @@ namespace SpaceGroup
                 //TheCamera.MoveForward(mouseDeltaY * 0.5);
             }
 
-            generateLabels();
+            GenerateLabels();
         }
 
         private void newGroup_Click(object sender, RoutedEventArgs e)
@@ -333,21 +330,21 @@ namespace SpaceGroup
             spaceGroupSettings.Show();
         }
 
-        //private void pickColor(object sender, RoutedEventArgs e)
-        //{
-        //    System.Windows.Forms.ColorDialog colorDialog = new System.Windows.Forms.ColorDialog();
-        //    if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-        //    {
-        //        atomColor = new SolidColorBrush(Color.FromArgb(colorDialog.Color.A, colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
-        //    }
-        //}
-
-        private void draw_translations(object sender, RoutedEventArgs e)
+        private void VisualizeTranslations(object sender, RoutedEventArgs e)
         {
-            
+            CompoundVisual translatedCompoundVisual = compoundVisual.CloneCompoundVisual();
+            var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2 + atomCell.ZAxisL, -atomCell.XAxisL / 2);
+            foreach (AtomVisual atomVisual in translatedCompoundVisual.Children)
+            {
+                System.Windows.Forms.MessageBox.Show("yes");
+                atomVisual.Transform = transform;
+            }
+            //MoveFromCenter(translatedCompoundVisual);
+            translatedCompoundVisual.Transform = transform;
+            MainViewport.Children.Add(translatedCompoundVisual);
         }
 
-        private void saveTableButton_Click(object sender, RoutedEventArgs e)
+        private void SaveTableButtonClick(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             saveFileDialog1.Filter = "SPG File|*.spg";

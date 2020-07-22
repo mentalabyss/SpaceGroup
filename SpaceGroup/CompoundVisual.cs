@@ -23,7 +23,13 @@ namespace SpaceGroup
 
         private Dictionary<int, string> colorTypeDictionary = new Dictionary<int, string>();
 
+        public Compound Compound { get => compound; set => compound = value; }
+        public SpaceGroupCl SelectedSpaceGroup { get => selectedSpaceGroup; set => selectedSpaceGroup = value; }
+        public List<Atom> MultipliedAtoms { get => multipliedAtoms; set => multipliedAtoms = value; }
+
         public CompoundVisual() { }
+
+
 
         public CompoundVisual(Compound compound, SpaceGroupCl spaceGroup, List<GeometryModel3D> SelectableModels, List<Atom> multipliedAtoms)
         {
@@ -36,9 +42,7 @@ namespace SpaceGroup
             this.SelectableModels = SelectableModels;
             this.multipliedAtoms = multipliedAtoms;
             MiscModel3DGroup.Children.Add(BuildCellBorders());
-
-            initializeDictionary();
-
+            InitializeDictionary();
             AddAtoms();
 
             Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
@@ -104,7 +108,7 @@ namespace SpaceGroup
             }
         }
 
-        private void initializeDictionary()
+        private void InitializeDictionary()
         {
             colorTypeDictionary.Add(0, "#FFFF0000");
 
@@ -130,6 +134,30 @@ namespace SpaceGroup
 
             MiscModel3DGroup.Children.Add(ambient_light);
             MiscModel3DGroup.Children.Add(directional_light);
+        }
+
+        public CompoundVisual CloneCompoundVisual()
+        {
+            var newCompound = new CompoundVisual
+            {
+                Compound = compound,
+                SelectedSpaceGroup = selectedSpaceGroup,
+                MultipliedAtoms = multipliedAtoms
+            };
+
+            foreach (AtomVisual child in Children)
+            {
+                var childCopy = new AtomVisual(
+                    child.Atom, colorTypeDictionary[child.Atom.TypeID],
+                    selectedSpaceGroup, atomCell,
+                    ref SelectableModels, ref multipliedAtoms);
+
+                newCompound.Children.Add(childCopy);
+            }
+
+            newCompound.Content = MiscModel3DGroup.Clone();
+
+            return newCompound;
         }
     }
 }

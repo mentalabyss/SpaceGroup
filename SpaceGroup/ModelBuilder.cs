@@ -143,11 +143,6 @@ namespace SpaceGroup
 
         public static void DrawPolyhedra(Model3DGroup PolyhedraGroup, CrystalCell atomCell, List<Atom> multipliedAtoms, ref List<GeometryModel3D> SelectableModels, ref List<List<Atom>> atomsList)
         {
-            //foreach(List<Atom> aList in atomsList)
-            //{
-            //   Polyhedra.CalculatePolyhedra(aList, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
-            //}
-
             Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
 
             foreach (Atom atom in multipliedAtoms.Where(a => a.hasPolyhedra))

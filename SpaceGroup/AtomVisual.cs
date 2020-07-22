@@ -39,7 +39,7 @@ namespace SpaceGroup
 
             atomMesh.AddSphere(new Point3D(x, y, z), atomVisualSize, 20, 30);
 
-            SolidColorBrush brush1 = (SolidColorBrush)(new BrushConverter().ConvertFrom(atomColor));
+            SolidColorBrush brush1 = (SolidColorBrush)(new BrushConverter().ConvertFrom(this.atomColor));
 
             DiffuseMaterial material1 = new DiffuseMaterial(brush1);
 
@@ -125,6 +125,7 @@ namespace SpaceGroup
         }
 
         public Atom Atom { get => atom; set => atom = value; }
+        public string AtomColor { get => atomColor; set => atomColor = value; }
 
         public void AddPolyhedra(CrystalCell atomCell)
         {
