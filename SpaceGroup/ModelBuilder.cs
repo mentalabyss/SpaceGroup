@@ -141,7 +141,7 @@ namespace SpaceGroup
                 vector.Z * scale);
         }
 
-        public static void DrawPolyhedra(Model3DGroup PolyhedraGroup, CrystalCell atomCell, List<Atom> multipliedAtoms, ref List<GeometryModel3D> SelectableModels, ref List<List<Atom>> atomsList)
+        public static void DrawPolyhedra(Model3DGroup PolyhedraGroup, CrystalCell atomCell, List<Atom> multipliedAtoms, List<GeometryModel3D> SelectableModels, List<List<Atom>> atomsList)
         {
             Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
 
@@ -201,8 +201,7 @@ namespace SpaceGroup
         }
 
 
-        public static void visualizeAtom(Model3DGroup model_group, Atom atom, string atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
-            ref List<GeometryModel3D> SelectableModels, ref List<Atom> multipliedAtoms, ref List<List<Atom>> atomsList, ref List<Model3DGroup> atomReproductions)
+        public static void visualizeAtom(Model3DGroup model_group, Atom atom, string atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell, List<GeometryModel3D> SelectableModels, List<Atom> multipliedAtoms, List<List<Atom>> atomsList, List<Model3DGroup> atomReproductions)
         {
             if (selectedSpaceGroup == null)
             {

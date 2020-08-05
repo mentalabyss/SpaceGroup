@@ -239,7 +239,7 @@ namespace SpaceGroup
         private void selectCompoundButton_Click(object sender, RoutedEventArgs e)
         {
             selectedCompound.GetAtomKeyValuePairs();
-            ((MainWindow)Owner).initCompound(selectedCompound);
+            ((MainWindow)Owner).InitCompound(selectedCompound);
             //((MainWindow)Owner).buildCompound();
             this.Close();
         }

@@ -20,6 +20,7 @@ using System.Runtime.Serialization;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Text.RegularExpressions;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace SpaceGroup
 {
@@ -81,14 +82,14 @@ namespace SpaceGroup
             AxisSceneCamera.PositionCamera();
         }
 
-        public void selectGroup(SpaceGroupCl spaceGroup)
+        public void SelectGroup(SpaceGroupCl spaceGroup)
         {
             selectedSpaceGroup = spaceGroup;
             groupSelected = true;
             BuildCompound();
         }
 
-        public void initCompound(Compound compound)
+        public void InitCompound(Compound compound)
         {
             this.compound = compound;
             compoundSelected = true;
@@ -97,32 +98,31 @@ namespace SpaceGroup
 
         private void BuildCompound()
         {
-            if (compoundSelected && groupSelected)
-            {
-                atomCell = compound.CrystalCell;
-                compoundVisual = new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtoms);
+            if (!compoundSelected || !groupSelected) return;
+            
+            atomCell = compound.CrystalCell;
+            compoundVisual = new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtoms);
 
-                MainViewport.Children.Add(compoundVisual);
-                MoveFromCenter(compoundVisual);
+            MainViewport.Children.Add(compoundVisual);
+            MoveFromCenter(compoundVisual);
 
-                ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
+            ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
 
-                DiscreteAxisGroup.Children.Add(discrete_x_axis);
-                DiscreteAxisGroup.Children.Add(discrete_y_axis);
-                DiscreteAxisGroup.Children.Add(discrete_z_axis);
+            DiscreteAxisGroup.Children.Add(discrete_x_axis);
+            DiscreteAxisGroup.Children.Add(discrete_y_axis);
+            DiscreteAxisGroup.Children.Add(discrete_z_axis);
 
-                ModelVisual3D axisModelVisual = new ModelVisual3D();
+            ModelVisual3D axisModelVisual = new ModelVisual3D();
 
-                AmbientLight ambient_light = new AmbientLight(Colors.Gray);
-                DirectionalLight directional_light =
-                    new DirectionalLight(Colors.Gray, new Vector3D(-1.0, -3.0, -2.0));
+            AmbientLight ambientLight = new AmbientLight(Colors.Gray);
+            DirectionalLight directionalLight =
+                new DirectionalLight(Colors.Gray, new Vector3D(-1.0, -3.0, -2.0));
 
-                DiscreteAxisGroup.Children.Add(ambient_light);
-                DiscreteAxisGroup.Children.Add(directional_light);
+            DiscreteAxisGroup.Children.Add(ambientLight);
+            DiscreteAxisGroup.Children.Add(directionalLight);
 
-                axisModelVisual.Content = DiscreteAxisGroup;
-                AxisViewport.Children.Add(axisModelVisual);
-            }
+            axisModelVisual.Content = DiscreteAxisGroup;
+            AxisViewport.Children.Add(axisModelVisual);
         }
 
         private void GenerateLabels()
@@ -132,19 +132,19 @@ namespace SpaceGroup
                 //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
                 canvasOn3D.Children.Clear();
                 //X
-                Point LabelXPoint = (Point)Point3DToScreen2D(new Point3D(5, 0, 0), AxisViewport);
-                Canvas.SetLeft(xLabel, LabelXPoint.X);
-                Canvas.SetTop(xLabel, LabelXPoint.Y);
+                Point labelXPoint = (Point)Point3DToScreen2D(new Point3D(5, 0, 0), AxisViewport);
+                Canvas.SetLeft(xLabel, labelXPoint.X);
+                Canvas.SetTop(xLabel, labelXPoint.Y);
                 canvasOn3D.Children.Add(xLabel);
 
-                Point LabelYPoint = (Point)Point3DToScreen2D(new Point3D(0, 5, 0), AxisViewport);
-                Canvas.SetLeft(yLabel, LabelYPoint.X);
-                Canvas.SetTop(yLabel, LabelYPoint.Y);
+                Point labelYPoint = (Point)Point3DToScreen2D(new Point3D(0, 5, 0), AxisViewport);
+                Canvas.SetLeft(yLabel, labelYPoint.X);
+                Canvas.SetTop(yLabel, labelYPoint.Y);
                 canvasOn3D.Children.Add(yLabel);
 
-                Point LabelZPoint = (Point)Point3DToScreen2D(new Point3D(0, 0, 5), AxisViewport);
-                Canvas.SetLeft(zLabel, LabelZPoint.X);
-                Canvas.SetTop(zLabel, LabelZPoint.Y);
+                Point labelZPoint = (Point)Point3DToScreen2D(new Point3D(0, 0, 5), AxisViewport);
+                Canvas.SetLeft(zLabel, labelZPoint.X);
+                Canvas.SetTop(zLabel, labelZPoint.Y);
                 canvasOn3D.Children.Add(zLabel);
             }
             catch (ArgumentOutOfRangeException)
@@ -176,9 +176,9 @@ namespace SpaceGroup
                 // Transform the 3D point to 2D
                 Point3D transformedPoint = m.Transform(point3D);
 
-                Point screen2DPoint = new Point(transformedPoint.X, transformedPoint.Y);
+                var screen2DPoint = new Point(transformedPoint.X, transformedPoint.Y);
 
-                return new Nullable<Point>(screen2DPoint);
+                return new Point?(screen2DPoint);
             }
             else
             {
@@ -186,7 +186,7 @@ namespace SpaceGroup
             }
         }
 
-        bool mouseDragged = false;
+        bool _mouseDragged;
 
         List<GeometryModel3D> SelectedModels = new List<GeometryModel3D>();
 
@@ -197,12 +197,12 @@ namespace SpaceGroup
                 if (!contextMenu1.IsOpen)
                 {
                     Point position = e.GetPosition(this);
-                    mouseX = position.X;
-                    mouseY = position.Y;
-                    if (!mouseDragged)
+                    _mouseX = position.X;
+                    _mouseY = position.Y;
+                    if (!_mouseDragged)
                     {
-                        MouseOldX = position.X;
-                        MouseOldY = position.Y;
+                        _mouseOldX = position.X;
+                        _mouseOldY = position.Y;
                     }
 
                     var hitModel = GetHitModel(e);
@@ -222,10 +222,7 @@ namespace SpaceGroup
             foreach (var selectedModel in SelectedModels)
             {
                 var selectedVisual = GetHitModelAtomVisual(selectedModel);
-                if (selectedVisual != null)
-                {
-                    selectedVisual.showPolyhedra();
-                }
+                selectedVisual?.showPolyhedra();
             }
         }
 
@@ -234,29 +231,25 @@ namespace SpaceGroup
             foreach (var selectedModel in SelectedModels)
             {
                 var selectedVisual = GetHitModelAtomVisual(selectedModel);
-                if (selectedVisual != null)
-                {
-                    selectedVisual.hidePolyhedra();
-                }
+                selectedVisual?.hidePolyhedra();
             }
         }
 
-        double mouseX;
-        double mouseY;
-        double MouseOldX;
-        double MouseOldY;
-        double mouseDeltaX;
-        double mouseDeltaY;
+        private double _mouseX;
+        private double _mouseY;
+        private double _mouseOldX;
+        private double _mouseOldY;
+        private double _mouseDeltaX;
+        private double _mouseDeltaY;
 
         private GeometryModel3D GetHitModel(MouseEventArgs e)
         {
             Point mouse_pos = e.GetPosition(MainViewport);
             HitTestResult result = VisualTreeHelper.HitTest(MainViewport, mouse_pos);
-            RayMeshGeometry3DHitTestResult mesh_result = result as RayMeshGeometry3DHitTestResult;
 
-            if (mesh_result != null)
+            if (result is RayMeshGeometry3DHitTestResult meshResult)
             {
-                 var model = (GeometryModel3D)mesh_result.ModelHit;
+                 var model = (GeometryModel3D)meshResult.ModelHit;
                  return model;
             }
 
@@ -272,49 +265,49 @@ namespace SpaceGroup
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                mouseDragged = true;
-                MouseOldX = mouseX;
-                MouseOldY = mouseY;
+                _mouseDragged = true;
+                _mouseOldX = _mouseX;
+                _mouseOldY = _mouseY;
                 Point position = e.GetPosition(this);
-                mouseX = position.X;
-                mouseY = position.Y;
-                mouseDeltaX = (mouseX - MouseOldX);
-                mouseDeltaY = (mouseY - MouseOldY);
+                _mouseX = position.X;
+                _mouseY = position.Y;
+                _mouseDeltaX = (_mouseX - _mouseOldX);
+                _mouseDeltaY = (_mouseY - _mouseOldY);
 
-                double angleX = mouseDeltaX * 0.1;
-                double angleY = mouseDeltaY * 0.1;
+                double angleX = _mouseDeltaX * 0.1;
+                double angleY = _mouseDeltaY * 0.1;
 
                 TheCamera.RotateCamera(angleX, angleY);
                 AxisSceneCamera.RotateCamera(angleX, angleY);
             }
             else
             {
-                mouseDragged = false;
+                _mouseDragged = false;
             }
 
             if(e.MiddleButton == MouseButtonState.Pressed)
             {
-                MouseOldX = mouseX;
-                MouseOldY = mouseY;
+                _mouseOldX = _mouseX;
+                _mouseOldY = _mouseY;
                 Point position = e.GetPosition(this);
-                mouseX = position.X;
-                mouseY = position.Y;
-                mouseDeltaX = (mouseX - MouseOldX);
-                mouseDeltaY = (mouseY - MouseOldY);
+                _mouseX = position.X;
+                _mouseY = position.Y;
+                _mouseDeltaX = (_mouseX - _mouseOldX);
+                _mouseDeltaY = (_mouseY - _mouseOldY);
 
-                TheCamera.MoveRight(- mouseDeltaX * 0.5);
-                TheCamera.MoveUp(mouseDeltaY * 0.5);
+                TheCamera.MoveRight(- _mouseDeltaX * 0.5);
+                TheCamera.MoveUp(_mouseDeltaY * 0.5);
             }
 
             if(e.RightButton == MouseButtonState.Pressed)
             {
-                MouseOldX = mouseX;
-                MouseOldY = mouseY;
+                _mouseOldX = _mouseX;
+                _mouseOldY = _mouseY;
                 Point position = e.GetPosition(this);
-                mouseX = position.X;
-                mouseY = position.Y;
-                mouseDeltaX = (mouseX - MouseOldX);
-                mouseDeltaY = (mouseY - MouseOldY);
+                _mouseX = position.X;
+                _mouseY = position.Y;
+                _mouseDeltaX = (_mouseX - _mouseOldX);
+                _mouseDeltaY = (_mouseY - _mouseOldY);
 
 
                 //TheCamera.MoveForward(mouseDeltaY * 0.5);
@@ -325,30 +318,30 @@ namespace SpaceGroup
 
         private void newGroup_Click(object sender, RoutedEventArgs e)
         {
-            SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings();
-            spaceGroupSettings.Owner = this;
+            SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings {Owner = this};
             spaceGroupSettings.Show();
         }
 
         private void VisualizeTranslations(object sender, RoutedEventArgs e)
         {
-            CompoundVisual translatedCompoundVisual = compoundVisual.CloneCompoundVisual();
-            var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2 + atomCell.ZAxisL, -atomCell.XAxisL / 2);
-            foreach (AtomVisual atomVisual in translatedCompoundVisual.Children)
-            {
-                System.Windows.Forms.MessageBox.Show("yes");
-                atomVisual.Transform = transform;
-            }
-            //MoveFromCenter(translatedCompoundVisual);
-            translatedCompoundVisual.Transform = transform;
+            List<Atom> multipliedAtomsTransl = new List<Atom>();
+
+            var translatedCompoundVisual =
+                new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtomsTransl, compoundVisual.ColorTypeDictionary);
+
             MainViewport.Children.Add(translatedCompoundVisual);
+
+            var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2 + atomCell.ZAxisL, -atomCell.XAxisL / 2);
+
+            translatedCompoundVisual.Transform = transform;
         }
 
         private void SaveTableButtonClick(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            saveFileDialog1.Filter = "SPG File|*.spg";
-            saveFileDialog1.Title = "Save Atoms State";
+            System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog
+            {
+                Filter = "SPG File|*.spg", Title = "Save Atoms State"
+            };
             saveFileDialog1.ShowDialog();
 
             if(saveFileDialog1.FileName != "")
@@ -362,16 +355,18 @@ namespace SpaceGroup
 
         private void ShowAllPolyhedras(object sender, RoutedEventArgs e)
         {
-            foreach (AtomVisual atomVisual in compoundVisual.Children)
-                foreach (AtomVisual atomVisualRep in atomVisual.Children)
-                    atomVisualRep.showPolyhedra();
+            foreach (CompoundVisual cVisual in MainViewport.Children)
+                foreach (AtomVisual atomVisual in cVisual.Children)
+                    foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                        atomVisualRep.showPolyhedra();
         }
 
         private void DeleteAllPolyhedras(object sender, RoutedEventArgs e)
         {
-            foreach (AtomVisual atomVisual in compoundVisual.Children)
-                foreach (AtomVisual atomVisualRep in atomVisual.Children)
-                    atomVisualRep.hidePolyhedra();
+            foreach (CompoundVisual cVisual in MainViewport.Children)
+                foreach (AtomVisual atomVisual in compoundVisual.Children)
+                    foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                        atomVisualRep.hidePolyhedra();
         }
 
         private void ShowSelectedAtomInfo(AtomVisual atomVisual)
@@ -387,12 +382,13 @@ namespace SpaceGroup
 
         private AtomVisual GetHitModelAtomVisual(GeometryModel3D selectedModel)
         {
-            if (selectedModel != null & compoundVisual != null)
-                foreach (AtomVisual atomVisual in compoundVisual.Children)
-                    foreach (AtomVisual atomVisualRep in atomVisual.Children)
-                        foreach (GeometryModel3D model in ((Model3DGroup)atomVisualRep.Content).Children)
-                            if (model == selectedModel)
-                                return atomVisualRep;
+            if (!(selectedModel != null & compoundVisual != null)) return null;
+            foreach (CompoundVisual cVisual in MainViewport.Children)
+            foreach (AtomVisual atomVisual in cVisual.Children)
+            foreach (AtomVisual atomVisualRep in atomVisual.Children)
+            foreach (GeometryModel3D model in ((Model3DGroup)atomVisualRep.Content).Children)
+                if (model == selectedModel)
+                    return atomVisualRep;
 
             return null;
         }

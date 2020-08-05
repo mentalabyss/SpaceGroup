@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -26,7 +27,7 @@ namespace SpaceGroup
 
         public AtomVisual() { }
 
-        public AtomVisual(double x, double y, double z, double atomVisualSize, string atomColor, ref Atom atom, CrystalCell crystalCell) //для создания атомов размножений
+        public AtomVisual(double x, double y, double z, double atomVisualSize, string atomColor, Atom atom, CrystalCell crystalCell) //для создания атомов размножений
         {
             this.x = x;
             this.y = y;
@@ -51,7 +52,7 @@ namespace SpaceGroup
         }
 
         public AtomVisual(Atom atom, string atomColor, SpaceGroupCl selectedSpaceGroup, CrystalCell atomCell,
-            ref List<GeometryModel3D> SelectableModels, ref List<Atom> multipliedAtoms)
+            List<Atom> multipliedAtoms, double xAxisL = 0, double yAxisL = 0, double zAxisL = 0)
         {
             if (selectedSpaceGroup == null)
                 throw new NotImplementedException();
@@ -108,19 +109,16 @@ namespace SpaceGroup
                 if (Z > 1)
                     Z -= 1;
 
-                var addedAtom = new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null);
-                if (!multipliedAtoms.Contains(addedAtom))
-                {
-                    multipliedAtoms.Add(addedAtom);
-                    AtomVisual multipliedAtomVisual = new AtomVisual(x, y, z, atomVisualSize, atomColor, ref addedAtom, atomCell);
-                    Children.Add(multipliedAtomVisual);
-                    atomReproList.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atom.Brush));
-                }
+                x += xAxisL;
+                y += yAxisL;
+                z += zAxisL;
 
-                else
-                {
-                    Console.WriteLine("Found duplicate");
-                }
+                var addedAtom = new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null);
+                if (multipliedAtoms.Contains(addedAtom)) continue;
+                multipliedAtoms.Add(addedAtom);
+                AtomVisual multipliedAtomVisual = new AtomVisual(x, y, z, atomVisualSize, atomColor, addedAtom, atomCell);
+                Children.Add(multipliedAtomVisual);
+                atomReproList.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atom.Brush));
             }
         }
 

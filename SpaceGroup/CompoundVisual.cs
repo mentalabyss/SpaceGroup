@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace SpaceGroup
 {
@@ -21,68 +22,77 @@ namespace SpaceGroup
         List<GeometryModel3D> SelectableModels;
         List<Atom> multipliedAtoms;
 
-        private Dictionary<int, string> colorTypeDictionary = new Dictionary<int, string>();
+        public Dictionary<int, string> ColorTypeDictionary { get; set; } = new Dictionary<int, string>();
 
-        public Compound Compound { get => compound; set => compound = value; }
-        public SpaceGroupCl SelectedSpaceGroup { get => selectedSpaceGroup; set => selectedSpaceGroup = value; }
-        public List<Atom> MultipliedAtoms { get => multipliedAtoms; set => multipliedAtoms = value; }
+        public CrystalCell AtomCell
+        {
+            get => atomCell;
+            set => atomCell = value;
+        }
 
         public CompoundVisual() { }
 
 
 
-        public CompoundVisual(Compound compound, SpaceGroupCl spaceGroup, List<GeometryModel3D> SelectableModels, List<Atom> multipliedAtoms)
+        public CompoundVisual(Compound compound, SpaceGroupCl spaceGroup, List<GeometryModel3D> selectableModels, List<Atom> multipliedAtoms, Dictionary<int, string> colorTypeDictionary = null)
         {
             MiscModel3DGroup = new Model3DGroup();
             Content = MiscModel3DGroup;
-            DefineLights();
             this.compound = compound;
-            atomCell = compound.CrystalCell;
+            
+            AtomCell = compound.CrystalCell;
+
             selectedSpaceGroup = spaceGroup;
-            this.SelectableModels = SelectableModels;
+            this.SelectableModels = selectableModels;
             this.multipliedAtoms = multipliedAtoms;
             MiscModel3DGroup.Children.Add(BuildCellBorders());
-            InitializeDictionary();
+
+            if (colorTypeDictionary == null)
+            {
+                DefineLights();
+            }
+
+            InitializeDictionary(colorTypeDictionary);
             AddAtoms();
 
-            Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
+            Polyhedra.CalculatePolyhedra(multipliedAtoms, AtomCell.YAxisL, AtomCell.ZAxisL, AtomCell.XAxisL);
 
             foreach (AtomVisual atomVisual in Children)
                 foreach (AtomVisual atomVisualRep in atomVisual.Children)
-                    atomVisualRep.AddPolyhedra(atomCell);
+                    atomVisualRep.AddPolyhedra(AtomCell);
         }
 
         private GeometryModel3D BuildCellBorders()
         {
-            MeshGeometry3D borders_mesh = new MeshGeometry3D();
+            MeshGeometry3D bordersMesh = new MeshGeometry3D();
 
             Point3D origin = new Point3D(0, 0, 0);
-            Point3D xLine = new Point3D(atomCell.YAxisL, 0, 0);
-            Point3D yLine = new Point3D(0, atomCell.ZAxisL, 0);
-            Point3D zLine = new Point3D(0, 0, atomCell.XAxisL);
+            Point3D xLine = new Point3D(AtomCell.YAxisL, 0, 0);
+            Point3D yLine = new Point3D(0, AtomCell.ZAxisL, 0);
+            Point3D zLine = new Point3D(0, 0, AtomCell.XAxisL);
 
-            borders_mesh.AddSegment(origin, xLine, new Vector3D(0, 1, 0), 0.04);
-            borders_mesh.AddSegment(origin, yLine, new Vector3D(1, 0, 0), 0.04);
-            borders_mesh.AddSegment(origin, zLine, new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(origin, xLine, new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(origin, yLine, new Vector3D(1, 0, 0), 0.04);
+            bordersMesh.AddSegment(origin, zLine, new Vector3D(0, 1, 0), 0.04);
 
-            borders_mesh.AddSegment(new Point3D(atomCell.YAxisL, 0, 0), new Point3D(atomCell.YAxisL, 0, atomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
-            borders_mesh.AddSegment(new Point3D(atomCell.YAxisL, atomCell.ZAxisL, 0), new Point3D(atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
-            borders_mesh.AddSegment(new Point3D(0, atomCell.ZAxisL, 0), new Point3D(0, atomCell.ZAxisL, atomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
-
-
-            borders_mesh.AddSegment(new Point3D(0, 0, atomCell.XAxisL), new Point3D(atomCell.YAxisL, 0, atomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
-            borders_mesh.AddSegment(new Point3D(0, atomCell.ZAxisL, atomCell.XAxisL), new Point3D(atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
-            borders_mesh.AddSegment(new Point3D(0, atomCell.ZAxisL, 0), new Point3D(atomCell.YAxisL, atomCell.ZAxisL, 0), new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(new Point3D(AtomCell.YAxisL, 0, 0), new Point3D(AtomCell.YAxisL, 0, AtomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(new Point3D(AtomCell.YAxisL, AtomCell.ZAxisL, 0), new Point3D(AtomCell.YAxisL, AtomCell.ZAxisL, AtomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(new Point3D(0, AtomCell.ZAxisL, 0), new Point3D(0, AtomCell.ZAxisL, AtomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
 
 
-            borders_mesh.AddSegment(new Point3D(atomCell.YAxisL, 0, 0), new Point3D(atomCell.YAxisL, atomCell.ZAxisL, 0), new Vector3D(1, 0, 0), 0.04);
-            borders_mesh.AddSegment(new Point3D(0, 0, atomCell.XAxisL), new Point3D(0, atomCell.ZAxisL, atomCell.XAxisL), new Vector3D(1, 0, 0), 0.04);
-            borders_mesh.AddSegment(new Point3D(atomCell.YAxisL, 0, atomCell.XAxisL), new Point3D(atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL), new Vector3D(1, 0, 0), 0.04);
+            bordersMesh.AddSegment(new Point3D(0, 0, AtomCell.XAxisL), new Point3D(AtomCell.YAxisL, 0, AtomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(new Point3D(0, AtomCell.ZAxisL, AtomCell.XAxisL), new Point3D(AtomCell.YAxisL, AtomCell.ZAxisL, AtomCell.XAxisL), new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(new Point3D(0, AtomCell.ZAxisL, 0), new Point3D(AtomCell.YAxisL, AtomCell.ZAxisL, 0), new Vector3D(0, 1, 0), 0.04);
 
 
-            SolidColorBrush borders_brush = System.Windows.Media.Brushes.Black;
-            DiffuseMaterial borders_material = new DiffuseMaterial(borders_brush);
-            return new GeometryModel3D(borders_mesh, borders_material);
+            bordersMesh.AddSegment(new Point3D(AtomCell.YAxisL, 0, 0), new Point3D(AtomCell.YAxisL, AtomCell.ZAxisL, 0), new Vector3D(1, 0, 0), 0.04);
+            bordersMesh.AddSegment(new Point3D(0, 0, AtomCell.XAxisL), new Point3D(0, AtomCell.ZAxisL, AtomCell.XAxisL), new Vector3D(1, 0, 0), 0.04);
+            bordersMesh.AddSegment(new Point3D(AtomCell.YAxisL, 0, AtomCell.XAxisL), new Point3D(AtomCell.YAxisL, AtomCell.ZAxisL, AtomCell.XAxisL), new Vector3D(1, 0, 0), 0.04);
+
+
+            SolidColorBrush bordersBrush = System.Windows.Media.Brushes.Black;
+            DiffuseMaterial bordersMaterial = new DiffuseMaterial(bordersBrush);
+            return new GeometryModel3D(bordersMesh, bordersMaterial);
         }
 
         private void AddAtoms()
@@ -91,8 +101,7 @@ namespace SpaceGroup
             {
                 try
                 {
-                    AtomVisual atomVisual = new AtomVisual(atom, colorTypeDictionary[atom.TypeID], selectedSpaceGroup, atomCell,
-                        ref SelectableModels, ref multipliedAtoms);
+                    AtomVisual atomVisual = new AtomVisual(atom, ColorTypeDictionary[atom.TypeID], selectedSpaceGroup, AtomCell, multipliedAtoms);
                     Children.Add(atomVisual);
                 }
                 catch (NullReferenceException)
@@ -108,14 +117,44 @@ namespace SpaceGroup
             }
         }
 
-        private void InitializeDictionary()
+        private void AddTranslatedAtoms(double xL, double yL, double zL)
         {
-            colorTypeDictionary.Add(0, "#FFFF0000");
+            foreach (Atom atom in compound.Atoms)
+            {
+                try
+                {
+                    AtomVisual atomVisual = new AtomVisual(atom, ColorTypeDictionary[atom.TypeID], selectedSpaceGroup, AtomCell, multipliedAtoms,
+                        xL, yL, zL);
+                    Children.Add(atomVisual);
+                }
+                catch (NullReferenceException)
+                {
+                    System.Windows.Forms.MessageBox.Show("Не выбрана группа!");
+                    break;
+                }
+                catch (NotImplementedException)
+                {
+                    System.Windows.Forms.MessageBox.Show("Test");
+                    break;
+                }
+            }
+        }
+
+        private void InitializeDictionary(Dictionary<int, string> colorTypeDictionary = null)
+        {
+            if (colorTypeDictionary != null)
+            {
+                ColorTypeDictionary = colorTypeDictionary;
+                return;
+            }
+
+
+            ColorTypeDictionary.Add(0, "#FFFF0000");
 
             for (int i = 1; i < compound.atomTypesDict.Count; i++)
             {
-                var color = String.Format("#{0:X6}", random.Next(0x1000000)); // = "#A197B9"
-                colorTypeDictionary.Add(i, color);
+                var color = $"#{random.Next(0x1000000):X6}"; // = "#A197B9"
+                ColorTypeDictionary.Add(i, color);
                 //imageSettingsGrid.RowDefinitions.Add(new RowDefinition());
 
                 var colorPickerButton = new Button();
@@ -128,36 +167,13 @@ namespace SpaceGroup
 
         internal void DefineLights()
         {
-            AmbientLight ambient_light = new AmbientLight(Colors.Gray);
-            DirectionalLight directional_light =
+            AmbientLight ambientLight = new AmbientLight(Colors.Gray);
+            DirectionalLight directionalLight =
                 new DirectionalLight(Colors.Gray, new Vector3D(-1.0, -3.0, -2.0));
 
-            MiscModel3DGroup.Children.Add(ambient_light);
-            MiscModel3DGroup.Children.Add(directional_light);
+            MiscModel3DGroup.Children.Add(ambientLight);
+            MiscModel3DGroup.Children.Add(directionalLight);
         }
 
-        public CompoundVisual CloneCompoundVisual()
-        {
-            var newCompound = new CompoundVisual
-            {
-                Compound = compound,
-                SelectedSpaceGroup = selectedSpaceGroup,
-                MultipliedAtoms = multipliedAtoms
-            };
-
-            foreach (AtomVisual child in Children)
-            {
-                var childCopy = new AtomVisual(
-                    child.Atom, colorTypeDictionary[child.Atom.TypeID],
-                    selectedSpaceGroup, atomCell,
-                    ref SelectableModels, ref multipliedAtoms);
-
-                newCompound.Children.Add(childCopy);
-            }
-
-            newCompound.Content = MiscModel3DGroup.Clone();
-
-            return newCompound;
-        }
     }
 }

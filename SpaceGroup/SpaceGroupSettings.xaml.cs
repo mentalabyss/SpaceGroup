@@ -169,7 +169,7 @@ namespace SpaceGroup
         private void selectButton_click(object sender, RoutedEventArgs e)
         {
             var selectedGroup = (SpaceGroupCl)combobox.SelectedItem;
-            ((MainWindow)this.Owner).selectGroup(selectedGroup);
+            ((MainWindow)this.Owner).SelectGroup(selectedGroup);
             this.Close();
         }
     }
