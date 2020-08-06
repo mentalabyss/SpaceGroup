@@ -90,18 +90,20 @@
 								<RowDefinition Height="Auto"/>
 								<RowDefinition Height="Auto"/>
 								<RowDefinition Height="Auto"/>
-
+								<RowDefinition Height="Auto"/>
 							</Grid.RowDefinitions>
 
 							<Label Grid.Column="0" Grid.Row="0" Content="Атом: "/>
 							<Label Grid.Column="0" Grid.Row="1" Content="x: "/>
 							<Label Grid.Column="0" Grid.Row="2" Content="y: "/>
 							<Label Grid.Column="0" Grid.Row="3" Content="z: "/>
+							<Label Grid.Column="0" Grid.Row="4" Content="Объем полиэдра: "/>
 
 							<Label Grid.Column="1" Grid.Row="0" Name="selectedAtomName"/>
 							<Label Grid.Column="1" Grid.Row="1" Name="selectedAtomX"/>
 							<Label Grid.Column="1" Grid.Row="2" Name="selectedAtomY"/>
 							<Label Grid.Column="1" Grid.Row="3" Name="selectedAtomZ"/>
+							<Label Grid.Column="1" Grid.Row="4" Name="selectedAtomPolyhedronVolume"/>
 						</Grid>
 					</GroupBox>
 

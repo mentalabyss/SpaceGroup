@@ -55,7 +55,7 @@ namespace SpaceGroup
             InitializeDictionary(colorTypeDictionary);
             AddAtoms();
 
-            Polyhedra.CalculatePolyhedra(multipliedAtoms, AtomCell.YAxisL, AtomCell.ZAxisL, AtomCell.XAxisL);
+            Polyhedra.CalculatePolyhedra(multipliedAtoms, AtomCell.YAxisL, AtomCell.ZAxisL, AtomCell.XAxisL, AtomCell);
 
             foreach (AtomVisual atomVisual in Children)
                 foreach (AtomVisual atomVisualRep in atomVisual.Children)

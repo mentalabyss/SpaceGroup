@@ -141,17 +141,6 @@ namespace SpaceGroup
                 vector.Z * scale);
         }
 
-        public static void DrawPolyhedra(Model3DGroup PolyhedraGroup, CrystalCell atomCell, List<Atom> multipliedAtoms, List<GeometryModel3D> SelectableModels, List<List<Atom>> atomsList)
-        {
-            Polyhedra.CalculatePolyhedra(multipliedAtoms, atomCell.YAxisL, atomCell.ZAxisL, atomCell.XAxisL);
-
-            foreach (Atom atom in multipliedAtoms.Where(a => a.hasPolyhedra))
-            {
-                MeshGeometry3D polyhedraMesh = new MeshGeometry3D();
-                var polyhedraModel = polyhedraMesh.DrawSinglePolyhedra(atom, atomCell, 4);
-                //SelectableModels.Add(polyhedraModel);
-            }
-        }
 
         public static void Translate_Cell(string direction, Model3DGroup Upper_Cell_Model, Model3DGroup cells_and_atoms, CrystalCell atomCell, Model3DGroup TranslationsGroup)
         {

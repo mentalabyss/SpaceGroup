@@ -81,6 +81,8 @@ namespace SpaceGroup
 
         public int TypeID { get => typeID; set => typeID = value; }
 
+        public double PolyhedronVolume { get; set; }
+
         public void StringToColor()
         {
             brush = new SolidColorBrush();

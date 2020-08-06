@@ -1,25 +1,13 @@
-﻿using SpaceGroup;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml.Serialization;
-using System.Runtime.Serialization;
 using System.Collections.ObjectModel;
-using System.Collections;
-using System.Text.RegularExpressions;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace SpaceGroup
@@ -29,32 +17,36 @@ namespace SpaceGroup
     /// </summary>
     public partial class MainWindow : Window
     {
-        List<Atom> multipliedAtoms;
-        CrystalCell atomCell;
-        SpaceGroupCl selectedSpaceGroup;
-        private AtomVisual selectedAtomVisual;
-        CompoundVisual compoundVisual;
-        Compound compound;
+        private List<Atom> _multipliedAtoms;
+        private CrystalCell _atomCell;
+        private SpaceGroupCl _selectedSpaceGroup;
+        private CompoundVisual _compoundVisual;
+        private Compound _compound;
 
-        private Model3DGroup DiscreteAxisGroup = new Model3DGroup();
-        private GeometryModel3D discrete_x_axis;
-        private GeometryModel3D discrete_y_axis;
-        private GeometryModel3D discrete_z_axis;
+        private readonly Model3DGroup _discreteAxisGroup = new Model3DGroup();
+        private GeometryModel3D _discreteXAxis;
+        private GeometryModel3D _discreteYAxis;
+        private GeometryModel3D _discreteZAxis;
 
-        private List<GeometryModel3D> SelectableModels = new List<GeometryModel3D>();
+        private readonly List<GeometryModel3D> _selectableModels = new List<GeometryModel3D>();
 
-        private bool groupSelected;
-        private bool compoundSelected;
+        private bool _groupSelected;
+        private bool _compoundSelected;
 
-        Label xLabel = new Label();
-        Label yLabel = new Label();
-        Label zLabel = new Label();
+        private readonly Label _xLabel = new Label();
+        private readonly Label _yLabel = new Label();
+        private readonly Label _zLabel = new Label();
 
         // The camera.
-        private OrthographicCamera TheCamera = new OrthographicCamera();
-        private OrthographicCamera AxisSceneCamera = new OrthographicCamera();
-
-        //Compound loadedCompound = new Compound();
+        private readonly OrthographicCamera _theCamera = new OrthographicCamera();
+        private readonly OrthographicCamera _axisSceneCamera = new OrthographicCamera();
+        
+        private double _mouseX;
+        private double _mouseY;
+        private double _mouseOldX;
+        private double _mouseOldY;
+        private double _mouseDeltaX;
+        private double _mouseDeltaY;
 
         public MainWindow()
         {
@@ -64,53 +56,53 @@ namespace SpaceGroup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            groupSelected = false;
-            compoundSelected = false;
-            xLabel.Content = "Y";
-            yLabel.Content = "Z";
-            zLabel.Content = "X";
-            xLabel.FontSize = 25;
-            yLabel.FontSize = 25;
-            zLabel.FontSize = 25;
-            multipliedAtoms = new List<Atom>();
-            atomCell = new CrystalCell();
-            TheCamera.Width = 90;
-            AxisSceneCamera.Width = 90;
-            MainViewport.Camera = TheCamera;
-            AxisViewport.Camera = AxisSceneCamera;
-            TheCamera.PositionCamera(atomCell);
-            AxisSceneCamera.PositionCamera();
+            _groupSelected = false;
+            _compoundSelected = false;
+            _xLabel.Content = "Y";
+            _yLabel.Content = "Z";
+            _zLabel.Content = "X";
+            _xLabel.FontSize = 25;
+            _yLabel.FontSize = 25;
+            _zLabel.FontSize = 25;
+            _multipliedAtoms = new List<Atom>();
+            _atomCell = new CrystalCell();
+            _theCamera.Width = 90;
+            _axisSceneCamera.Width = 90;
+            MainViewport.Camera = _theCamera;
+            AxisViewport.Camera = _axisSceneCamera;
+            _theCamera.PositionCamera(_atomCell);
+            _axisSceneCamera.PositionCamera();
         }
 
         public void SelectGroup(SpaceGroupCl spaceGroup)
         {
-            selectedSpaceGroup = spaceGroup;
-            groupSelected = true;
+            _selectedSpaceGroup = spaceGroup;
+            _groupSelected = true;
             BuildCompound();
         }
 
         public void InitCompound(Compound compound)
         {
-            this.compound = compound;
-            compoundSelected = true;
+            this._compound = compound;
+            _compoundSelected = true;
             BuildCompound();
         }
 
         private void BuildCompound()
         {
-            if (!compoundSelected || !groupSelected) return;
+            if (!_compoundSelected || !_groupSelected) return;
             
-            atomCell = compound.CrystalCell;
-            compoundVisual = new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtoms);
+            _atomCell = _compound.CrystalCell;
+            _compoundVisual = new CompoundVisual(_compound, _selectedSpaceGroup, _selectableModels, _multipliedAtoms);
 
-            MainViewport.Children.Add(compoundVisual);
-            MoveFromCenter(compoundVisual);
+            MainViewport.Children.Add(_compoundVisual);
+            MoveFromCenter(_compoundVisual);
 
-            ModelBuilder.buildDiscreteAxis(out discrete_y_axis, out discrete_x_axis, out discrete_z_axis, atomCell);
+            ModelBuilder.buildDiscreteAxis(out _discreteYAxis, out _discreteXAxis, out _discreteZAxis, _atomCell);
 
-            DiscreteAxisGroup.Children.Add(discrete_x_axis);
-            DiscreteAxisGroup.Children.Add(discrete_y_axis);
-            DiscreteAxisGroup.Children.Add(discrete_z_axis);
+            _discreteAxisGroup.Children.Add(_discreteXAxis);
+            _discreteAxisGroup.Children.Add(_discreteYAxis);
+            _discreteAxisGroup.Children.Add(_discreteZAxis);
 
             ModelVisual3D axisModelVisual = new ModelVisual3D();
 
@@ -118,10 +110,10 @@ namespace SpaceGroup
             DirectionalLight directionalLight =
                 new DirectionalLight(Colors.Gray, new Vector3D(-1.0, -3.0, -2.0));
 
-            DiscreteAxisGroup.Children.Add(ambientLight);
-            DiscreteAxisGroup.Children.Add(directionalLight);
+            _discreteAxisGroup.Children.Add(ambientLight);
+            _discreteAxisGroup.Children.Add(directionalLight);
 
-            axisModelVisual.Content = DiscreteAxisGroup;
+            axisModelVisual.Content = _discreteAxisGroup;
             AxisViewport.Children.Add(axisModelVisual);
         }
 
@@ -133,19 +125,19 @@ namespace SpaceGroup
                 canvasOn3D.Children.Clear();
                 //X
                 Point labelXPoint = (Point)Point3DToScreen2D(new Point3D(5, 0, 0), AxisViewport);
-                Canvas.SetLeft(xLabel, labelXPoint.X);
-                Canvas.SetTop(xLabel, labelXPoint.Y);
-                canvasOn3D.Children.Add(xLabel);
+                Canvas.SetLeft(_xLabel, labelXPoint.X);
+                Canvas.SetTop(_xLabel, labelXPoint.Y);
+                canvasOn3D.Children.Add(_xLabel);
 
                 Point labelYPoint = (Point)Point3DToScreen2D(new Point3D(0, 5, 0), AxisViewport);
-                Canvas.SetLeft(yLabel, labelYPoint.X);
-                Canvas.SetTop(yLabel, labelYPoint.Y);
-                canvasOn3D.Children.Add(yLabel);
+                Canvas.SetLeft(_yLabel, labelYPoint.X);
+                Canvas.SetTop(_yLabel, labelYPoint.Y);
+                canvasOn3D.Children.Add(_yLabel);
 
                 Point labelZPoint = (Point)Point3DToScreen2D(new Point3D(0, 0, 5), AxisViewport);
-                Canvas.SetLeft(zLabel, labelZPoint.X);
-                Canvas.SetTop(zLabel, labelZPoint.Y);
-                canvasOn3D.Children.Add(zLabel);
+                Canvas.SetLeft(_zLabel, labelZPoint.X);
+                Canvas.SetTop(_zLabel, labelZPoint.Y);
+                canvasOn3D.Children.Add(_zLabel);
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -155,7 +147,7 @@ namespace SpaceGroup
 
         private void MoveFromCenter(ModelVisual3D model)
         {
-            var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2);
+            var transform = new TranslateTransform3D(-_atomCell.YAxisL / 2, -_atomCell.ZAxisL / 2, -_atomCell.XAxisL / 2);
             //compoundVisual.Transform = transform;
             model.Transform = transform;
         }
@@ -235,13 +227,6 @@ namespace SpaceGroup
             }
         }
 
-        private double _mouseX;
-        private double _mouseY;
-        private double _mouseOldX;
-        private double _mouseOldY;
-        private double _mouseDeltaX;
-        private double _mouseDeltaY;
-
         private GeometryModel3D GetHitModel(MouseEventArgs e)
         {
             Point mouse_pos = e.GetPosition(MainViewport);
@@ -261,7 +246,6 @@ namespace SpaceGroup
             var hitModel = GetHitModel(e);
             var hitModelAtomVisual = GetHitModelAtomVisual(hitModel);
             ShowSelectedAtomInfo(hitModelAtomVisual);
-            selectedAtomVisual = hitModelAtomVisual;
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -277,8 +261,8 @@ namespace SpaceGroup
                 double angleX = _mouseDeltaX * 0.1;
                 double angleY = _mouseDeltaY * 0.1;
 
-                TheCamera.RotateCamera(angleX, angleY);
-                AxisSceneCamera.RotateCamera(angleX, angleY);
+                _theCamera.RotateCamera(angleX, angleY);
+                _axisSceneCamera.RotateCamera(angleX, angleY);
             }
             else
             {
@@ -295,8 +279,8 @@ namespace SpaceGroup
                 _mouseDeltaX = (_mouseX - _mouseOldX);
                 _mouseDeltaY = (_mouseY - _mouseOldY);
 
-                TheCamera.MoveRight(- _mouseDeltaX * 0.5);
-                TheCamera.MoveUp(_mouseDeltaY * 0.5);
+                _theCamera.MoveRight(- _mouseDeltaX * 0.5);
+                _theCamera.MoveUp(_mouseDeltaY * 0.5);
             }
 
             if(e.RightButton == MouseButtonState.Pressed)
@@ -327,11 +311,11 @@ namespace SpaceGroup
             List<Atom> multipliedAtomsTransl = new List<Atom>();
 
             var translatedCompoundVisual =
-                new CompoundVisual(compound, selectedSpaceGroup, SelectableModels, multipliedAtomsTransl, compoundVisual.ColorTypeDictionary);
+                new CompoundVisual(_compound, _selectedSpaceGroup, _selectableModels, multipliedAtomsTransl, _compoundVisual.ColorTypeDictionary);
 
             MainViewport.Children.Add(translatedCompoundVisual);
 
-            var transform = new TranslateTransform3D(-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2 + atomCell.ZAxisL, -atomCell.XAxisL / 2);
+            var transform = new TranslateTransform3D(-_atomCell.YAxisL / 2, -_atomCell.ZAxisL / 2 + _atomCell.ZAxisL, -_atomCell.XAxisL / 2);
 
             translatedCompoundVisual.Transform = transform;
         }
@@ -364,31 +348,31 @@ namespace SpaceGroup
         private void DeleteAllPolyhedras(object sender, RoutedEventArgs e)
         {
             foreach (CompoundVisual cVisual in MainViewport.Children)
-                foreach (AtomVisual atomVisual in compoundVisual.Children)
+                foreach (AtomVisual atomVisual in cVisual.Children)
                     foreach (AtomVisual atomVisualRep in atomVisual.Children)
                         atomVisualRep.hidePolyhedra();
         }
 
         private void ShowSelectedAtomInfo(AtomVisual atomVisual)
         {
-            if (atomVisual != null)
-            {
-                selectedAtomName.Content = atomVisual.Atom.Element;
-                selectedAtomX.Content = atomVisual.Atom.X;
-                selectedAtomY.Content = atomVisual.Atom.Y;
-                selectedAtomZ.Content = atomVisual.Atom.Z;
-            }
+            if (atomVisual == null) return;
+
+            selectedAtomName.Content = atomVisual.Atom.Element;
+            selectedAtomX.Content = atomVisual.Atom.X;
+            selectedAtomY.Content = atomVisual.Atom.Y;
+            selectedAtomZ.Content = atomVisual.Atom.Z;
+            selectedAtomPolyhedronVolume.Content = atomVisual.Atom.PolyhedronVolume;
         }
 
         private AtomVisual GetHitModelAtomVisual(GeometryModel3D selectedModel)
         {
-            if (!(selectedModel != null & compoundVisual != null)) return null;
+            if (!(selectedModel != null & _compoundVisual != null)) return null;
             foreach (CompoundVisual cVisual in MainViewport.Children)
-            foreach (AtomVisual atomVisual in cVisual.Children)
-            foreach (AtomVisual atomVisualRep in atomVisual.Children)
-            foreach (GeometryModel3D model in ((Model3DGroup)atomVisualRep.Content).Children)
-                if (model == selectedModel)
-                    return atomVisualRep;
+                foreach (AtomVisual atomVisual in cVisual.Children)
+                foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                foreach (GeometryModel3D model in ((Model3DGroup)atomVisualRep.Content).Children)
+                    if (model == selectedModel)
+                        return atomVisualRep;
 
             return null;
         }
@@ -410,22 +394,22 @@ namespace SpaceGroup
             {
                 if (checkBox == checkboxXaxis)
                 {
-                    DiscreteAxisGroup.Children.Add(discrete_x_axis);
+                    _discreteAxisGroup.Children.Add(_discreteXAxis);
 
                     //MainModel3Dgroup.Children.Add(y_Axis);
-                    zLabel.Visibility = Visibility.Visible;
+                    _zLabel.Visibility = Visibility.Visible;
                 }
                 else if (checkBox == checkboxYaxis)
                 {
-                    DiscreteAxisGroup.Children.Add(discrete_y_axis);
+                    _discreteAxisGroup.Children.Add(_discreteYAxis);
                     //MainModel3Dgroup.Children.Add(x_Axis);
-                    xLabel.Visibility = Visibility.Visible;
+                    _xLabel.Visibility = Visibility.Visible;
                 }
                 else if (checkBox == checkboxZaxis)
                 {
-                    DiscreteAxisGroup.Children.Add(discrete_z_axis);
+                    _discreteAxisGroup.Children.Add(_discreteZAxis);
                     //MainModel3Dgroup.Children.Add(z_Axis);
-                    yLabel.Visibility = Visibility.Visible;
+                    _yLabel.Visibility = Visibility.Visible;
                 }
             }
 
@@ -441,19 +425,19 @@ namespace SpaceGroup
 
             if (checkBox == checkboxXaxis)
             {
-                DiscreteAxisGroup.Children.Remove(discrete_x_axis);
-                zLabel.Visibility = Visibility.Hidden;
+                _discreteAxisGroup.Children.Remove(_discreteXAxis);
+                _zLabel.Visibility = Visibility.Hidden;
             }
             else if (checkBox == checkboxYaxis)
             {
-                DiscreteAxisGroup.Children.Remove(discrete_y_axis);
+                _discreteAxisGroup.Children.Remove(_discreteYAxis);
 
-                xLabel.Visibility = Visibility.Hidden;
+                _xLabel.Visibility = Visibility.Hidden;
             }
             else if (checkBox == checkboxZaxis)
             {
-                DiscreteAxisGroup.Children.Remove(discrete_z_axis);
-                yLabel.Visibility = Visibility.Hidden;
+                _discreteAxisGroup.Children.Remove(_discreteZAxis);
+                _yLabel.Visibility = Visibility.Hidden;
             }
         }
 
@@ -462,10 +446,9 @@ namespace SpaceGroup
         private void SerializeTableList(string fileName)
         {
             List<Atom> atoms = new List<Atom>();
-            foreach (Atom a in atomCell.atomCollection)
-            {
+            foreach (Atom a in _atomCell.atomCollection)
                 atoms.Add(a);
-            }
+
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Atom>));
             TextWriter writer = new StreamWriter(fileName);
 
@@ -504,8 +487,8 @@ namespace SpaceGroup
             double scale = newWidth / originalWidth * 1.5;
 
             double fov = Math.Atan(Math.Tan(originalFieldOfView / 2.0 / 180.0 * Math.PI) * scale) * 2.0;
-            TheCamera.Width = fov / Math.PI * 180.0;
-            TheCamera.NearPlaneDistance = originalNearPlaneDistance * scale;
+            _theCamera.Width = fov / Math.PI * 180.0;
+            _theCamera.NearPlaneDistance = originalNearPlaneDistance * scale;
 
             //AxisSceneCamera.Width = fov / Math.PI * 180.0 * 0.1;
             //AxisSceneCamera.NearPlaneDistance = originalNearPlaneDistance * scale;        
@@ -514,15 +497,14 @@ namespace SpaceGroup
         private void OnViewportMouseScroll(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
-                TheCamera.Width -= 5;
+                _theCamera.Width -= 5;
             else
-                TheCamera.Width += 5;
+                _theCamera.Width += 5;
         }
 
         private void OnAddCompoundButtonClick(object sender, RoutedEventArgs e)
         {
-            CellParamsWindow addCompoundName = new CellParamsWindow();
-            addCompoundName.Owner = this;
+            CellParamsWindow addCompoundName = new CellParamsWindow {Owner = this};
             addCompoundName.Show();
             //addCompoundName.saveToNewFormat(loadedCompound);
         }
