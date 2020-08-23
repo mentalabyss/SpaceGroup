@@ -44,26 +44,10 @@ namespace SpaceGroup
 
                 this.element = element;
 
-                CultureInfo culture = new CultureInfo("en-US");
-                if (x.Contains('.'))
-                    this.x = Double.Parse(x, culture);
-                else if (x.Contains(','))
-                    this.x = Double.Parse(x, new CultureInfo("ru-RU"));
-                else
-                    this.x = Double.Parse(x);
+                this.x = double.Parse(x.Replace('.', ','), new CultureInfo("ru-RU"));
+                this.y = double.Parse(y.Replace('.', ','), new CultureInfo("ru-RU"));
+                this.z = double.Parse(z.Replace('.', ','), new CultureInfo("ru-RU"));
 
-                if (y.Contains('.'))
-                    this.y = Double.Parse(y, culture);
-                else if (y.Contains(','))
-                    this.y = Double.Parse(y, new CultureInfo("ru-RU"));
-                else
-                    this.y = Double.Parse(y);
-                if (z.Contains('.'))
-                    this.z = Double.Parse(z, culture);
-                else if (z.Contains(','))
-                    this.z = Double.Parse(z, new CultureInfo("ru-RU"));
-                else
-                    this.z = Double.Parse(z);
                 this.brush = brush;
                 //color = brush.ToString();
             }
@@ -73,20 +57,13 @@ namespace SpaceGroup
             }
         }
 
-        public string Color
-        {
-            get { return color; }
-            set { color = value; }
-        }
-
         public int TypeID { get => typeID; set => typeID = value; }
 
         public double PolyhedronVolume { get; set; }
 
         public void StringToColor()
         {
-            brush = new SolidColorBrush();
-            brush.Color = (Color)ColorConverter.ConvertFromString(color);
+            brush = new SolidColorBrush {Color = (Color) ColorConverter.ConvertFromString(color)};
         }
 
         public static double ThreeAtomsAngle(Atom atomA, Atom atomB, Atom atomC)
@@ -114,22 +91,6 @@ namespace SpaceGroup
                 + (atom1.Z - atom2.Z) * (atom1.Z - atom2.Z) * atomCell.ZAxisL * atomCell.ZAxisL);
         }
 
-        private static double GetDouble(string value, double defaultValue)
-        {
-            double result;
-
-            // Try parsing in the current culture
-            if (
-                // Then try in US english
-                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
-                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out result) &&
-                // Then in neutral language
-                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
-            {
-                result = defaultValue;
-            }
-            return result;
-        }
 
         public bool PositionEquals(object obj)
         {

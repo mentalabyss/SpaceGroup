@@ -23,6 +23,8 @@ namespace SpaceGroup
         private CompoundVisual _compoundVisual;
         private Compound _compound;
 
+        private List<CompoundVisual> TranslationsList = new List<CompoundVisual>();
+
         private readonly Model3DGroup _discreteAxisGroup = new Model3DGroup();
         private GeometryModel3D _discreteXAxis;
         private GeometryModel3D _discreteYAxis;
@@ -318,6 +320,15 @@ namespace SpaceGroup
             var transform = new TranslateTransform3D(-_atomCell.YAxisL / 2, -_atomCell.ZAxisL / 2 + _atomCell.ZAxisL, -_atomCell.XAxisL / 2);
 
             translatedCompoundVisual.Transform = transform;
+
+            TranslationsList.Add(translatedCompoundVisual);
+        }
+
+        private void HideTranslations(object sender, RoutedEventArgs e)
+        {
+            foreach (CompoundVisual cv in TranslationsList)
+                MainViewport.Children.Remove(cv);
+            TranslationsList = new List<CompoundVisual>();
         }
 
         private void SaveTableButtonClick(object sender, RoutedEventArgs e)

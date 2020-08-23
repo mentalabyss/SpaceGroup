@@ -157,22 +157,29 @@ namespace SpaceGroup
             }
 
             if ((string)saveTableButton.Content == "Добавить")
-            {
-                Compound compound = new Compound();
+                try
+                {
+                    Compound compound = new Compound();
 
-                compound.Name = compoundNameTextBox.Text;
+                    compound.Name = compoundNameTextBox.Text;
 
-                compound.CrystalCell.setCellParams(Convert.ToDouble(aText.Text), Convert.ToDouble(bText.Text), Convert.ToDouble(cText.Text),
-                    Convert.ToDouble(alphaText.Text), Convert.ToDouble(betaText.Text), Convert.ToDouble(gammaText.Text));
+                    compound.CrystalCell.setCellParams(Convert.ToDouble(aText.Text), Convert.ToDouble(bText.Text),
+                        Convert.ToDouble(cText.Text),
+                        Convert.ToDouble(alphaText.Text), Convert.ToDouble(betaText.Text),
+                        Convert.ToDouble(gammaText.Text));
 
-                compound.Atoms = new List<Atom>(addedAtomsList);
+                    compound.Atoms = new List<Atom>(addedAtomsList);
 
-                compoundsList.Remove(dummy);
+                    compoundsList.Remove(dummy);
 
-                compoundsList.Add(compound);
+                    compoundsList.Add(compound);
 
-                compoundsList.Add(dummy);
-            }
+                    compoundsList.Add(dummy);
+                }
+                catch(Exception)
+                {
+                    System.Windows.Forms.MessageBox.Show("Ошибка добавления соединения!");
+                }
 
             SerializeTableList("Compounds.comp");
         }

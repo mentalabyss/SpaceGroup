@@ -55,6 +55,8 @@ namespace SpaceGroup
             InitializeDictionary(colorTypeDictionary);
             AddAtoms();
 
+            MessageBox.Show($@"What: {Children.Count}");
+
             Polyhedra.CalculatePolyhedra(multipliedAtoms, AtomCell.YAxisL, AtomCell.ZAxisL, AtomCell.XAxisL, AtomCell);
 
             foreach (AtomVisual atomVisual in Children)
