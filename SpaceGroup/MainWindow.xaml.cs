@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
+using System.Threading;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace SpaceGroup

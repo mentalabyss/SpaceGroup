@@ -44,9 +44,15 @@ namespace SpaceGroup
 
                 this.element = element;
 
-                this.x = double.Parse(x.Replace('.', ','), new CultureInfo("ru-RU"));
-                this.y = double.Parse(y.Replace('.', ','), new CultureInfo("ru-RU"));
-                this.z = double.Parse(z.Replace('.', ','), new CultureInfo("ru-RU"));
+                NumberFormatInfo format = new NumberFormatInfo();
+                // Set the 'splitter' for thousands
+                format.NumberGroupSeparator = ".";
+                // Set the decimal seperator
+                format.NumberDecimalSeparator = ",";
+
+                this.x = double.Parse(x.Replace('.', ','), format);
+                this.y = double.Parse(y.Replace('.', ','), format);
+                this.z = double.Parse(z.Replace('.', ','), format);
 
                 this.brush = brush;
                 //color = brush.ToString();

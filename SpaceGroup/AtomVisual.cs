@@ -73,7 +73,6 @@ namespace SpaceGroup
 
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
-                
                 double X = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0);
                 double x = X * atomCell.YAxisL; //Y
                 double Y = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z);

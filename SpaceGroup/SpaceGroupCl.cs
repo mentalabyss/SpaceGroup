@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SpaceGroup
 {
@@ -47,43 +48,62 @@ namespace SpaceGroup
             char[] vars = new char[] { 'x', 'y', 'z' };
             string[] tmp = expression.Split(vars[0]);
 
-            try
-            {
-                CultureInfo culture = new CultureInfo("en-US");
+            //NEW TEST
+            expression = String.Join(x.ToString(new CultureInfo("en-EN")), tmp);
+            tmp = expression.Split(vars[1]);
+            expression = String.Join(y.ToString(new CultureInfo("en-EN")), tmp);
 
-                expression = String.Join(Convert.ToString(x, culture), tmp);
+            tmp = expression.Split(vars[2]);
+            expression = String.Join(z.ToString(new CultureInfo("en-EN")), tmp);
 
-                tmp = expression.Split(vars[1]);
-                expression = String.Join(Convert.ToString(y, culture), tmp);
+            DataTable table = new DataTable();
+            //table.Locale = new CultureInfo("ru-RU");
 
-                tmp = expression.Split(vars[2]);
-                expression = String.Join(Convert.ToString(z, culture), tmp);
+            table.Columns.Add("expression", typeof(string), expression);
+            DataRow row = table.NewRow();
+            table.Rows.Add(row);
+            return double.Parse((string)row["expression"]);
+            //NEW TEST
 
-                DataTable table = new DataTable();
-                table.Columns.Add("expression", typeof(string), expression);
-                DataRow row = table.NewRow();
-                table.Rows.Add(row);
-                return double.Parse((string)row["expression"], culture);
-            }
-            catch(Exception)
-            {
-                System.Windows.Forms.MessageBox.Show("Test");
+            //try
+            //{
+            //    CultureInfo culture = new CultureInfo("en-EN");
 
-                CultureInfo culture = new CultureInfo("ru-RU");
+            //    expression = String.Join(Convert.ToString(x, culture), tmp);
 
-                expression = String.Join(Convert.ToString(x, culture), tmp);
+            //    tmp = expression.Split(vars[1]);
+            //    expression = String.Join(Convert.ToString(y, culture), tmp);
 
-                tmp = expression.Split(vars[1]);
-                expression = String.Join(Convert.ToString(y, culture), tmp);
+            //    tmp = expression.Split(vars[2]);
+            //    expression = String.Join(Convert.ToString(z, culture), tmp);
 
-                tmp = expression.Split(vars[2]);
-                expression = String.Join(Convert.ToString(z, culture), tmp);
-                DataTable table = new DataTable();
-                table.Columns.Add("expression", typeof(string), expression);
-                DataRow row = table.NewRow();
-                table.Rows.Add(row);
-                return double.Parse((string)row["expression"], culture);
-            }
+            //    DataTable table = new DataTable();
+            //    table.Columns.Add("expression", typeof(string), expression);
+            //    DataRow row = table.NewRow();
+            //    table.Rows.Add(row);
+
+            //    return double.Parse((string)row["expression"], culture);
+
+            //}
+            //catch(Exception)
+            //{
+            //    System.Windows.Forms.MessageBox.Show("Test");
+
+            //    CultureInfo culture = new CultureInfo("ru-RU");
+
+            //    expression = String.Join(Convert.ToString(x, culture), tmp);
+
+            //    tmp = expression.Split(vars[1]);
+            //    expression = String.Join(Convert.ToString(y, culture), tmp);
+
+            //    tmp = expression.Split(vars[2]);
+            //    expression = String.Join(Convert.ToString(z, culture), tmp);
+            //    DataTable table = new DataTable();
+            //    table.Columns.Add("expression", typeof(string), expression);
+            //    DataRow row = table.NewRow();
+            //    table.Rows.Add(row);
+            //    return double.Parse((string)row["expression"], culture);
+            //}
         }
 
         public override string ToString()

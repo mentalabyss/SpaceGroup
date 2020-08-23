@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -150,8 +151,13 @@ namespace SpaceGroup
             if ((string)saveTableButton.Content == "Изменить" && selectedCompound != null && !selectedCompound.dummy)
             {
                 selectedCompound.Name = compoundNameTextBox.Text;
-                selectedCompound.CrystalCell.setCellParams(Convert.ToDouble(aText.Text), Convert.ToDouble(bText.Text), Convert.ToDouble(cText.Text),
-                    Convert.ToDouble(alphaText.Text), Convert.ToDouble(betaText.Text), Convert.ToDouble(gammaText.Text));
+
+                selectedCompound.CrystalCell.setCellParams(double.Parse(aText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                    double.Parse(bText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                    double.Parse(cText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                    double.Parse(alphaText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                double.Parse(betaText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                double.Parse(gammaText.Text.Replace('.', ','), new CultureInfo("ru-RU")));
 
                 selectedCompound.Atoms = new List<Atom>(addedAtomsList);
             }
@@ -163,10 +169,12 @@ namespace SpaceGroup
 
                     compound.Name = compoundNameTextBox.Text;
 
-                    compound.CrystalCell.setCellParams(Convert.ToDouble(aText.Text), Convert.ToDouble(bText.Text),
-                        Convert.ToDouble(cText.Text),
-                        Convert.ToDouble(alphaText.Text), Convert.ToDouble(betaText.Text),
-                        Convert.ToDouble(gammaText.Text));
+                    compound.CrystalCell.setCellParams(double.Parse(aText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                        double.Parse(bText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                        double.Parse(cText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                        double.Parse(alphaText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                        double.Parse(betaText.Text.Replace('.', ','), new CultureInfo("ru-RU")),
+                        double.Parse(gammaText.Text.Replace('.', ','), new CultureInfo("ru-RU")));
 
                     compound.Atoms = new List<Atom>(addedAtomsList);
 
