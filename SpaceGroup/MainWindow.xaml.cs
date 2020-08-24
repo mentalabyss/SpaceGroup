@@ -18,13 +18,15 @@ namespace SpaceGroup
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Private Data and Boilerplate
+
+
         private List<Atom> _multipliedAtoms;
         private CrystalCell _atomCell;
         private SpaceGroupCl _selectedSpaceGroup;
         private CompoundVisual _compoundVisual;
         private Compound _compound;
 
-        private List<CompoundVisual> TranslationsList = new List<CompoundVisual>();
 
         private readonly Model3DGroup _discreteAxisGroup = new Model3DGroup();
         private GeometryModel3D _discreteXAxis;
@@ -32,6 +34,9 @@ namespace SpaceGroup
         private GeometryModel3D _discreteZAxis;
 
         private readonly List<GeometryModel3D> _selectableModels = new List<GeometryModel3D>();
+        private List<GeometryModel3D> SelectedModels = new List<GeometryModel3D>();
+        private List<CompoundVisual> TranslationsList = new List<CompoundVisual>();
+
 
         private bool _groupSelected;
         private bool _compoundSelected;
@@ -43,13 +48,14 @@ namespace SpaceGroup
         // The camera.
         private readonly OrthographicCamera _theCamera = new OrthographicCamera();
         private readonly OrthographicCamera _axisSceneCamera = new OrthographicCamera();
-        
+
         private double _mouseX;
         private double _mouseY;
         private double _mouseOldX;
         private double _mouseOldY;
         private double _mouseDeltaX;
         private double _mouseDeltaY;
+        private bool _mouseDragged;
 
         public MainWindow()
         {
@@ -57,6 +63,10 @@ namespace SpaceGroup
         }
 
 
+        #endregion
+
+
+        #region Event Handlers
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             _groupSelected = false;
@@ -76,6 +86,263 @@ namespace SpaceGroup
             _theCamera.PositionCamera(_atomCell);
             _axisSceneCamera.PositionCamera();
         }
+
+        public void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && e.ClickCount == 1)
+            {
+                if (!contextMenu1.IsOpen)
+                {
+                    Point position = e.GetPosition(this);
+                    _mouseX = position.X;
+                    _mouseY = position.Y;
+                    if (!_mouseDragged)
+                    {
+                        _mouseOldX = position.X;
+                        _mouseOldY = position.Y;
+                    }
+
+                    var hitModel = GetHitModel(e);
+
+                    if (hitModel != null)
+                    {
+                        SelectedModels.Add(hitModel);
+                    }
+                    else
+                        SelectedModels.Clear();
+                }
+            }
+        }
+
+        public void SinglePolyhedraButtonClicked(object sender, RoutedEventArgs e)
+        {
+            foreach (var selectedModel in SelectedModels)
+            {
+                var selectedVisual = GetHitModelAtomVisual(selectedModel);
+                selectedVisual?.showPolyhedra();
+            }
+        }
+
+        public void SinglePolyhedraDeleteButtonClicked(object sender, RoutedEventArgs e)
+        {
+            foreach (var selectedModel in SelectedModels)
+            {
+                var selectedVisual = GetHitModelAtomVisual(selectedModel);
+                selectedVisual?.hidePolyhedra();
+            }
+        }
+
+        public void OnViewportMouseMove(object sender, MouseEventArgs e)
+        {
+            var hitModel = GetHitModel(e);
+            var hitModelAtomVisual = GetHitModelAtomVisual(hitModel);
+            ShowSelectedAtomInfo(hitModelAtomVisual);
+
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                _mouseDragged = true;
+                _mouseOldX = _mouseX;
+                _mouseOldY = _mouseY;
+                Point position = e.GetPosition(this);
+                _mouseX = position.X;
+                _mouseY = position.Y;
+                _mouseDeltaX = (_mouseX - _mouseOldX);
+                _mouseDeltaY = (_mouseY - _mouseOldY);
+
+                double angleX = _mouseDeltaX * 0.1;
+                double angleY = _mouseDeltaY * 0.1;
+
+                _theCamera.RotateCamera(angleX, angleY);
+                _axisSceneCamera.RotateCamera(angleX, angleY);
+            }
+            else
+            {
+                _mouseDragged = false;
+            }
+
+            if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                _mouseOldX = _mouseX;
+                _mouseOldY = _mouseY;
+                Point position = e.GetPosition(this);
+                _mouseX = position.X;
+                _mouseY = position.Y;
+                _mouseDeltaX = (_mouseX - _mouseOldX);
+                _mouseDeltaY = (_mouseY - _mouseOldY);
+
+                _theCamera.MoveRight(-_mouseDeltaX * 0.5);
+                _theCamera.MoveUp(_mouseDeltaY * 0.5);
+            }
+
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                _mouseOldX = _mouseX;
+                _mouseOldY = _mouseY;
+                Point position = e.GetPosition(this);
+                _mouseX = position.X;
+                _mouseY = position.Y;
+                _mouseDeltaX = (_mouseX - _mouseOldX);
+                _mouseDeltaY = (_mouseY - _mouseOldY);
+
+
+                //TheCamera.MoveForward(mouseDeltaY * 0.5);
+            }
+
+            GenerateLabels();
+        }
+
+        private void newGroup_Click(object sender, RoutedEventArgs e)
+        {
+            SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings { Owner = this };
+            spaceGroupSettings.Show();
+        }
+
+        private void VisualizeTranslations(object sender, RoutedEventArgs e)
+        {
+            List<Atom> multipliedAtomsTransl = new List<Atom>();
+
+            var translatedCompoundVisual =
+                new CompoundVisual(_compound, _selectedSpaceGroup, _selectableModels, multipliedAtomsTransl, _compoundVisual.ColorTypeDictionary);
+
+            MainViewport.Children.Add(translatedCompoundVisual);
+
+            var transform = new TranslateTransform3D(-_atomCell.YAxisL / 2, -_atomCell.ZAxisL / 2 + _atomCell.ZAxisL, -_atomCell.XAxisL / 2);
+
+            translatedCompoundVisual.Transform = transform;
+
+            TranslationsList.Add(translatedCompoundVisual);
+        }
+
+        private void HideTranslations(object sender, RoutedEventArgs e)
+        {
+            foreach (CompoundVisual cv in TranslationsList)
+                MainViewport.Children.Remove(cv);
+            TranslationsList = new List<CompoundVisual>();
+        }
+
+        private void SaveTableButtonClick(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog
+            {
+                Filter = "SPG File|*.spg",
+                Title = "Save Atoms State"
+            };
+            saveFileDialog1.ShowDialog();
+
+            if (saveFileDialog1.FileName != "")
+                SerializeTableList(saveFileDialog1.FileName);
+        }
+
+        private void openBtnClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ShowAllPolyhedras(object sender, RoutedEventArgs e)
+        {
+            foreach (CompoundVisual cVisual in MainViewport.Children)
+                foreach (AtomVisual atomVisual in cVisual.Children)
+                    foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                        atomVisualRep.showPolyhedra();
+        }
+
+        private void DeleteAllPolyhedras(object sender, RoutedEventArgs e)
+        {
+            foreach (CompoundVisual cVisual in MainViewport.Children)
+                foreach (AtomVisual atomVisual in cVisual.Children)
+                    foreach (AtomVisual atomVisualRep in atomVisual.Children)
+                        atomVisualRep.hidePolyhedra();
+        }
+
+        //HOMAGE TO GAME DEVS
+        private void CheckBoxChecked(object sender, RoutedEventArgs e)
+        {
+            //CheckBox checkBox = (CheckBox)sender;
+            MenuItem checkBox = (MenuItem)sender;
+            try
+            {
+                if (checkBox == checkboxXaxis)
+                {
+                    _discreteAxisGroup.Children.Add(_discreteXAxis);
+
+                    //MainModel3Dgroup.Children.Add(y_Axis);
+                    _zLabel.Visibility = Visibility.Visible;
+                }
+                else if (checkBox == checkboxYaxis)
+                {
+                    _discreteAxisGroup.Children.Add(_discreteYAxis);
+                    //MainModel3Dgroup.Children.Add(x_Axis);
+                    _xLabel.Visibility = Visibility.Visible;
+                }
+                else if (checkBox == checkboxZaxis)
+                {
+                    _discreteAxisGroup.Children.Add(_discreteZAxis);
+                    //MainModel3Dgroup.Children.Add(z_Axis);
+                    _yLabel.Visibility = Visibility.Visible;
+                }
+            }
+
+            catch (System.ArgumentException)
+            {
+                Console.WriteLine("first time check");
+            }
+        }
+
+        private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
+        {
+            MenuItem checkBox = (MenuItem)sender;
+
+            if (checkBox == checkboxXaxis)
+            {
+                _discreteAxisGroup.Children.Remove(_discreteXAxis);
+                _zLabel.Visibility = Visibility.Hidden;
+            }
+            else if (checkBox == checkboxYaxis)
+            {
+                _discreteAxisGroup.Children.Remove(_discreteYAxis);
+
+                _xLabel.Visibility = Visibility.Hidden;
+            }
+            else if (checkBox == checkboxZaxis)
+            {
+                _discreteAxisGroup.Children.Remove(_discreteZAxis);
+                _yLabel.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double newWidth = grid.ActualWidth;
+            double originalWidth = 509.0;
+            double originalNearPlaneDistance = 0.125;
+            double originalFieldOfView = 45.0;
+            double scale = newWidth / originalWidth * 1.5;
+
+            double fov = Math.Atan(Math.Tan(originalFieldOfView / 2.0 / 180.0 * Math.PI) * scale) * 2.0;
+            _theCamera.Width = fov / Math.PI * 180.0;
+            _theCamera.NearPlaneDistance = originalNearPlaneDistance * scale;
+
+            //AxisSceneCamera.Width = fov / Math.PI * 180.0 * 0.1;
+            //AxisSceneCamera.NearPlaneDistance = originalNearPlaneDistance * scale;        
+        }
+
+        private void OnViewportMouseScroll(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+                _theCamera.Width -= 5;
+            else
+                _theCamera.Width += 5;
+        }
+
+        private void OnAddCompoundButtonClick(object sender, RoutedEventArgs e)
+        {
+            CellParamsWindow addCompoundName = new CellParamsWindow { Owner = this };
+            addCompoundName.Show();
+            //addCompoundName.saveToNewFormat(loadedCompound);
+        }
+
+        #endregion
+
 
         public void SelectGroup(SpaceGroupCl spaceGroup)
         {
@@ -157,76 +424,25 @@ namespace SpaceGroup
 
         public Point? Point3DToScreen2D(Point3D point3D, Viewport3D viewPort)
         {
-            bool bOK = false;
-
             // We need a Viewport3DVisual but we only have a Viewport3D.
 
             Viewport3DVisual vpv = VisualTreeHelper.GetParent(viewPort.Children[0]) as Viewport3DVisual;
 
             // Get the world to viewport transform matrix
-            Matrix3D m = MUtils.TryWorldToViewportTransform(vpv, out bOK);
+            Matrix3D m = MUtils.TryWorldToViewportTransform(vpv, out var bOk);
 
-            if (bOK)
+            if (bOk)
             {
                 // Transform the 3D point to 2D
                 Point3D transformedPoint = m.Transform(point3D);
 
                 var screen2DPoint = new Point(transformedPoint.X, transformedPoint.Y);
 
-                return new Point?(screen2DPoint);
+                return screen2DPoint;
             }
             else
             {
                 return null;
-            }
-        }
-
-        bool _mouseDragged;
-
-        List<GeometryModel3D> SelectedModels = new List<GeometryModel3D>();
-
-        public void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left && e.ClickCount == 1)
-            {
-                if (!contextMenu1.IsOpen)
-                {
-                    Point position = e.GetPosition(this);
-                    _mouseX = position.X;
-                    _mouseY = position.Y;
-                    if (!_mouseDragged)
-                    {
-                        _mouseOldX = position.X;
-                        _mouseOldY = position.Y;
-                    }
-
-                    var hitModel = GetHitModel(e);
-
-                    if (hitModel != null)
-                    {
-                        SelectedModels.Add(hitModel);
-                    }
-                    else
-                        SelectedModels.Clear();
-                }
-            }
-        }
-
-        public void SinglePolyhedraButtonClicked(object sender, RoutedEventArgs e)
-        {
-            foreach (var selectedModel in SelectedModels)
-            {
-                var selectedVisual = GetHitModelAtomVisual(selectedModel);
-                selectedVisual?.showPolyhedra();
-            }
-        }
-
-        public void SinglePolyhedraDeleteButtonClicked(object sender, RoutedEventArgs e)
-        {
-            foreach (var selectedModel in SelectedModels)
-            {
-                var selectedVisual = GetHitModelAtomVisual(selectedModel);
-                selectedVisual?.hidePolyhedra();
             }
         }
 
@@ -244,126 +460,6 @@ namespace SpaceGroup
             return null;
         }
 
-        public void OnViewportMouseMove(object sender, MouseEventArgs e)
-        {
-            var hitModel = GetHitModel(e);
-            var hitModelAtomVisual = GetHitModelAtomVisual(hitModel);
-            ShowSelectedAtomInfo(hitModelAtomVisual);
-
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                _mouseDragged = true;
-                _mouseOldX = _mouseX;
-                _mouseOldY = _mouseY;
-                Point position = e.GetPosition(this);
-                _mouseX = position.X;
-                _mouseY = position.Y;
-                _mouseDeltaX = (_mouseX - _mouseOldX);
-                _mouseDeltaY = (_mouseY - _mouseOldY);
-
-                double angleX = _mouseDeltaX * 0.1;
-                double angleY = _mouseDeltaY * 0.1;
-
-                _theCamera.RotateCamera(angleX, angleY);
-                _axisSceneCamera.RotateCamera(angleX, angleY);
-            }
-            else
-            {
-                _mouseDragged = false;
-            }
-
-            if(e.MiddleButton == MouseButtonState.Pressed)
-            {
-                _mouseOldX = _mouseX;
-                _mouseOldY = _mouseY;
-                Point position = e.GetPosition(this);
-                _mouseX = position.X;
-                _mouseY = position.Y;
-                _mouseDeltaX = (_mouseX - _mouseOldX);
-                _mouseDeltaY = (_mouseY - _mouseOldY);
-
-                _theCamera.MoveRight(- _mouseDeltaX * 0.5);
-                _theCamera.MoveUp(_mouseDeltaY * 0.5);
-            }
-
-            if(e.RightButton == MouseButtonState.Pressed)
-            {
-                _mouseOldX = _mouseX;
-                _mouseOldY = _mouseY;
-                Point position = e.GetPosition(this);
-                _mouseX = position.X;
-                _mouseY = position.Y;
-                _mouseDeltaX = (_mouseX - _mouseOldX);
-                _mouseDeltaY = (_mouseY - _mouseOldY);
-
-
-                //TheCamera.MoveForward(mouseDeltaY * 0.5);
-            }
-
-            GenerateLabels();
-        }
-
-        private void newGroup_Click(object sender, RoutedEventArgs e)
-        {
-            SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings {Owner = this};
-            spaceGroupSettings.Show();
-        }
-
-        private void VisualizeTranslations(object sender, RoutedEventArgs e)
-        {
-            List<Atom> multipliedAtomsTransl = new List<Atom>();
-
-            var translatedCompoundVisual =
-                new CompoundVisual(_compound, _selectedSpaceGroup, _selectableModels, multipliedAtomsTransl, _compoundVisual.ColorTypeDictionary);
-
-            MainViewport.Children.Add(translatedCompoundVisual);
-
-            var transform = new TranslateTransform3D(-_atomCell.YAxisL / 2, -_atomCell.ZAxisL / 2 + _atomCell.ZAxisL, -_atomCell.XAxisL / 2);
-
-            translatedCompoundVisual.Transform = transform;
-
-            TranslationsList.Add(translatedCompoundVisual);
-        }
-
-        private void HideTranslations(object sender, RoutedEventArgs e)
-        {
-            foreach (CompoundVisual cv in TranslationsList)
-                MainViewport.Children.Remove(cv);
-            TranslationsList = new List<CompoundVisual>();
-        }
-
-        private void SaveTableButtonClick(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog
-            {
-                Filter = "SPG File|*.spg", Title = "Save Atoms State"
-            };
-            saveFileDialog1.ShowDialog();
-
-            if(saveFileDialog1.FileName != "")
-                SerializeTableList(saveFileDialog1.FileName);
-        }
-
-        private void openBtnClick(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void ShowAllPolyhedras(object sender, RoutedEventArgs e)
-        {
-            foreach (CompoundVisual cVisual in MainViewport.Children)
-                foreach (AtomVisual atomVisual in cVisual.Children)
-                    foreach (AtomVisual atomVisualRep in atomVisual.Children)
-                        atomVisualRep.showPolyhedra();
-        }
-
-        private void DeleteAllPolyhedras(object sender, RoutedEventArgs e)
-        {
-            foreach (CompoundVisual cVisual in MainViewport.Children)
-                foreach (AtomVisual atomVisual in cVisual.Children)
-                    foreach (AtomVisual atomVisualRep in atomVisual.Children)
-                        atomVisualRep.hidePolyhedra();
-        }
 
         private void ShowSelectedAtomInfo(AtomVisual atomVisual)
         {
@@ -397,61 +493,6 @@ namespace SpaceGroup
             selectedAtomZ.Content = "";
         }
 
-        //HOMAGE TO GAME DEVS
-        private void CheckBoxChecked(object sender, RoutedEventArgs e)
-        {
-            //CheckBox checkBox = (CheckBox)sender;
-            MenuItem checkBox = (MenuItem)sender;
-            try
-            {
-                if (checkBox == checkboxXaxis)
-                {
-                    _discreteAxisGroup.Children.Add(_discreteXAxis);
-
-                    //MainModel3Dgroup.Children.Add(y_Axis);
-                    _zLabel.Visibility = Visibility.Visible;
-                }
-                else if (checkBox == checkboxYaxis)
-                {
-                    _discreteAxisGroup.Children.Add(_discreteYAxis);
-                    //MainModel3Dgroup.Children.Add(x_Axis);
-                    _xLabel.Visibility = Visibility.Visible;
-                }
-                else if (checkBox == checkboxZaxis)
-                {
-                    _discreteAxisGroup.Children.Add(_discreteZAxis);
-                    //MainModel3Dgroup.Children.Add(z_Axis);
-                    _yLabel.Visibility = Visibility.Visible;
-                }
-            }
-
-            catch (System.ArgumentException)
-            {
-                Console.WriteLine("first time check");
-            }
-        }
-
-        private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
-        {
-            MenuItem checkBox = (MenuItem)sender;
-
-            if (checkBox == checkboxXaxis)
-            {
-                _discreteAxisGroup.Children.Remove(_discreteXAxis);
-                _zLabel.Visibility = Visibility.Hidden;
-            }
-            else if (checkBox == checkboxYaxis)
-            {
-                _discreteAxisGroup.Children.Remove(_discreteYAxis);
-
-                _xLabel.Visibility = Visibility.Hidden;
-            }
-            else if (checkBox == checkboxZaxis)
-            {
-                _discreteAxisGroup.Children.Remove(_discreteZAxis);
-                _yLabel.Visibility = Visibility.Hidden;
-            }
-        }
 
         // Serializers
 
@@ -488,37 +529,6 @@ namespace SpaceGroup
                 System.Windows.Forms.MessageBox.Show("Невозможно открыть файл!");
             }
             return new ObservableCollection<Atom>();
-        }
-
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            double newWidth = grid.ActualWidth;
-            double originalWidth = 509.0;
-            double originalNearPlaneDistance = 0.125;
-            double originalFieldOfView = 45.0;
-            double scale = newWidth / originalWidth * 1.5;
-
-            double fov = Math.Atan(Math.Tan(originalFieldOfView / 2.0 / 180.0 * Math.PI) * scale) * 2.0;
-            _theCamera.Width = fov / Math.PI * 180.0;
-            _theCamera.NearPlaneDistance = originalNearPlaneDistance * scale;
-
-            //AxisSceneCamera.Width = fov / Math.PI * 180.0 * 0.1;
-            //AxisSceneCamera.NearPlaneDistance = originalNearPlaneDistance * scale;        
-        }
-
-        private void OnViewportMouseScroll(object sender, MouseWheelEventArgs e)
-        {
-            if (e.Delta > 0)
-                _theCamera.Width -= 5;
-            else
-                _theCamera.Width += 5;
-        }
-
-        private void OnAddCompoundButtonClick(object sender, RoutedEventArgs e)
-        {
-            CellParamsWindow addCompoundName = new CellParamsWindow {Owner = this};
-            addCompoundName.Show();
-            //addCompoundName.saveToNewFormat(loadedCompound);
         }
     }
 }
