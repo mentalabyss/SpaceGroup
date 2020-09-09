@@ -111,12 +111,17 @@
 						</TabItem>
 
 						<TabItem Header="Расстояния">
-							<DataGrid>
-								<DataGrid.Columns>
-									<DataGridTextColumn IsReadOnly="False" Header="Атом" Width="0.25*" Binding="{Binding Element}"></DataGridTextColumn>
-									<DataGridTextColumn IsReadOnly="False" Header="Å" Width="0.25*" Binding="{Binding X}"></DataGridTextColumn>
-								</DataGrid.Columns>
-							</DataGrid>
+							<Grid>
+								<DataGrid x:Name="distanceDataGrid"
+									   CanUserAddRows="False" CanUserDeleteRows="False"
+									  AutoGenerateColumns="False">
+									<DataGrid.Columns>
+										<DataGridTextColumn IsReadOnly="False" Header="Атом" Binding="{Binding element}"></DataGridTextColumn>
+										<DataGridTextColumn IsReadOnly="False" Header="Å" Binding="{Binding distance}"></DataGridTextColumn>
+									</DataGrid.Columns>
+								</DataGrid>
+							</Grid>
+							
 						</TabItem>
 						
 					</TabControl>

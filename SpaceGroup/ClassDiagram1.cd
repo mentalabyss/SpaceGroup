@@ -3,7 +3,7 @@
   <Class Name="SpaceGroup.Atom">
     <Position X="0.5" Y="0.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>EAAAAAAgAkBAAIYEgAgAAAAIAAAAAACAAABggQAAYAE=</HashCode>
+      <HashCode>EEAAAAAAAkBAAIYEgAgAAAAIAAAAAACgAABgIQAAYAE=</HashCode>
       <FileName>Atom.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -21,25 +21,17 @@
       <FileName>Expr.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="SpaceGroup.MainWindow" BaseTypeListCollapsed="true">
-    <Position X="11.75" Y="0.5" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AIHBAkKkJCIgiC5IAICcGMogCMBAgAVAeCQAgQgFcAE=</HashCode>
-      <FileName>MainWindow.xaml.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
   <Class Name="SpaceGroup.ModelBuilder">
     <Position X="2.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAIAAAAAgAAAAAAAABIAAAAAIAAAIAAAEAgCCAQAAE=</HashCode>
+      <HashCode>QAAAAAAAAgAAAAAAAABIAAAAAAAAAAAAAEAgAAAQAAE=</HashCode>
       <FileName>ModelBuilder.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SpaceGroup.Polyhedra">
     <Position X="6" Y="0.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAgACAAAAAAAAAAAAAAAAQAAAAABAACAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAgAAAAAAAAAAACAAAAAAQAAAAABAAABAAAIAAAA=</HashCode>
       <FileName>Polyhedra.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -55,6 +47,21 @@
     <TypeIdentifier>
       <HashCode>gAABAAAQAAAAAAAAAAAAAAoQABAAABAgAAAAAoAAAEA=</HashCode>
       <FileName>SpaceGroupSettings.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="SpaceGroup.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="11.75" Y="0.5" Width="2" />
+    <NestedTypes>
+      <Struct Name="SpaceGroup.MainWindow.DistancesData" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>MainWindow.xaml.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>BAEEEEBOGCBAqgbIAIQLpEggElAAgIAATAAwkQhgUAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>

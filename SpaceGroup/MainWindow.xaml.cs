@@ -36,6 +36,7 @@ namespace SpaceGroup
         private readonly List<GeometryModel3D> _selectableModels = new List<GeometryModel3D>();
         private List<GeometryModel3D> SelectedModels = new List<GeometryModel3D>();
         private List<CompoundVisual> TranslationsList = new List<CompoundVisual>();
+        private ObservableCollection<Atom> selectedAtomBondOxygens = new ObservableCollection<Atom>();
 
 
         private bool _groupSelected;
@@ -107,6 +108,11 @@ namespace SpaceGroup
                     if (hitModel != null)
                     {
                         SelectedModels.Add(hitModel);
+                        var hitModelAtomVisual = GetHitModelAtomVisual(hitModel);
+                        if (hitModelAtomVisual != null)
+                        {
+                            UpdateDistancesTable(hitModelAtomVisual.Atom);
+                        }
                     }
                     else
                         SelectedModels.Clear();
@@ -529,6 +535,21 @@ namespace SpaceGroup
                 System.Windows.Forms.MessageBox.Show("Невозможно открыть файл!");
             }
             return new ObservableCollection<Atom>();
+        }
+
+        private void UpdateDistancesTable(Atom mainAtom)
+        {
+            distanceDataGrid.Items.Clear();
+            foreach (Atom atom in mainAtom.PolyhedraAtoms)
+            {
+                distanceDataGrid.Items.Add(new DistancesData { element = atom.Element, distance = Atom.DistanceTwoAtoms(atom, mainAtom, _atomCell).ToString() });
+            }
+        }
+
+        public struct DistancesData
+        {
+            public string element { set; get; }
+            public string distance { set; get; }
         }
     }
 }
