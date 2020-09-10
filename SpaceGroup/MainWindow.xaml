@@ -65,7 +65,17 @@
 					<MenuItem Header="Удалить полиэдр" Click="SinglePolyhedraDeleteButtonClicked"/>
 				</ContextMenu>
 			</Canvas.ContextMenu>
+
 		</Canvas>
+
+		<Popup x:Name="atomInfoPopup" Placement="Mouse" Focusable="False">
+			<Border BorderBrush="DarkBlue" BorderThickness="1" Background="White">
+				<TextBlock x:Name="atomInfoPopText"
+					   Text="Popup" Width="150"
+						   Padding="5"
+						   TextWrapping="Wrap"/>
+			</Border>
+		</Popup>
 
 		<Grid x:Name="scrollGrid" Grid.Column ="0" Grid.Row="1">
 			<ScrollViewer Name="Scroll" Height="Auto">

@@ -88,7 +88,7 @@ namespace SpaceGroup
             _axisSceneCamera.PositionCamera();
         }
 
-        public void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
+        public void OnViewportMouseDown(object sender, MouseButtonEventArgs e) //On Mouse Click
         {
             if (e.ChangedButton == MouseButton.Left && e.ClickCount == 1)
             {
@@ -138,11 +138,12 @@ namespace SpaceGroup
             }
         }
 
-        public void OnViewportMouseMove(object sender, MouseEventArgs e)
+        public void OnViewportMouseMove(object sender, MouseEventArgs e) //On Mouse Hover
         {
             var hitModel = GetHitModel(e);
             var hitModelAtomVisual = GetHitModelAtomVisual(hitModel);
             ShowSelectedAtomInfo(hitModelAtomVisual);
+            ShowPopupAtomInfo(hitModelAtomVisual);
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -195,6 +196,19 @@ namespace SpaceGroup
             }
 
             GenerateLabels();
+        }
+
+        private void ShowPopupAtomInfo(AtomVisual atomVisual)
+        {
+            if (atomVisual == null)
+            {
+                atomInfoPopText.Text = "";
+                atomInfoPopup.IsOpen = false;
+                return;
+            }
+            Atom atom = atomVisual.Atom;
+            atomInfoPopText.Text = $"{atom.Element}\n{atom.X}\n{atom.Y}\n{atom.Z}";
+            atomInfoPopup.IsOpen = true;
         }
 
         private void newGroup_Click(object sender, RoutedEventArgs e)
