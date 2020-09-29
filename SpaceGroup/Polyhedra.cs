@@ -62,6 +62,9 @@ namespace SpaceGroup
 
         static bool CheckIfPointIsInTetrahydron(Atom centerAtom, List<Atom> oxygens)
         {
+            if (oxygens.Count < 4)
+                return false;
+
             double centerX = (oxygens[0].X + oxygens[1].X + oxygens[2].X + oxygens[3].X) / 4;
             double centerY = (oxygens[0].Y + oxygens[1].Y + oxygens[2].Y + oxygens[3].Y) / 4;
             double centerZ = (oxygens[0].Z + oxygens[1].Z + oxygens[2].Z + oxygens[3].Z) / 4;
