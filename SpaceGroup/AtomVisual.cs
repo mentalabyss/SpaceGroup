@@ -38,7 +38,11 @@ namespace SpaceGroup
 
             MeshGeometry3D atomMesh = new MeshGeometry3D();
 
-            atomMesh.AddSphere(new Point3D(x, y, z), atomVisualSize, 20, 30);
+            double za = z * Math.Cos(ToRadians(90-crystalCell.Gamma)) - x * Math.Sin(ToRadians(90-crystalCell.Gamma));
+            double xa = z * Math.Sin(ToRadians(90-crystalCell.Gamma)) + x * Math.Cos(ToRadians(90-crystalCell.Gamma));
+            double ya = x * Math.Sin(ToRadians(crystalCell.Alpha)) + y * Math.Cos((ToRadians(crystalCell.Alpha)));
+
+            atomMesh.AddSphere(new Point3D(xa, y, za), atomVisualSize, 20, 30);
 
             SolidColorBrush brush1 = (SolidColorBrush)(new BrushConverter().ConvertFrom(this.atomColor));
 
@@ -141,6 +145,11 @@ namespace SpaceGroup
         public void hidePolyhedra()
         {
             MiscModel3DGroup.Children.Remove(polyhedraModel);
+        }
+
+        public static double ToRadians(double angle)
+        {
+            return (Math.PI / 180) * angle;
         }
     }
 }

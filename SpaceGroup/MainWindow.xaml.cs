@@ -219,6 +219,12 @@ namespace SpaceGroup
 
         private void VisualizeTranslations(object sender, RoutedEventArgs e)
         {
+            if (_compound == null || _selectedSpaceGroup == null)
+            {
+                translationsCheckbox.IsChecked = false;
+                return;
+            }
+
             List<Atom> multipliedAtomsTransl = new List<Atom>();
 
             var translatedCompoundVisual =
@@ -231,6 +237,7 @@ namespace SpaceGroup
             translatedCompoundVisual.Transform = transform;
 
             TranslationsList.Add(translatedCompoundVisual);
+
         }
 
         private void HideTranslations(object sender, RoutedEventArgs e)
@@ -414,9 +421,9 @@ namespace SpaceGroup
 
         private void GenerateLabels()
         {
-            try
-            {
-                //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
+            if (!_compoundSelected || !_groupSelected)
+                return;
+            //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
                 canvasOn3D.Children.Clear();
                 //X
                 Point labelXPoint = (Point)Point3DToScreen2D(new Point3D(5, 0, 0), AxisViewport);
@@ -433,11 +440,7 @@ namespace SpaceGroup
                 Canvas.SetLeft(_zLabel, labelZPoint.X);
                 Canvas.SetTop(_zLabel, labelZPoint.Y);
                 canvasOn3D.Children.Add(_zLabel);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                Console.WriteLine("no Axis");
-            }
+            
         }
 
         private void MoveFromCenter(ModelVisual3D model)
@@ -450,10 +453,12 @@ namespace SpaceGroup
         public Point? Point3DToScreen2D(Point3D point3D, Viewport3D viewPort)
         {
             // We need a Viewport3DVisual but we only have a Viewport3D.
+            if (viewPort.Children.Count == 0)
+                return null;
 
             Viewport3DVisual vpv = VisualTreeHelper.GetParent(viewPort.Children[0]) as Viewport3DVisual;
 
-            // Get the world to viewport transform matrix
+                // Get the world to viewport transform matrix
             Matrix3D m = MUtils.TryWorldToViewportTransform(vpv, out var bOk);
 
             if (bOk)

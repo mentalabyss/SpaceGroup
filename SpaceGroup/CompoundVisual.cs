@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -103,17 +104,20 @@ namespace SpaceGroup
         {
             MeshGeometry3D bordersMesh = new MeshGeometry3D();
 
-            double b = atomCell.YAxisL;
-            double c = atomCell.ZAxisL;
-            double x_c = c * Math.Cos(ToRadians(atomCell.Alpha));
-            double y_c = (b * c * Math.Cos(ToRadians(atomCell.Beta)) - x_c * b * Math.Cos(ToRadians(atomCell.Gamma)))
-                         / b * Math.Sin(ToRadians(atomCell.Gamma));
+            double a = atomCell.YAxisL;
+            double b = atomCell.ZAxisL;
+            double c = atomCell.XAxisL;
+            double xC = c * Math.Cos(ToRadians(atomCell.Gamma));
+            double yC = (b * c * Math.Cos(ToRadians(atomCell.Beta)) - xC * b * Math.Cos(ToRadians(atomCell.Alpha))) /
+                b * Math.Sin(ToRadians(atomCell.Alpha));
+            double zC = Math.Sqrt(c * c - xC * xC - yC * yC);
 
             Point3D oPoint = new Point3D(0, 0, 0);
-            Point3D xPoint = new Point3D(AtomCell.YAxisL, 0, 0);
-            Point3D zPoint = new Point3D(b * Math.Cos(ToRadians(atomCell.Gamma)), 0, b * Math.Sin(atomCell.Gamma));
-            Point3D zxPoint = new Point3D(b * Math.Cos(ToRadians(atomCell.Gamma)) + b, 0, b * Math.Sin(atomCell.Gamma));
-            Point3D oyPoint = new Point3D(x_c, AtomCell.ZAxisL, y_c);
+            Point3D xPoint = new Point3D(a, 0, 0);
+            Point3D oyPoint = new Point3D(b * Math.Cos(ToRadians(atomCell.Alpha)), b * Math.Sin(ToRadians(atomCell.Alpha)), 0);
+            Point3D zPoint = new Point3D(xC, yC, zC);
+
+            Point3D zxPoint = Point3D.Add(xPoint, Point3D.Subtract(zPoint, oPoint));
             Point3D xyPoint = Point3D.Add(oyPoint, Point3D.Subtract(xPoint, oPoint));
             Point3D zyPoint = Point3D.Add(oyPoint, Point3D.Subtract(zPoint, oPoint));
             Point3D zxyPoint = Point3D.Add(xyPoint, Point3D.Subtract(zxPoint, xPoint));
@@ -141,6 +145,24 @@ namespace SpaceGroup
             SolidColorBrush bordersBrush = System.Windows.Media.Brushes.Black;
             DiffuseMaterial bordersMaterial = new DiffuseMaterial(bordersBrush);
             return new GeometryModel3D(bordersMesh, bordersMaterial);
+        }
+
+        private void filler()
+        {
+            MeshGeometry3D bordersMesh = new MeshGeometry3D();
+
+            double a = atomCell.YAxisL;
+            double b = atomCell.ZAxisL;
+            double c = atomCell.XAxisL;
+
+            Vector3D OX = new Vector3D(a, 0, 0);
+            Vector3D OY = new Vector3D(b * Math.Cos(ToRadians(atomCell.Alpha)), b * Math.Sin(ToRadians(atomCell.Alpha)), 0);
+
+            double xC = c * Math.Cos(atomCell.Gamma);
+            double yC = (b * c * Math.Cos(ToRadians(atomCell.Beta)) - xC * b * Math.Cos(ToRadians(atomCell.Alpha))) /
+                b * Math.Sin(ToRadians(atomCell.Alpha));
+            double zC = c * c - xC * xC - yC * yC;
+            Vector3D OZ = new Vector3D(xC, yC, zC);
         }
 
         private void AddAtoms()

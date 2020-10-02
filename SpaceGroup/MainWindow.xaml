@@ -37,7 +37,7 @@
 				<MenuItem Header="_Отображать ось X" x:Name="checkboxXaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
 				<MenuItem Header="_Отображать ось Y" x:Name="checkboxYaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
 				<MenuItem Header="_Отображать ось Z" x:Name="checkboxZaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
-				<MenuItem Header="_Трансляция" IsCheckable="True" Checked="VisualizeTranslations" Unchecked="HideTranslations" IsChecked="False"/>
+				<MenuItem Name="translationsCheckbox" Header="_Трансляция" IsCheckable="True" Checked="VisualizeTranslations" Unchecked="HideTranslations" IsChecked="False"/>
 			</MenuItem>
 			<MenuItem Header="_Полиэдры">
 				<MenuItem Header="_Показать все" Click="ShowAllPolyhedras"/>
