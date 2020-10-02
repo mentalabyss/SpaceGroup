@@ -382,14 +382,19 @@ namespace SpaceGroup
         {
             if (!_compoundSelected || !_groupSelected) return;
             
+
+
             _atomCell = _compound.CrystalCell;
             _compoundVisual = new CompoundVisual(_compound, _selectedSpaceGroup, _selectableModels, _multipliedAtoms);
 
+            MainViewport.Children.Clear();
             MainViewport.Children.Add(_compoundVisual);
             MoveFromCenter(_compoundVisual);
 
-            ModelBuilder.buildDiscreteAxis(out _discreteYAxis, out _discreteXAxis, out _discreteZAxis, _atomCell);
+            ModelBuilder.BuildDiscreteAxis(out _discreteYAxis, out _discreteXAxis, out _discreteZAxis, _atomCell);
 
+
+            _discreteAxisGroup.Children.Clear();
             _discreteAxisGroup.Children.Add(_discreteXAxis);
             _discreteAxisGroup.Children.Add(_discreteYAxis);
             _discreteAxisGroup.Children.Add(_discreteZAxis);

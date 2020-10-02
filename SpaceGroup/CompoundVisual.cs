@@ -8,7 +8,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using System.Xml.Serialization;
 using MessageBox = System.Windows.Forms.MessageBox;
+using Point = System.Drawing.Point;
 
 namespace SpaceGroup
 {
@@ -45,7 +47,7 @@ namespace SpaceGroup
             selectedSpaceGroup = spaceGroup;
             this.SelectableModels = selectableModels;
             this.multipliedAtoms = multipliedAtoms;
-            MiscModel3DGroup.Children.Add(BuildCellBorders());
+            MiscModel3DGroup.Children.Add(NewBuildCellBorders()); //
 
             if (colorTypeDictionary == null)
             {
@@ -89,6 +91,51 @@ namespace SpaceGroup
             bordersMesh.AddSegment(new Point3D(AtomCell.YAxisL, 0, 0), new Point3D(AtomCell.YAxisL, AtomCell.ZAxisL, 0), new Vector3D(1, 0, 0), 0.04);
             bordersMesh.AddSegment(new Point3D(0, 0, AtomCell.XAxisL), new Point3D(0, AtomCell.ZAxisL, AtomCell.XAxisL), new Vector3D(1, 0, 0), 0.04);
             bordersMesh.AddSegment(new Point3D(AtomCell.YAxisL, 0, AtomCell.XAxisL), new Point3D(AtomCell.YAxisL, AtomCell.ZAxisL, AtomCell.XAxisL), new Vector3D(1, 0, 0), 0.04);
+
+
+            SolidColorBrush bordersBrush = System.Windows.Media.Brushes.Black;
+            DiffuseMaterial bordersMaterial = new DiffuseMaterial(bordersBrush);
+
+            return new GeometryModel3D(bordersMesh, bordersMaterial);
+        }
+
+        private GeometryModel3D NewBuildCellBorders()
+        {
+            MeshGeometry3D bordersMesh = new MeshGeometry3D();
+
+            double b = atomCell.YAxisL;
+            double c = atomCell.ZAxisL;
+            double x_c = c * Math.Cos(ToRadians(atomCell.Alpha));
+            double y_c = (b * c * Math.Cos(ToRadians(atomCell.Beta)) - x_c * b * Math.Cos(ToRadians(atomCell.Gamma)))
+                         / b * Math.Sin(ToRadians(atomCell.Gamma));
+
+            Point3D oPoint = new Point3D(0, 0, 0);
+            Point3D xPoint = new Point3D(AtomCell.YAxisL, 0, 0);
+            Point3D zPoint = new Point3D(b * Math.Cos(ToRadians(atomCell.Gamma)), 0, b * Math.Sin(atomCell.Gamma));
+            Point3D zxPoint = new Point3D(b * Math.Cos(ToRadians(atomCell.Gamma)) + b, 0, b * Math.Sin(atomCell.Gamma));
+            Point3D oyPoint = new Point3D(x_c, AtomCell.ZAxisL, y_c);
+            Point3D xyPoint = Point3D.Add(oyPoint, Point3D.Subtract(xPoint, oPoint));
+            Point3D zyPoint = Point3D.Add(oyPoint, Point3D.Subtract(zPoint, oPoint));
+            Point3D zxyPoint = Point3D.Add(xyPoint, Point3D.Subtract(zxPoint, xPoint));
+
+            //x
+            bordersMesh.AddSegment(zPoint, zxPoint, new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(oPoint, xPoint, new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(oyPoint, xyPoint, new Vector3D(0, 1, 0), 0.04);
+            bordersMesh.AddSegment(zyPoint, zxyPoint, new Vector3D(0, 1, 0), 0.04);
+
+
+            //z
+            bordersMesh.AddSegment(xPoint, zxPoint, new Vector3D(1, 1, 0), 0.04);
+            bordersMesh.AddSegment(oPoint, zPoint, new Vector3D(1, 1, 0), 0.04);
+            bordersMesh.AddSegment(oyPoint, zyPoint, new Vector3D(1, 1, 0), 0.04);
+            bordersMesh.AddSegment(xyPoint, zxyPoint, new Vector3D(1, 1, 0), 0.04);
+
+            //y
+            bordersMesh.AddSegment(zPoint, zyPoint, new Vector3D(1, 0, 0), 0.04);
+            bordersMesh.AddSegment(xPoint, xyPoint, new Vector3D(1, 0, 0), 0.04);
+            bordersMesh.AddSegment(zxPoint, zxyPoint, new Vector3D(1, 0, 0), 0.04);
+            bordersMesh.AddSegment(oPoint, oyPoint, new Vector3D(1, 0, 0), 0.04);
 
 
             SolidColorBrush bordersBrush = System.Windows.Media.Brushes.Black;
@@ -176,5 +223,10 @@ namespace SpaceGroup
             MiscModel3DGroup.Children.Add(directionalLight);
         }
 
+
+        private static double ToRadians(double angle)
+        {
+            return (Math.PI / 180) * angle;
+        }
     }
 }
