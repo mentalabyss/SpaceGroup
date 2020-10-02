@@ -147,24 +147,6 @@ namespace SpaceGroup
             return new GeometryModel3D(bordersMesh, bordersMaterial);
         }
 
-        private void filler()
-        {
-            MeshGeometry3D bordersMesh = new MeshGeometry3D();
-
-            double a = atomCell.YAxisL;
-            double b = atomCell.ZAxisL;
-            double c = atomCell.XAxisL;
-
-            Vector3D OX = new Vector3D(a, 0, 0);
-            Vector3D OY = new Vector3D(b * Math.Cos(ToRadians(atomCell.Alpha)), b * Math.Sin(ToRadians(atomCell.Alpha)), 0);
-
-            double xC = c * Math.Cos(atomCell.Gamma);
-            double yC = (b * c * Math.Cos(ToRadians(atomCell.Beta)) - xC * b * Math.Cos(ToRadians(atomCell.Alpha))) /
-                b * Math.Sin(ToRadians(atomCell.Alpha));
-            double zC = c * c - xC * xC - yC * yC;
-            Vector3D OZ = new Vector3D(xC, yC, zC);
-        }
-
         private void AddAtoms()
         {
             foreach (Atom atom in compound.Atoms)
