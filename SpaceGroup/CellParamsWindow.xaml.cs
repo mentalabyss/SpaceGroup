@@ -239,8 +239,6 @@ namespace SpaceGroup
                 alphaText.Text = selectedCompound.CrystalCell.Alpha.ToString();
                 betaText.Text = selectedCompound.CrystalCell.Beta.ToString();
                 gammaText.Text = selectedCompound.CrystalCell.Gamma.ToString();
-
-                System.Windows.Forms.MessageBox.Show(selectedCompound.Atoms.Count().ToString());
             }
 
 

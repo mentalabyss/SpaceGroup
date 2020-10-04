@@ -51,9 +51,7 @@ namespace SpaceGroup
             MiscModel3DGroup.Children.Add(NewBuildCellBorders()); //
 
             if (colorTypeDictionary == null)
-            {
                 DefineLights();
-            }
 
             InitializeDictionary(colorTypeDictionary);
             AddAtoms();

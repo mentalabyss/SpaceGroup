@@ -380,7 +380,7 @@ namespace SpaceGroup
 
         public void InitCompound(Compound compound)
         {
-            this._compound = compound;
+            _compound = compound;
             _compoundSelected = true;
             BuildCompound();
         }
@@ -389,11 +389,9 @@ namespace SpaceGroup
         {
             if (!_compoundSelected || !_groupSelected) return;
             
-
-
             _atomCell = _compound.CrystalCell;
             _compoundVisual = new CompoundVisual(_compound, _selectedSpaceGroup, _selectableModels, _multipliedAtoms);
-
+            _multipliedAtoms.Clear();
             MainViewport.Children.Clear();
             MainViewport.Children.Add(_compoundVisual);
             MoveFromCenter(_compoundVisual);
