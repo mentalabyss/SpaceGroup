@@ -63,6 +63,7 @@
     <Compile Include="AtomVisual.cs" />
     <Compile Include="Compound.cs" />
     <Compile Include="CompoundVisual.cs" />
+    <Compile Include="MatrixClass.cs" />
     <Compile Include="MeshExtension.cs" />
     <Compile Include="OrthographicCameraExtension.cs" />
     <Compile Include="CellParamsWindow.xaml.cs">

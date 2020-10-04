@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Media3D;
 
 namespace SpaceGroup
@@ -27,20 +28,15 @@ namespace SpaceGroup
 
         public AtomVisual() { }
 
-        public AtomVisual(double x, double y, double z, double atomVisualSize, string atomColor, Atom atom, CrystalCell crystalCell) //для создания атомов размножений
+        public AtomVisual(Point3D atomPoint, double atomVisualSize, string atomColor, Atom atom) //для создания атомов размножений
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
             this.atomVisualSize = atomVisualSize;
             this.atomColor = atomColor;
             this.atom = atom;
 
             MeshGeometry3D atomMesh = new MeshGeometry3D();
 
-
-
-            atomMesh.AddSphere(new Point3D(x, y, z), atomVisualSize, 20, 30);
+            atomMesh.AddSphere(atomPoint, atomVisualSize, 20, 30);
 
             SolidColorBrush brush1 = (SolidColorBrush)(new BrushConverter().ConvertFrom(this.atomColor));
 
@@ -59,7 +55,6 @@ namespace SpaceGroup
             if (selectedSpaceGroup == null)
                 throw new NotImplementedException();
 
-
             this.atom = atom;
 
             Content = MiscModel3DGroup;
@@ -75,19 +70,10 @@ namespace SpaceGroup
 
             for (int i = 0; i < selectedSpaceGroup.Expressions.Length; i += 3)
             {
-                double X = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0);
-                double x = X * atomCell.YAxisL; //Y
+                double X = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 1], 0, atom.Y, 0); //сухие координаты
                 double Y = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i + 2], 0, 0, atom.Z);
-                double y = Y * atomCell.ZAxisL; //Z
                 double Z = SpaceGroupCl.Evaluate(selectedSpaceGroup.Expressions[i], atom.X, 0, 0);
-                double z = Z * atomCell.XAxisL; //X
 
-                if (x < 0)
-                    x += atomCell.YAxisL;
-                if (y < 0)
-                    y += atomCell.ZAxisL;
-                if (z < 0)
-                    z += atomCell.XAxisL;
 
                 if (X < 0)
                     X += 1;
@@ -96,13 +82,6 @@ namespace SpaceGroup
                 if (Z < 0)
                     Z += 1;
 
-                if (x > atomCell.YAxisL)
-                    x -= atomCell.YAxisL;
-                if (y > atomCell.ZAxisL)
-                    y -= atomCell.ZAxisL;
-                if (z > atomCell.XAxisL)
-                    z -= atomCell.XAxisL;
-
                 if (X > 1)
                     X -= 1;
                 if (Y > 1)
@@ -110,14 +89,28 @@ namespace SpaceGroup
                 if (Z > 1)
                     Z -= 1;
 
-                x += xAxisL;
-                y += yAxisL;
-                z += zAxisL;
+                //
+                double a = atomCell.YAxisL;
+                double b = atomCell.ZAxisL;
+                double c = atomCell.XAxisL;
+
+                double xC = c * Math.Cos(ToRadians(atomCell.Gamma));
+                double yC = (b * c * Math.Cos(ToRadians(atomCell.Beta)) - xC * b * Math.Cos(ToRadians(atomCell.Alpha))) /
+                    b * Math.Sin(ToRadians(atomCell.Alpha));
+                double zC = Math.Sqrt(c * c - xC * xC - yC * yC);
+
+                Vector3D xVector = new Vector3D(a * X, 0, 0);
+                Vector3D oyVector = new Vector3D(b * Math.Cos(ToRadians(atomCell.Alpha)) * Y, b * Math.Sin(ToRadians(atomCell.Alpha)) * Y, 0);
+                Vector3D zVector = new Vector3D(xC * Z, yC * Z, zC * Z);
+
+                Vector3D xyVector = Vector3D.Add(xVector, oyVector);
+                Vector3D xyzVector = Vector3D.Add(xyVector, zVector);
+                //
 
                 var addedAtom = new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), null);
                 if (multipliedAtoms.Contains(addedAtom)) continue;
                 multipliedAtoms.Add(addedAtom);
-                AtomVisual multipliedAtomVisual = new AtomVisual(x, y, z, atomVisualSize, atomColor, addedAtom, atomCell);
+                AtomVisual multipliedAtomVisual = new AtomVisual((Point3D)xyzVector, atomVisualSize, atomColor, addedAtom);
                 Children.Add(multipliedAtomVisual);
                 atomReproList.Add(new Atom(atom.Element, Z.ToString(), X.ToString(), Y.ToString(), atom.Brush));
             }
