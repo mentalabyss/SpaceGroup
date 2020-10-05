@@ -40,6 +40,9 @@ namespace SpaceGroup
         {
             try
             {
+                if (x == "" || y == "" || z == "")
+                    return;
+
                 PolyhedraAtoms = new List<Atom>();
 
                 this.element = element;
@@ -57,7 +60,11 @@ namespace SpaceGroup
                 this.brush = brush;
                 //color = brush.ToString();
             }
-            catch(NullReferenceException e)
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (FormatException e)
             {
                 Console.WriteLine(e.Message);
             }

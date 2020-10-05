@@ -55,6 +55,10 @@ namespace SpaceGroup
 
         private void addAtomButton_Click(object sender, RoutedEventArgs e)
         {
+            if (String.IsNullOrEmpty(atomName.Text) || String.IsNullOrEmpty(xCoord.Text)
+                                                    || String.IsNullOrEmpty(yCoord.Text) ||
+                                                    String.IsNullOrEmpty(zCoord.Text))
+                return;
             try
             {
                 string s = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(atomName.Text.ToLower());

@@ -108,8 +108,8 @@ namespace SpaceGroup
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var comboBox = (ComboBox)sender;
-            var selectedItem = comboBox.SelectedItem as SpaceGroupCl;
+            //var comboBox = (ComboBox)sender;
+            var selectedItem = (SpaceGroupCl)combobox.SelectedItem;
 
             if (selectedItem != null && selectedItem.dummy)
             {
@@ -130,7 +130,7 @@ namespace SpaceGroup
                 //Removing and adding the dummy item from the collection, thus it is always the last on the 'list'
                 spaceGroupGroup.Remove(selectedItem);
                 spaceGroupGroup.Add(selectedItem);
-                comboBox.ItemsSource = spaceGroupGroup;
+                combobox.ItemsSource = spaceGroupGroup;
                 //Select the new item
             }
             else
@@ -139,23 +139,20 @@ namespace SpaceGroup
                 try
                 {
                     sgName.Text = combobox.SelectedItem.ToString();
-                    var selectedGroup = (SpaceGroupCl)combobox.SelectedItem;
+                    var selectedGroup = (SpaceGroupCl) combobox.SelectedItem;
                     Expressions = new ObservableCollection<Expr>();
                     Expressions = selectedGroup.exprs;
                     expressionsGrid.ItemsSource = null;
                     expressionsGrid.ItemsSource = Expressions;
                 }
-                catch(NullReferenceException nullref)
+                catch (NullReferenceException nullref)
                 {
                     Console.WriteLine(nullref.Message);
                 }
-                
-                //foreach(string s in selectedGroup.Expressions)
-                //{
-                //    Expr expr = new Expr { Text = s };
-                //    Expressions.Add(expr);
-                //}
-                
+                catch (Exception)
+                {
+
+                }
                 readdDummy();
             }
         }
