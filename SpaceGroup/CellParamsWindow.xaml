@@ -102,9 +102,7 @@
 				<TextBox Height="23" Name="xCoord" Width="90" Grid.Column="1" Grid.Row="1" Margin="5"/>
 				<TextBox Height="23" Name="yCoord" Grid.Column="1" Grid.Row="2" Width="90"/>
 				<TextBox Height="23" Name="zCoord" Grid.Column="1" Grid.Row="3" Width="90"/>
-
-				<Button Content="Цвет" Grid.Column="2" Click="pickColor" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-				<Button Name="addButton" Grid.Row="5" Grid.ColumnSpan="3" Margin="5" HorizontalAlignment="Center" Width="90" Click="addAtomButton_Click" >Добавить</Button>
+					<Button Name="addButton" Grid.Row="5" Grid.ColumnSpan="3" Margin="5" HorizontalAlignment="Center" Width="90" Click="addAtomButton_Click" >Добавить</Button>
 			</Grid>
 
 		</GroupBox>

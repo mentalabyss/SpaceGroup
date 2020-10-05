@@ -251,6 +251,12 @@ namespace SpaceGroup
 
         private void selectCompoundButton_Click(object sender, RoutedEventArgs e)
         {
+            if (selectedCompound.dummy)
+            {
+                System.Windows.Forms.MessageBox.Show("Соединение не выбрано!");
+                return;
+            }
+
             selectedCompound.GetAtomKeyValuePairs();
             ((MainWindow)Owner).InitCompound(selectedCompound);
             //((MainWindow)Owner).buildCompound();

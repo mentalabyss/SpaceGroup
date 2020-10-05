@@ -67,6 +67,8 @@ namespace SpaceGroup
 
         public double PolyhedronVolume { get; set; }
 
+        public double PolyhedronFillingDegree => 4.3 * Math.PI * 0.26 * 0.26 * 0.26 / PolyhedronVolume;
+
         public void StringToColor()
         {
             brush = new SolidColorBrush {Color = (Color) ColorConverter.ConvertFromString(color)};

@@ -111,13 +111,19 @@ namespace SpaceGroup
                         var hitModelAtomVisual = GetHitModelAtomVisual(hitModel);
                         if (hitModelAtomVisual != null)
                         {
+                            ShowSelectedAtomInfo(hitModelAtomVisual);
                             UpdateDistancesTable(hitModelAtomVisual.Atom);
                         }
                     }
                     else
                         SelectedModels.Clear();
+
                 }
             }
+
+            if (e.ChangedButton != MouseButton.Left || e.ClickCount != 2) return;
+            ClearSelectedAtomInfo();
+            distanceDataGrid.Items.Clear();
         }
 
         public void SinglePolyhedraButtonClicked(object sender, RoutedEventArgs e)
@@ -142,7 +148,6 @@ namespace SpaceGroup
         {
             var hitModel = GetHitModel(e);
             var hitModelAtomVisual = GetHitModelAtomVisual(hitModel);
-            ShowSelectedAtomInfo(hitModelAtomVisual);
             ShowPopupAtomInfo(hitModelAtomVisual);
 
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -375,6 +380,7 @@ namespace SpaceGroup
         {
             _selectedSpaceGroup = spaceGroup;
             _groupSelected = true;
+            SpaceGroupNameLabel.Content = spaceGroup.Name;
             BuildCompound();
         }
 
@@ -382,6 +388,8 @@ namespace SpaceGroup
         {
             _compound = compound;
             _compoundSelected = true;
+            CompoundNameLabel.Content = compound.Name;
+            CompoundVolumeLabel.Content = $"{Math.Round(compound.CrystalCell.Volume, 4)} Å^3";
             BuildCompound();
         }
 
@@ -459,45 +467,39 @@ namespace SpaceGroup
                 // Get the world to viewport transform matrix
             Matrix3D m = MUtils.TryWorldToViewportTransform(vpv, out var bOk);
 
-            if (bOk)
-            {
-                // Transform the 3D point to 2D
-                Point3D transformedPoint = m.Transform(point3D);
+            if (!bOk) return null;
+            // Transform the 3D point to 2D
+            var transformedPoint = m.Transform(point3D);
 
-                var screen2DPoint = new Point(transformedPoint.X, transformedPoint.Y);
+            var screen2DPoint = new Point(transformedPoint.X, transformedPoint.Y);
 
-                return screen2DPoint;
-            }
-            else
-            {
-                return null;
-            }
+            return screen2DPoint;
+
         }
 
         private GeometryModel3D GetHitModel(MouseEventArgs e)
         {
-            Point mouse_pos = e.GetPosition(MainViewport);
-            HitTestResult result = VisualTreeHelper.HitTest(MainViewport, mouse_pos);
+            var mousePos = e.GetPosition(MainViewport);
+            HitTestResult result = VisualTreeHelper.HitTest(MainViewport, mousePos);
 
-            if (result is RayMeshGeometry3DHitTestResult meshResult)
-            {
-                 var model = (GeometryModel3D)meshResult.ModelHit;
-                 return model;
-            }
+            if (!(result is RayMeshGeometry3DHitTestResult meshResult)) return null;
+            var model = (GeometryModel3D)meshResult.ModelHit;
+            return model;
 
-            return null;
         }
 
 
         private void ShowSelectedAtomInfo(AtomVisual atomVisual)
         {
-            if (atomVisual == null) return;
+            if (atomVisual == null)
+                return;
 
             selectedAtomName.Content = atomVisual.Atom.Element;
             selectedAtomX.Content = atomVisual.Atom.X;
             selectedAtomY.Content = atomVisual.Atom.Y;
             selectedAtomZ.Content = atomVisual.Atom.Z;
-            selectedAtomPolyhedronVolume.Content = atomVisual.Atom.PolyhedronVolume;
+            selectedAtomPolyhedronVolume.Content = Math.Round(atomVisual.Atom.PolyhedronVolume, 4);
+            SelectedAtomPolyhedronFillingDegree.Content = Math.Round(atomVisual.Atom.PolyhedronFillingDegree, 4);
         }
 
         private AtomVisual GetHitModelAtomVisual(GeometryModel3D selectedModel)
@@ -519,6 +521,7 @@ namespace SpaceGroup
             selectedAtomX.Content = "";
             selectedAtomY.Content = "";
             selectedAtomZ.Content = "";
+            selectedAtomPolyhedronVolume.Content = "";
         }
 
 
@@ -564,14 +567,20 @@ namespace SpaceGroup
             distanceDataGrid.Items.Clear();
             foreach (Atom atom in mainAtom.PolyhedraAtoms)
             {
-                distanceDataGrid.Items.Add(new DistancesData { element = atom.Element, distance = Atom.DistanceTwoAtoms(atom, mainAtom, _atomCell).ToString() });
+                distanceDataGrid.Items.Add(new DistancesData
+                {
+                    Element = atom.Element,
+                    Distance = Math.Round(Atom.DistanceTwoAtoms(atom, mainAtom, _atomCell), 4).ToString(),
+                });
             }
         }
 
         public struct DistancesData
         {
-            public string element { set; get; }
-            public string distance { set; get; }
+            public string Element { set; get; }
+            public string Distance { set; get; }
+
+            public string Angle { set; get; }
         }
     }
 }

@@ -32,17 +32,19 @@
 			<MenuItem Header="_Соединение">
 				<MenuItem Header="_Параметры соединений" Click="OnAddCompoundButtonClick"/>
 			</MenuItem>
-			<MenuItem Header="_Параметры">
-				<MenuItem Header="_Настройки группы" Click="newGroup_Click"/>
-				<MenuItem Header="_Отображать ось X" x:Name="checkboxXaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
-				<MenuItem Header="_Отображать ось Y" x:Name="checkboxYaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
-				<MenuItem Header="_Отображать ось Z" x:Name="checkboxZaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
-				<MenuItem Name="translationsCheckbox" Header="_Трансляция" IsCheckable="True" Checked="VisualizeTranslations" Unchecked="HideTranslations" IsChecked="False"/>
+			<MenuItem Header="_Простр. группа" Click="newGroup_Click">
 			</MenuItem>
 			<MenuItem Header="_Полиэдры">
 				<MenuItem Header="_Показать все" Click="ShowAllPolyhedras"/>
 				<MenuItem Header="_Удалить все" Click="DeleteAllPolyhedras"/>
 			</MenuItem>
+			<MenuItem Header="_Параметры">
+				<MenuItem Header="_Отображать ось X" x:Name="checkboxXaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
+				<MenuItem Header="_Отображать ось Y" x:Name="checkboxYaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
+				<MenuItem Header="_Отображать ось Z" x:Name="checkboxZaxis" IsCheckable="True" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked" IsChecked="True"/>
+				<MenuItem Name="translationsCheckbox" Header="_Трансляция" IsCheckable="True" Checked="VisualizeTranslations" Unchecked="HideTranslations" IsChecked="False"/>
+			</MenuItem>
+
 		</Menu>
 
 		<Viewport3D Grid.Column ="2" Grid.Row ="1"  Name ="MainViewport">
@@ -59,8 +61,6 @@
 				MouseWheel="OnViewportMouseScroll">
 			<Canvas.ContextMenu>
 				<ContextMenu x:Name="contextMenu1">
-					<MenuItem Header ="Расстояние"/>
-					<MenuItem Header="Угол"/>
 					<MenuItem Header="Построить полиэдр" Click="SinglePolyhedraButtonClicked"/>
 					<MenuItem Header="Удалить полиэдр" Click="SinglePolyhedraDeleteButtonClicked"/>
 				</ContextMenu>
@@ -79,71 +79,129 @@
 
 		<Grid x:Name="scrollGrid" Grid.Column ="0" Grid.Row="1">
 			<ScrollViewer Name="Scroll" Height="Auto">
-				<Grid>
+				<Grid Margin="5">
 					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="*"/>
 					</Grid.RowDefinitions>
 
-					<TabControl>
-						<TabItem Header="Общее">
-							<GroupBox Grid.Row="0" Header="Выбранный элемент">
+					<GroupBox Grid.Row="0">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width ="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
 
-								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height ="Auto"/>
+								<RowDefinition Height ="Auto"/>
+								<RowDefinition Height ="Auto"/>
+							</Grid.RowDefinitions>
 
-									<Grid.RowDefinitions>
-										<RowDefinition Height="Auto"/>
-										<RowDefinition Height="Auto"/>
-										<RowDefinition Height="Auto"/>
-										<RowDefinition Height="Auto"/>
-										<RowDefinition Height="Auto"/>
-									</Grid.RowDefinitions>
+							<Label Grid.Column="0" Grid.Row="0" Content="Соединение: "/>
+							<Label Grid.Column="0" Grid.Row="1" Content="Группа: "/>
+							<Label Grid.Column="0" Grid.Row="2" Content="Объем: "/>
+							<Label Grid.Column="1" Grid.Row="0" Name="CompoundNameLabel"/>
+							<Label Grid.Column="1" Grid.Row="1" Name="SpaceGroupNameLabel"/>
+							<Label Grid.Column="1" Grid.Row="2" Name="CompoundVolumeLabel"/>
 
-									<Label Grid.Column="0" Grid.Row="0" Content="Атом: "/>
-									<Label Grid.Column="0" Grid.Row="1" Content="x: "/>
-									<Label Grid.Column="0" Grid.Row="2" Content="y: "/>
-									<Label Grid.Column="0" Grid.Row="3" Content="z: "/>
-									<Label Grid.Column="0" Grid.Row="4" Content="Объем полиэдра: "/>
-
-									<Label Grid.Column="1" Grid.Row="0" Name="selectedAtomName"/>
-									<Label Grid.Column="1" Grid.Row="1" Name="selectedAtomX"/>
-									<Label Grid.Column="1" Grid.Row="2" Name="selectedAtomY"/>
-									<Label Grid.Column="1" Grid.Row="3" Name="selectedAtomZ"/>
-									<Label Grid.Column="1" Grid.Row="4" Name="selectedAtomPolyhedronVolume"/>
-								</Grid>
-							</GroupBox>
-						</TabItem>
-
-						<TabItem Header="Расстояния">
-							<Grid>
-								<DataGrid x:Name="distanceDataGrid"
-									   CanUserAddRows="False" CanUserDeleteRows="False"
-									  AutoGenerateColumns="False">
-									<DataGrid.Columns>
-										<DataGridTextColumn IsReadOnly="False" Header="Атом" Binding="{Binding element}"></DataGridTextColumn>
-										<DataGridTextColumn IsReadOnly="False" Header="Å" Binding="{Binding distance}"></DataGridTextColumn>
-									</DataGrid.Columns>
-								</DataGrid>
-							</Grid>
-							
-						</TabItem>
-						
-					</TabControl>
-					
-
-					<GroupBox Grid.Row="1" Header="Параметры изображения">
-						<Grid Name="imageSettingsGrid">
-							
 						</Grid>
 					</GroupBox>
-					
-					
+
+					<GroupBox Grid.Row="1" Header="Выбранный элемент">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
+							<Label Grid.Column="0" Grid.Row="0" Content="Атом: "/>
+							<Label Grid.Column="1" Grid.Row="0" Name="selectedAtomName"/>
+
+							<TabControl Grid.ColumnSpan="2" Grid.Row="1" HorizontalAlignment="Left">
+								<TabItem Header="Общее">
+									<GroupBox>
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="Auto"/>
+												<ColumnDefinition Width="Auto"/>
+											</Grid.ColumnDefinitions>
+
+											<Grid.RowDefinitions>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+											</Grid.RowDefinitions>
+
+											<Label Grid.Column="0" Grid.Row="1" Content="x: "/>
+											<Label Grid.Column="0" Grid.Row="2" Content="y: "/>
+											<Label Grid.Column="0" Grid.Row="3" Content="z: "/>
+											<Label Grid.Column="0" Grid.Row="4" Content="Объем полиэдра: "/>
+											<Label Grid.Column="0" Grid.Row="5" Content="Степень заполнения: "/>
+
+
+											<Label Grid.Column="1" Grid.Row="1" Name="selectedAtomX"/>
+											<Label Grid.Column="1" Grid.Row="2" Name="selectedAtomY"/>
+											<Label Grid.Column="1" Grid.Row="3" Name="selectedAtomZ"/>
+											<Label Grid.Column="1" Grid.Row="4" Name="selectedAtomPolyhedronVolume"/>
+											<Label Grid.Column="1" Grid.Row="5" Name="SelectedAtomPolyhedronFillingDegree"/>
+										</Grid>
+									</GroupBox>
+								</TabItem>
+
+								<TabItem Header="Расстояния">
+									<Grid>
+										<DataGrid x:Name="distanceDataGrid"
+												          CanUserAddRows="False" CanUserDeleteRows="False"
+												          AutoGenerateColumns="False">
+											<DataGrid.Columns>
+												<DataGridTextColumn IsReadOnly="False" Header="Атом" Binding="{Binding Element}"></DataGridTextColumn>
+												<DataGridTextColumn IsReadOnly="False" Header="Å" Binding="{Binding Distance}"></DataGridTextColumn>
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+								</TabItem>
+
+								<TabItem Header="Углы">
+									<Grid>
+										<DataGrid x:Name="AnglesDataGrid"
+										          CanUserAddRows="False" CanUserDeleteRows="False"
+										          AutoGenerateColumns="False">
+											<DataGrid.Columns>
+												<DataGridTextColumn IsReadOnly="False" Header="Атом" Binding="{Binding Element}"></DataGridTextColumn>
+												<DataGridTextColumn IsReadOnly="False" Header="Угол" Binding="{Binding Angle}"></DataGridTextColumn>
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+								</TabItem>
+
+							</TabControl>
+						</Grid>
+
+
+					</GroupBox>
+
+					<GroupBox Grid.Row="2" Header="Параметры изображения">
+						<Grid Name="imageSettingsGrid">
+
+						</Grid>
+					</GroupBox>
+
+
 				</Grid>
 			</ScrollViewer>
 		</Grid>
