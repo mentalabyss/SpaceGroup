@@ -3,7 +3,7 @@
   <Class Name="SpaceGroup.Atom">
     <Position X="0.5" Y="0.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>EEAAAAAAAkBAAIYEgAgAAAAIAAAAAACgAABgIQAAYAE=</HashCode>
+      <HashCode>EEAAAAAAAkBAAIaEgAgAAAAIAAAAAACgAABgIQAAYAE=</HashCode>
       <FileName>Atom.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -24,7 +24,7 @@
   <Class Name="SpaceGroup.ModelBuilder">
     <Position X="2.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAAAAAAAAgAAAAAAAABIAAAAAAAAAAAAAEAgAAAQAAE=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAIAAABAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
       <FileName>ModelBuilder.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -45,10 +45,9 @@
   <Class Name="SpaceGroup.SpaceGroupSettings" BaseTypeListCollapsed="true">
     <Position X="6" Y="3.25" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>gAABAAAQAAAAAAAAAAAAAAoQABAAABAgAAAAAoAAAEA=</HashCode>
+      <HashCode>AAAAAAAAAAAAEACgIBAACAgQABAAAAQCAAAAAoAAAEA=</HashCode>
       <FileName>SpaceGroupSettings.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="SpaceGroup.MainWindow" BaseTypeListCollapsed="true">
     <Position X="11.75" Y="0.5" Width="2" />
@@ -60,7 +59,7 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>BAEEEEBOGCBAqgbIAIQLpEggElAAgIAATAAwkQhgUAA=</HashCode>
+      <HashCode>BAEEEEBOGCBAqgbIAIQLpEggElAIgIAATAAwkQhgUAA=</HashCode>
       <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />

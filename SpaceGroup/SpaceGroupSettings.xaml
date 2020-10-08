@@ -1,11 +1,11 @@
 ﻿<Window x:Class="SpaceGroup.SpaceGroupSettings"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SpaceGroup"
-        mc:Ignorable="d"
-        Title="Настройки группы" Height="450" Width="800"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:SpaceGroup"
+		mc:Ignorable="d"
+		Title="Настройки группы" Height="450" Width="800"
 		Loaded="Window_Loaded">
 	<Grid>
 		<Grid.RowDefinitions>
@@ -15,25 +15,28 @@
 		</Grid.RowDefinitions>
 
 		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*"/>
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
 
-		<Label Grid.Row="0" Content="Название" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,10"/>
-		<TextBox x:Name="sgName" Grid.Row="0" HorizontalAlignment="Left" Height="23" Margin="73,14,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-		<DataGrid x:Name="expressionsGrid" Grid.Row="1" Grid.Column="0" AutoGenerateColumns="False" ItemsSource="{Binding Expressions}" CanUserAddRows="True" CanUserDeleteRows="True" AlternationCount="1" Margin="10,10,10,10">
-			<DataGrid.Columns>
-				<DataGridTextColumn Binding="{Binding Path=Text}" IsReadOnly="False" Width="*" Header="Уравнение" />
+		<Label Grid.Row="0" Content="Название" Grid.Column="0" Margin="10"/>
+		<TextBox x:Name="SgName" Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" Margin="10"/>
+		<DataGrid x:Name="ExpressionsGrid" Grid.ColumnSpan="4" Grid.Row="1" Grid.Column="0" AutoGenerateColumns="False" ItemsSource="{Binding Expressions}" CanUserAddRows="True" CanUserDeleteRows="True" AlternationCount="1" Margin="10,10,10,10">
+			<DataGrid.Columns >
+				<DataGridTextColumn Binding="{Binding Path=Text}" IsReadOnly="False" Width="*" Header="Трансляция" />
 				<DataGridTemplateColumn Width="Auto" Header="Действие">
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<Button Content="Удалить" Click="deleteButtonClick" />
+							<Button Content="Удалить" Click="DeleteButtonClick" />
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 			</DataGrid.Columns>
 		</DataGrid>
-		<Button x:Name="addButton" Content="Добавить группу" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Margin="10,10,10,10" Click="addGroupButtonClicked"/>
-		<ComboBox Name="combobox" HorizontalAlignment="Left" Margin="198,15,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
-		<Button x:Name="selectButton" Content="Выбрать группу" HorizontalAlignment="Left" Margin="112,10,0,0" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Click="selectButton_click"/>
+		<Button x:Name="addButton" Content="Добавить группу" Grid.Column="0" Grid.Row="2" Click="AddGroupButtonClicked" Margin="10"/>
+		<ComboBox Name="combobox" Grid.Row="0" Grid.Column="2" Margin="10" SelectionChanged="ComboBox_SelectionChanged"/>
+		<Button x:Name="selectButton" Content="Выбрать группу" Grid.Column="3" Grid.Row="0" Width="Auto" Margin="10" Click="SelectButtonClick"/>
 	</Grid>
 </Window>

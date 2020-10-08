@@ -2,19 +2,24 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml.Serialization;
+using ComboBox = System.Windows.Controls.ComboBox;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace SpaceGroup
@@ -25,20 +30,14 @@ namespace SpaceGroup
     /// 
     public partial class SpaceGroupSettings : Window
     {
-        public int a;
-
-        private List<SpaceGroupCl> spaceGroupGroup;
+        private List<SpaceGroupCl> _spaceGroupGroup;
+        private bool _newElement = false;
+        private SpaceGroupCl currentGroup;
         public List<SpaceGroupCl> SpaceGroupGroup
         {
-            get
-            {
-                return spaceGroupGroup;
-            }
+            get => _spaceGroupGroup;
 
-            set
-            {
-                spaceGroupGroup = value;
-            }
+            set => _spaceGroupGroup = value;
         }
 
         public ObservableCollection<Expr> Expressions
@@ -53,48 +52,38 @@ namespace SpaceGroup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if (currentGroup != null)
+            {
+                combobox.SelectedItem = currentGroup;
+                combobox.Text = currentGroup.Name;
+            }
+
+            ExpressionsGrid.CellEditEnding += RowAdded;
             Expressions = new ObservableCollection<Expr>();
-            expressionsGrid.ItemsSource = Expressions;
+            ExpressionsGrid.ItemsSource = Expressions;
             try
             {
-                spaceGroupGroup = DeserializeSpaceGroupList();
+                _spaceGroupGroup = DeserializeSpaceGroupList();
             }
             catch(FileNotFoundException)
             {
-                spaceGroupGroup = new List<SpaceGroupCl>();
+                _spaceGroupGroup = new List<SpaceGroupCl>();
             }
             catch(Exception)
             {
-                spaceGroupGroup = new List<SpaceGroupCl>();
+                _spaceGroupGroup = new List<SpaceGroupCl>();
             }
 
-            combobox.ItemsSource = spaceGroupGroup;
-            spaceGroupGroup.RemoveAll(item => item.dummy);
-            spaceGroupGroup.Add(new SpaceGroupCl { Name = "Добавить группу...", dummy = true });
-        }
-
-        private void deleteButtonClick(object sender, RoutedEventArgs e)
-        {
-            var expr = expressionsGrid.SelectedItem as Expr;
-            Expressions.Remove(expr);
-        }
-
-        private void addGroupButtonClicked(object sender, RoutedEventArgs e)
-        {
-            SpaceGroupCl spaceGroupCl = new SpaceGroupCl(sgName.Text, Expressions);
-            spaceGroupGroup.RemoveAll(x => x.Name == sgName.Text);
-            spaceGroupGroup.Add(spaceGroupCl);
-            SerializeSpaceGroupList();
-            readdDummy();
-            combobox.ItemsSource = null;
-            combobox.ItemsSource = spaceGroupGroup;
+            combobox.ItemsSource = _spaceGroupGroup;
+            _spaceGroupGroup.RemoveAll(item => item.dummy);
+            _spaceGroupGroup.Add(new SpaceGroupCl { Name = "Добавить группу...", dummy = true });
         }
 
         private void SerializeSpaceGroupList()
         {
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<SpaceGroupCl>));
             TextWriter writer = new StreamWriter("spacegroups.xml");
-            xmlSerializer.Serialize(writer, spaceGroupGroup);
+            xmlSerializer.Serialize(writer, _spaceGroupGroup);
             writer.Close();
         }
 
@@ -108,12 +97,14 @@ namespace SpaceGroup
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //var comboBox = (ComboBox)sender;
-            var selectedItem = (SpaceGroupCl)combobox.SelectedItem;
+            var comboBox = (ComboBox)sender;
+            var selectedItem = (SpaceGroupCl)comboBox.SelectedItem;
 
-            if (selectedItem != null && selectedItem.dummy)
+            if (selectedItem == null) return;
+            
+            if (selectedItem.dummy)
             {
-                sgName.Text = String.Empty;
+                SgName.Text = String.Empty;
                 Console.WriteLine("BEFORE: ", Expressions.Count);
 
                 for (int i = 0; i < Expressions.Count; i++)
@@ -122,15 +113,15 @@ namespace SpaceGroup
                 }
 
                 Console.WriteLine("AFTER", Expressions.Count);
-                expressionsGrid.ItemsSource = Expressions;
+                ExpressionsGrid.ItemsSource = Expressions;
                 //Creating the new item
                 addButton.Content = "Добавить новую группу";
                 //Adding to the datasource
 
                 //Removing and adding the dummy item from the collection, thus it is always the last on the 'list'
-                spaceGroupGroup.Remove(selectedItem);
-                spaceGroupGroup.Add(selectedItem);
-                combobox.ItemsSource = spaceGroupGroup;
+                _spaceGroupGroup.Remove(selectedItem);
+                _spaceGroupGroup.Add(selectedItem);
+                combobox.ItemsSource = _spaceGroupGroup;
                 //Select the new item
             }
             else
@@ -138,37 +129,87 @@ namespace SpaceGroup
                 addButton.Content = "Применить";
                 try
                 {
-                    sgName.Text = combobox.SelectedItem.ToString();
+                    SgName.Text = comboBox.SelectedItem.ToString();
                     var selectedGroup = (SpaceGroupCl) combobox.SelectedItem;
                     Expressions = new ObservableCollection<Expr>();
                     Expressions = selectedGroup.exprs;
-                    expressionsGrid.ItemsSource = null;
-                    expressionsGrid.ItemsSource = Expressions;
+                    ExpressionsGrid.ItemsSource = null;
+                    ExpressionsGrid.ItemsSource = Expressions;
                 }
-                catch (NullReferenceException nullref)
+                catch (ArgumentException argumentException)
                 {
-                    Console.WriteLine(nullref.Message);
+                    Console.WriteLine(argumentException.Message);
                 }
-                catch (Exception)
+                catch (NullReferenceException nullRef)
                 {
+                    Console.WriteLine(nullRef.Message);
+                }
 
-                }
-                readdDummy();
+                AddDummy();
             }
         }
 
-        private void readdDummy()
+        private void AddDummy()
         {
-            spaceGroupGroup.RemoveAll(item => item.dummy);
+            _spaceGroupGroup.RemoveAll(item => item.dummy);
             //spaceGroupGroup.Add()
-            spaceGroupGroup.Add(new SpaceGroupCl { Name = "Добавить новую группу...", dummy = true });
+            _spaceGroupGroup.Add(new SpaceGroupCl { Name = "Добавить новую группу...", dummy = true });
         }
 
-        private void selectButton_click(object sender, RoutedEventArgs e)
+        private void SelectButtonClick(object sender, RoutedEventArgs e)
         {
-            var selectedGroup = (SpaceGroupCl)combobox.SelectedItem;
-            ((MainWindow)this.Owner).SelectGroup(selectedGroup);
+            currentGroup = (SpaceGroupCl)combobox.SelectedItem;
+            ((MainWindow)this.Owner).SelectGroup(currentGroup);
             this.Close();
+        }
+
+        private void DeleteButtonClick(object sender, RoutedEventArgs e)
+        {
+            var expr = ExpressionsGrid.SelectedItem as Expr;
+            Expressions.Remove(expr);
+        }
+
+        private void AddGroupButtonClicked(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Сохранить изменения?", "Сохранить", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) ==
+                System.Windows.Forms.DialogResult.No)
+                return;
+
+            SpaceGroupCl spaceGroupCl = new SpaceGroupCl(SgName.Text, Expressions);
+            _spaceGroupGroup.RemoveAll(x => x.Name == SgName.Text);
+            _spaceGroupGroup.Add(spaceGroupCl);
+            SerializeSpaceGroupList();
+            AddDummy();
+            combobox.ItemsSource = null;
+            combobox.ItemsSource = _spaceGroupGroup;
+            combobox.SelectedItem = spaceGroupCl;
+        }
+
+        private void NewElementAdded(object sender, EventArgs e)
+        {
+            _newElement = true;
+        }
+
+        private void RowAdded(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            var testSpaceGroup = (SpaceGroupCl) combobox.SelectedItem;
+            foreach (var t1 in testSpaceGroup.Expressions)
+            {
+                try
+                {
+                    var t = SpaceGroupCl.Evaluate(t1, 1, 1, 1);
+                }
+                catch (EvaluateException)
+                {
+                    MessageBox.Show("Ошибка в веденных данных!");
+
+                    var count = Expressions.Count;
+                    Expressions.RemoveAt(e.Row.GetIndex());
+
+                    if (e.Row.GetIndex() + 1 == count)
+                        Expressions.Add(new Expr());
+                }
+            }
         }
     }
 }
