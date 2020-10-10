@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Threading;
 using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -218,7 +219,7 @@ namespace SpaceGroup
 
         private void newGroup_Click(object sender, RoutedEventArgs e)
         {
-            SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings { Owner = this };
+            SpaceGroupSettings spaceGroupSettings = new SpaceGroupSettings (_selectedSpaceGroup) { Owner = this };
             spaceGroupSettings.Show();
         }
 
@@ -265,7 +266,7 @@ namespace SpaceGroup
                 SerializeTableList(saveFileDialog1.FileName);
         }
 
-        private void openBtnClick(object sender, RoutedEventArgs e)
+        private void OpenBtnClick(object sender, RoutedEventArgs e)
         {
 
         }
@@ -396,11 +397,23 @@ namespace SpaceGroup
         private void BuildCompound()
         {
             if (!_compoundSelected || !_groupSelected) return;
-            
-            _atomCell = _compound.CrystalCell;
-            _compoundVisual = new CompoundVisual(_compound, _selectedSpaceGroup, _selectableModels, _multipliedAtoms);
+
             _multipliedAtoms.Clear();
             MainViewport.Children.Clear();
+
+            _atomCell = _compound.CrystalCell;
+            try
+            {
+                _compoundVisual =
+                    new CompoundVisual(_compound, _selectedSpaceGroup, _selectableModels, _multipliedAtoms);
+            }
+            catch (EvaluateException)
+            {
+                MessageBox.Show("Ошибка в записях пространственной группы! Ячейка построена неправильно!");
+                return;
+            }
+
+            
             MainViewport.Children.Add(_compoundVisual);
             MoveFromCenter(_compoundVisual);
 
@@ -427,7 +440,7 @@ namespace SpaceGroup
 
         private void GenerateLabels()
         {
-            if (!_compoundSelected || !_groupSelected)
+            if (!_compoundSelected || !_groupSelected || AxisViewport.Children.Count == 0)
                 return;
             //-atomCell.YAxisL / 2, -atomCell.ZAxisL / 2, -atomCell.XAxisL / 2
                 canvasOn3D.Children.Clear();

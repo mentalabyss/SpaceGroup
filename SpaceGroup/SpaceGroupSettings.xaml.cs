@@ -21,6 +21,7 @@ using System.Windows.Shapes;
 using System.Xml.Serialization;
 using ComboBox = System.Windows.Controls.ComboBox;
 using MessageBox = System.Windows.Forms.MessageBox;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace SpaceGroup
 {
@@ -32,7 +33,7 @@ namespace SpaceGroup
     {
         private List<SpaceGroupCl> _spaceGroupGroup;
         private bool _newElement = false;
-        private SpaceGroupCl currentGroup;
+        private SpaceGroupCl _currentGroup;
         public List<SpaceGroupCl> SpaceGroupGroup
         {
             get => _spaceGroupGroup;
@@ -45,19 +46,15 @@ namespace SpaceGroup
             get; set;
         }
 
-        public SpaceGroupSettings()
+        public SpaceGroupSettings(SpaceGroupCl loadedSpaceGroupCl)
         {
             InitializeComponent();
+            if (loadedSpaceGroupCl != null)
+                _currentGroup = loadedSpaceGroupCl;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (currentGroup != null)
-            {
-                combobox.SelectedItem = currentGroup;
-                combobox.Text = currentGroup.Name;
-            }
-
             ExpressionsGrid.CellEditEnding += RowAdded;
             Expressions = new ObservableCollection<Expr>();
             ExpressionsGrid.ItemsSource = Expressions;
@@ -72,6 +69,12 @@ namespace SpaceGroup
             catch(Exception)
             {
                 _spaceGroupGroup = new List<SpaceGroupCl>();
+            }
+
+            if (_currentGroup != null)
+            {
+                var currentIndex = _spaceGroupGroup.FindIndex(x => x.Name == _currentGroup.Name);
+                combobox.SelectedIndex = currentIndex;
             }
 
             combobox.ItemsSource = _spaceGroupGroup;
@@ -158,8 +161,8 @@ namespace SpaceGroup
 
         private void SelectButtonClick(object sender, RoutedEventArgs e)
         {
-            currentGroup = (SpaceGroupCl)combobox.SelectedItem;
-            ((MainWindow)this.Owner).SelectGroup(currentGroup);
+            _currentGroup = (SpaceGroupCl)combobox.SelectedItem;
+            ((MainWindow)this.Owner).SelectGroup(_currentGroup);
             this.Close();
         }
 
@@ -192,22 +195,24 @@ namespace SpaceGroup
 
         private void RowAdded(object sender, DataGridCellEditEndingEventArgs e)
         {
-            var testSpaceGroup = (SpaceGroupCl) combobox.SelectedItem;
-            foreach (var t1 in testSpaceGroup.Expressions)
+            var textBox = e.EditingElement as TextBox;
+            try
             {
-                try
+                var expres = textBox.Text.Split(',');
+                foreach (string f in expres)
+                    SpaceGroupCl.Evaluate(f, 1, 1, 1);
+            }
+            catch (Exception ex)
+            {
+                if (ex is SyntaxErrorException || ex is EvaluateException)
                 {
-                    var t = SpaceGroupCl.Evaluate(t1, 1, 1, 1);
+                    MessageBox.Show("Ошибка в записи симметрии!");
+                    e.Row.Item = new Expr();
                 }
-                catch (EvaluateException)
+                else
                 {
-                    MessageBox.Show("Ошибка в веденных данных!");
-
-                    var count = Expressions.Count;
-                    Expressions.RemoveAt(e.Row.GetIndex());
-
-                    if (e.Row.GetIndex() + 1 == count)
-                        Expressions.Add(new Expr());
+                    MessageBox.Show("Возможная ошибка в записи симметрии!");
+                    Console.WriteLine(ex.Message);
                 }
             }
         }

@@ -45,7 +45,7 @@
   <Class Name="SpaceGroup.SpaceGroupSettings" BaseTypeListCollapsed="true">
     <Position X="6" Y="3.25" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAEACgIBAACAgQABAAAAQCAAAAAoAAAEA=</HashCode>
+      <HashCode>AAAAAACAAAAAEACgIBAACAgQABAAAAQCAAAAAoAAAEA=</HashCode>
       <FileName>SpaceGroupSettings.xaml.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -59,7 +59,7 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>BAEEEEBOGCBAqgbIAIQLpEggElAIgIAATAAwkQhgUAA=</HashCode>
+      <HashCode>BAEEEEBOGCBArgbIAIQLpEggElAIgIAATAAwkQhgUAA=</HashCode>
       <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />

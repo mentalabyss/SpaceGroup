@@ -46,64 +46,22 @@ namespace SpaceGroup
         public static double Evaluate(string expression, double x, double y, double z)
         {
             char[] vars = new char[] {'x', 'y', 'z'};
-                string[] tmp = expression.Split(vars[0]);
+            string[] tmp = expression.Split(vars[0]);
 
-                //NEW TEST
-                expression = String.Join(x.ToString(new CultureInfo("en-EN")), tmp);
-                tmp = expression.Split(vars[1]);
-                expression = String.Join(y.ToString(new CultureInfo("en-EN")), tmp);
+            //NEW TEST
+            expression = String.Join(x.ToString(new CultureInfo("en-EN")), tmp);
+            tmp = expression.Split(vars[1]);
+            expression = String.Join(y.ToString(new CultureInfo("en-EN")), tmp);
+            tmp = expression.Split(vars[2]);
+            expression = String.Join(z.ToString(new CultureInfo("en-EN")), tmp);
 
-                tmp = expression.Split(vars[2]);
-                expression = String.Join(z.ToString(new CultureInfo("en-EN")), tmp);
+            DataTable table = new DataTable(); 
+            //table.Locale = new CultureInfo("ru-RU");
 
-                DataTable table = new DataTable();
-                //table.Locale = new CultureInfo("ru-RU");
-
-                table.Columns.Add("expression", typeof(string), expression);
-                DataRow row = table.NewRow();
-                table.Rows.Add(row);
-                return double.Parse((string) row["expression"]);
-                //NEW TEST
-
-            //try
-            //{
-            //    CultureInfo culture = new CultureInfo("en-EN");
-
-            //    expression = String.Join(Convert.ToString(x, culture), tmp);
-
-            //    tmp = expression.Split(vars[1]);
-            //    expression = String.Join(Convert.ToString(y, culture), tmp);
-
-            //    tmp = expression.Split(vars[2]);
-            //    expression = String.Join(Convert.ToString(z, culture), tmp);
-
-            //    DataTable table = new DataTable();
-            //    table.Columns.Add("expression", typeof(string), expression);
-            //    DataRow row = table.NewRow();
-            //    table.Rows.Add(row);
-
-            //    return double.Parse((string)row["expression"], culture);
-
-            //}
-            //catch(Exception)
-            //{
-            //    System.Windows.Forms.MessageBox.Show("Test");
-
-            //    CultureInfo culture = new CultureInfo("ru-RU");
-
-            //    expression = String.Join(Convert.ToString(x, culture), tmp);
-
-            //    tmp = expression.Split(vars[1]);
-            //    expression = String.Join(Convert.ToString(y, culture), tmp);
-
-            //    tmp = expression.Split(vars[2]);
-            //    expression = String.Join(Convert.ToString(z, culture), tmp);
-            //    DataTable table = new DataTable();
-            //    table.Columns.Add("expression", typeof(string), expression);
-            //    DataRow row = table.NewRow();
-            //    table.Rows.Add(row);
-            //    return double.Parse((string)row["expression"], culture);
-            //}
+            table.Columns.Add("expression", typeof(string), expression);
+            DataRow row = table.NewRow();
+            table.Rows.Add(row);
+            return double.Parse((string) row["expression"]);
         }
 
         public override string ToString()

@@ -24,7 +24,7 @@
 
 		<Menu DockPanel.Dock="Top" Grid.ColumnSpan="3">
 			<MenuItem Header="_Файл">
-				<MenuItem Header="_Открыть" Click="openBtnClick" />
+				<MenuItem Header="_Открыть" Click="OpenBtnClick" />
 				<MenuItem Header="_Сохранить" Click="SaveTableButtonClick"/>
 				<Separator />
 				<MenuItem Header="_Выйти" />
@@ -194,14 +194,6 @@
 
 
 					</GroupBox>
-
-					<GroupBox Grid.Row="2" Header="Параметры изображения">
-						<Grid Name="imageSettingsGrid">
-
-						</Grid>
-					</GroupBox>
-
-
 				</Grid>
 			</ScrollViewer>
 		</Grid>
