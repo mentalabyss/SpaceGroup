@@ -9,6 +9,7 @@ using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Text;
 using System.Threading;
 using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -390,7 +391,7 @@ namespace SpaceGroup
             _compound = compound;
             _compoundSelected = true;
             CompoundNameLabel.Content = compound.Name;
-            CompoundVolumeLabel.Content = $"{Math.Round(compound.CrystalCell.Volume, 4)} Å^3";
+            CompoundVolumeLabel.Content = $"{Math.Round(compound.CrystalCell.Volume, 4)} Å\xB3";
             BuildCompound();
         }
 
@@ -511,7 +512,7 @@ namespace SpaceGroup
             selectedAtomX.Content = atomVisual.Atom.X;
             selectedAtomY.Content = atomVisual.Atom.Y;
             selectedAtomZ.Content = atomVisual.Atom.Z;
-            selectedAtomPolyhedronVolume.Content = Math.Round(atomVisual.Atom.PolyhedronVolume, 4);
+            selectedAtomPolyhedronVolume.Content = $"{Math.Round(atomVisual.Atom.PolyhedronVolume, 4)} A\xB3";
             SelectedAtomPolyhedronFillingDegree.Content = Math.Round(atomVisual.Atom.PolyhedronFillingDegree, 4);
         }
 
