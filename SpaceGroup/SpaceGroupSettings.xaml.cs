@@ -104,7 +104,8 @@ namespace SpaceGroup
             var selectedItem = (SpaceGroupCl)comboBox.SelectedItem;
 
             if (selectedItem == null) return;
-            
+
+            _currentGroup = selectedItem;
             if (selectedItem.dummy)
             {
                 SgName.Text = String.Empty;
@@ -207,7 +208,9 @@ namespace SpaceGroup
                 if (ex is SyntaxErrorException || ex is EvaluateException)
                 {
                     MessageBox.Show("Ошибка в записи симметрии!");
-                    e.Row.Item = new Expr();
+                    Expressions.RemoveAt(e.Row.GetIndex());
+                    ExpressionsGrid.ItemsSource = null;
+                    ExpressionsGrid.ItemsSource = Expressions;
                 }
                 else
                 {
